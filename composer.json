@@ -1,0 +1,17 @@
+{
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "^1.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app",
+            "App\\API\\": "app/API"
+        }
+    }
+}
