@@ -2,6 +2,7 @@
 
 namespace App\API;
 
+use App\API\Gravity\Gravity;
 use App\PiHole;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -54,7 +55,7 @@ class FTL
         $API = new CallAPI();
         $stats = $API->doCall('stats');
         $data = $this->formatStats($stats, $raw);
-        $data['gravity_last_updated'] = PiHole::gravity_last_update($raw);
+        $data['gravity_last_updated'] = Gravity::gravity_last_update($raw);
         $body = $response->getBody();
         $body->write(json_encode($data));
 

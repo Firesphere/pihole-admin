@@ -25,6 +25,7 @@ $app->group('/api/', function (RouteCollectorProxy $group) {
     $group->get('enable', [App\API\FTL::class, 'startstop']);
     $group->get('disable[/{time}]', [App\API\FTL::class, 'startstop']);
     $group->get('getMaxlogage', [App\API\FTL::class, 'getMaxlogage']);
+    $group->get('version', [App\API\PiHole::class, 'getVersion']);
 });
 /**
  * Add Error Handling Middleware
