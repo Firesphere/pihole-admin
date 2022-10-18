@@ -26,6 +26,13 @@ $app->group('/api/', function (RouteCollectorProxy $group) {
     $group->get('disable[/{time}]', [App\API\FTL::class, 'startstop']);
     $group->get('getMaxlogage', [App\API\FTL::class, 'getMaxlogage']);
     $group->get('version', [App\API\PiHole::class, 'getVersion']);
+    // Custom DNS features
+    $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
+        $dnsGroup->post('add', [App\API\PiHole::class, 'addRecord']);
+        $dnsGroup->post('delete', [App\API\DNSControl::class, 'deleteRecord']);
+        $dnsGroup->get('get', [App\API\DNSControl::class, 'getAllAsJSON']);
+        $dnsGroup->get('deleteAll/{type}', [App\API\DNSControl::class, 'deleteAll']);
+    });
 });
 /**
  * Add Error Handling Middleware

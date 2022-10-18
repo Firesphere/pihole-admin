@@ -1,8 +1,10 @@
 <?php
 
-namespace app\API;
+namespace App\API;
 
-use app\Model\DNSRecord;
+use App\Model\DNSRecord;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class DNSControl
 {
@@ -10,21 +12,23 @@ class DNSControl
     private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
 
     /**
-     * @var array
+     * @var array|DNSRecord[]
      */
     protected static array $existing_records = [];
 
     public function __construct()
     {
-        if (file_exists(static::CUSTOM_DNS_FILE)) {
-            $this->readEntries(static::CUSTOM_CNAME_FILE);
-        }
-        if (file_exists(static::CUSTOM_DNS_FILE)) {
-            $this->readEntries(static::CUSTOM_DNS_FILE);
+        if (!count(static::$existing_records)) {
+            if (file_exists(static::CUSTOM_DNS_FILE)) {
+                static::readEntries(static::CUSTOM_CNAME_FILE);
+            }
+            if (file_exists(static::CUSTOM_DNS_FILE)) {
+                static::readEntries(static::CUSTOM_DNS_FILE);
+            }
         }
     }
 
-    private function readEntries($file)
+    public static function readEntries($file)
     {
         $handle = fopen($file, 'r');
         $type = ($file === static::CUSTOM_CNAME_FILE) ? 'CNAME' : 'IP';
@@ -62,22 +66,28 @@ class DNSControl
 
     /**
      * Add a $name to point to $target, of $type
-     * @param string $name Domain name
-     * @param string $target Target (e.g. Domain or IP)
-     * @param string $type CNAME or A or AAAA
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param $args
+     * @return ResponseInterface
      */
-    public function addRecord($name, $target, $type)
+    public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
+        $name = $args['domain'];
+        $target = $args['target'];
+        $type = 'A';
         // Validate domain and IP of target
         if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
             throw new \InvalidArgumentException('Invalid domain name');
         }
         if (
-            ($type === 'CNAME' && !filter_var($target, FILTER_VALIDATE_DOMAIN)) ||
-            ($type !== 'CNAME' && !filter_var($target, FILTER_VALIDATE_IP))
+            !filter_var($target, FILTER_VALIDATE_DOMAIN) &&
+            !filter_var($target, FILTER_VALIDATE_IP)
         ) {
             throw new \InvalidArgumentException('Invalid target');
+        }
+        if (filter_var($target, FILTER_VALIDATE_DOMAIN)) {
+            $type = 'CNAME';
         }
         // IPv6 type checking
         if ($type === 'A' && !filter_var($type, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
@@ -102,36 +112,81 @@ class DNSControl
         $record->save();
 
         static::$existing_records[] = $record;
+
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     /**
      * Delete a $name to point to $target, of $type
-     * @param string $name Domain name
-     * @param string $target Target (e.g. Domain or IP)
-     * @param string $type CNAME or A or AAAA
-     * @return void
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param $args
+     * @return ResponseInterface
      */
-    public function deleteRecord($name, $target, $type)
+    public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
-        // Validate domain and IP of target
+        $name = $args['domain'];
+        $target = $args['target'];
+        // Validate domain and IP of the domain
         if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
             throw new \InvalidArgumentException('Invalid domain name');
         }
         if (
-            ($type === 'CNAME' && !filter_var($target, FILTER_VALIDATE_DOMAIN)) ||
-            ($type !== 'CNAME' && !filter_var($target, FILTER_VALIDATE_IP))
+            (!filter_var($target, FILTER_VALIDATE_DOMAIN)) &&
+            (!filter_var($target, FILTER_VALIDATE_IP))
         ) {
             throw new \InvalidArgumentException('Invalid target');
         }
         /** @var DNSRecord $existing */
-        foreach (static::$existing_records as $existing) {
+        foreach (static::$existing_records as $key => $existing) {
             if ($existing->getName() === $name &&
-                $existing->getTarget() === $target &&
-                $existing->getType() === $type
+                $existing->getTarget() === $target
             ) {
                 $existing->delete();
+                unset(static::$existing_records[$key]);
                 break;
             }
         }
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
     }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function getAllAsJSON(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $list = static::getExistingRecords();
+        $body = $response->getBody();
+        $body->write(json_encode($list));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+
+
+    public function deleteAll(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        $type = $args['type'];
+        foreach (static::$existing_records as $key => $record) {
+            if ($record->getType() === $type) {
+                $record->delete();
+                unset(static::$existing_records[$key]);
+            }
+        }
+
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
 }
