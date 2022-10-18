@@ -1,9 +1,20 @@
 <?php
 
 use Slim\App;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 
 return static function (App $app) {
+    // Parse json, form data and xml
+    $app->addBodyParsingMiddleware();
+
+    // Add routing
     $app->addRoutingMiddleware();
+    // Create Twig
+    $twig = Twig::create(__DIR__ . '/../templates');
+
+// Add Twig-View Middleware
+    $app->add(TwigMiddleware::create($app, $twig));
     /**
      * Add Error Handling Middleware
      *

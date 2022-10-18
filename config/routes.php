@@ -4,10 +4,12 @@
 use App\API\DNSControl;
 use App\API\FTL;
 use App\API\PiHole;
+use App\Frontend\Index;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return static function (App $app) {
+    $app->get('/', [Index::class, 'index']);
     $app->group('/api/', function (RouteCollectorProxy $group) {
         $group->get('summary', [FTL::class, 'summary']);
         $group->get('summaryRaw', [FTL::class, 'summary']);
