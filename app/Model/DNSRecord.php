@@ -1,6 +1,8 @@
 <?php
 
-namespace app\Model;
+namespace App\Model;
+
+use App\PiHole;
 
 class DNSRecord
 {
@@ -24,9 +26,9 @@ class DNSRecord
 
     public function __construct($params)
     {
-        $this->type = trim($params['type']);
-        $this->name = trim($params['name']);
-        $this->target = trim($params['target']);
+        $this->type = strtoupper(trim($params['type']));
+        $this->name = strtolower(trim($params['name']));
+        $this->target = strtolower(trim($params['target']));
     }
 
     /**
@@ -77,4 +79,15 @@ class DNSRecord
         $this->target = $target;
     }
 
+    public function save()
+    {
+        $action = $this->type === 'CNAME' ? 'addcustomcname' : 'addcustomdns';
+        PiHole::execute(sprintf('sudo pihole -a %s %s %s', $action,  $this->name, $this->target));
+    }
+
+    public function delete()
+    {
+        $action = $this->type === 'CNAME' ? 'removecustomcname' : 'removecustomdns';
+        PiHole::execute(sprintf('sudo pihole -a %s %s %s', $action,  $this->name, $this->target));
+    }
 }

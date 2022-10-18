@@ -10,7 +10,10 @@ class PiHole
 {
     private const VERSION_FILE = '/var/www/pihole-admin/versions';
 
-    private $parsedVersions = [];
+    /**
+     * @var array|false
+     */
+    private array|false $parsedVersions;
 
     protected static $urls = [
         'coreUrl'   => 'https://github.com/pi-hole/pi-hole/releases',
@@ -19,6 +22,10 @@ class PiHole
         'dockerUrl' => 'https://github.com/pi-hole/docker-pi-hole/releases',
     ];
 
+    /**
+     * Check if the Versions file is readable.
+     * If so, load it
+     */
     public function __construct()
     {
         if (!is_readable(static::VERSION_FILE)) {
@@ -28,6 +35,10 @@ class PiHole
         $this->parsedVersions = parse_ini_file(static::VERSION_FILE);
     }
 
+    /**
+     * @param $part
+     * @return array|false[]
+     */
     protected function getVersionsFor($part)
     {
         $return = [
