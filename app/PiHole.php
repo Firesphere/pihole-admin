@@ -38,4 +38,14 @@ class PiHole
 
         return self::$piholeFTLConfig;
     }
+
+    public static function execute($command)
+    {
+        exec($command, $output, $returnstatus);
+        if ($returnstatus !== 0) {
+            throw new \RuntimeException("Executing {$command} failed.", E_USER_WARNING);
+        }
+
+        return $output;
+    }
 }

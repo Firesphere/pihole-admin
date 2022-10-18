@@ -3,6 +3,7 @@
 /coverage/
 /vendor/
 /logs/*
+/cache
 !/logs/README.md
 .phpunit.result.cache
 *.db

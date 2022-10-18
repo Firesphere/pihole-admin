@@ -28,18 +28,11 @@ class FTL
             throw new HttpBadRequestException($request, E_USER_ERROR);
         }
         $escaped = escapeshellcmd($requestParts[$id]);
-        $output = null;
-        $return_status = -1;
         if ($escaped === 'disable' && $args['time']) {
             $escaped = sprintf('disable %ds', (int)$args['time']);
         }
-        $command = 'sudo pihole ' . $escaped;
-        exec($command, $output, $return_status);
-        if ($return_status !== 0) {
-            throw new \RuntimeException("Executing {$command} failed.", E_USER_WARNING);
-        }
 
-        return $output;
+        return PiHole::execute($escaped);
     }
 
     /**

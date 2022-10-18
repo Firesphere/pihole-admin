@@ -1,0 +1,192 @@
+<?php
+
+namespace App\API;
+
+use App\Model\DNSRecord;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
+class DNSControl
+{
+    private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
+    private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
+
+    /**
+     * @var array|DNSRecord[]
+     */
+    protected static array $existing_records = [];
+
+    public function __construct()
+    {
+        if (!count(static::$existing_records)) {
+            if (file_exists(static::CUSTOM_DNS_FILE)) {
+                static::readEntries(static::CUSTOM_CNAME_FILE);
+            }
+            if (file_exists(static::CUSTOM_DNS_FILE)) {
+                static::readEntries(static::CUSTOM_DNS_FILE);
+            }
+        }
+    }
+
+    public static function readEntries($file)
+    {
+        $handle = fopen($file, 'r');
+        $type = ($file === static::CUSTOM_CNAME_FILE) ? 'CNAME' : 'IP';
+        $explode = $type === 'IP' ? ' ' : ',';
+        while ($line = fgets($handle)) {
+            $line = str_replace('cname=', '', trim($line));
+            $explodedLine = explode($explode, $line);
+
+            if (count($explodedLine) <= 1) {
+                continue;
+            }
+
+            if ($type === 'A' && !filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $type = 'AAAA';
+            }
+
+            $data = new DNSRecord([
+                'name'   => $explodedLine[0],
+                'target' => $explodedLine[1],
+                'type'   => $type
+            ]);
+            static::$existing_records[] = $data;
+        }
+
+        fclose($handle);
+    }
+
+    /**
+     * @return array
+     */
+    public static function getExistingRecords(): array
+    {
+        return self::$existing_records;
+    }
+
+    /**
+     * Add a $name to point to $target, of $type
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param $args
+     * @return ResponseInterface
+     */
+    public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
+    {
+        $name = $args['domain'];
+        $target = $args['target'];
+        $type = 'A';
+        // Validate domain and IP of target
+        if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
+            throw new \InvalidArgumentException('Invalid domain name');
+        }
+        if (
+            !filter_var($target, FILTER_VALIDATE_DOMAIN) &&
+            !filter_var($target, FILTER_VALIDATE_IP)
+        ) {
+            throw new \InvalidArgumentException('Invalid target');
+        }
+        if (filter_var($target, FILTER_VALIDATE_DOMAIN)) {
+            $type = 'CNAME';
+        }
+        // IPv6 type checking
+        if ($type === 'A' && !filter_var($type, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $type = 'AAAA';
+        }
+
+        $record = new DNSRecord([
+            'type'   => $type,
+            'target' => $target,
+            'name'   => $name
+        ]);
+
+        foreach (static::$existing_records as $existing) {
+            if ($existing->getName() === $name &&
+                $existing->getTarget() === $target &&
+                $existing->getType() === $type
+            ) {
+                throw new \InvalidArgumentException('Record already exists');
+            }
+        }
+
+        $record->save();
+
+        static::$existing_records[] = $record;
+
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * Delete a $name to point to $target, of $type
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param $args
+     * @return ResponseInterface
+     */
+    public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        $name = $args['domain'];
+        $target = $args['target'];
+        // Validate domain and IP of the domain
+        if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
+            throw new \InvalidArgumentException('Invalid domain name');
+        }
+        if (
+            (!filter_var($target, FILTER_VALIDATE_DOMAIN)) &&
+            (!filter_var($target, FILTER_VALIDATE_IP))
+        ) {
+            throw new \InvalidArgumentException('Invalid target');
+        }
+        /** @var DNSRecord $existing */
+        foreach (static::$existing_records as $key => $existing) {
+            if ($existing->getName() === $name &&
+                $existing->getTarget() === $target
+            ) {
+                $existing->delete();
+                unset(static::$existing_records[$key]);
+                break;
+            }
+        }
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
+
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    public function getAllAsJSON(ServerRequestInterface $request, ResponseInterface $response)
+    {
+        $list = static::getExistingRecords();
+        $body = $response->getBody();
+        $body->write(json_encode($list));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+
+
+    public function deleteAll(ServerRequestInterface $request, ResponseInterface $response, $args)
+    {
+        $type = $args['type'];
+        foreach (static::$existing_records as $key => $record) {
+            if ($record->getType() === $type) {
+                $record->delete();
+                unset(static::$existing_records[$key]);
+            }
+        }
+
+        $body = $response->getBody();
+        $body->write(json_encode(['success' => true, 'message' => '']));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+}
