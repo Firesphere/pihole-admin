@@ -4,12 +4,11 @@
 use App\API\DNSControl;
 use App\API\FTL;
 use App\API\PiHole;
-use App\Frontend\Index;
+use App\Frontend\Frontend;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return static function (App $app) {
-    $app->get('/', [Index::class, 'index']);
     $app->group('/api/', function (RouteCollectorProxy $group) {
         $group->get('summary', [FTL::class, 'summary']);
         $group->get('summaryRaw', [FTL::class, 'summary']);
@@ -25,4 +24,5 @@ return static function (App $app) {
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']);
         });
     });
+    $app->get('/', [Frontend::class, 'index']);
 };

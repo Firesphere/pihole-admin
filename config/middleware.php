@@ -1,20 +1,27 @@
 <?php
 
 use Slim\App;
+use Slim\Middleware\Session;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-return static function (App $app) {
+return static function (App $app, Twig $twig) {
     // Parse json, form data and xml
     $app->addBodyParsingMiddleware();
 
     // Add routing
     $app->addRoutingMiddleware();
-    // Create Twig
-    $twig = Twig::create(__DIR__ . '/../templates');
-
-// Add Twig-View Middleware
+    // Add Twig-View Middleware
     $app->add(TwigMiddleware::create($app, $twig));
+    // Add session
+    $app->add(
+        new Session([
+            'name' => 'PHPSESSID',
+            'autorefresh' => true,
+            'lifetime' => '24 hour',
+            'httponly' => false,
+        ])
+    );
     /**
      * Add Error Handling Middleware
      *
@@ -26,5 +33,4 @@ return static function (App $app) {
      * for middleware added after it.
      */
     $app->addErrorMiddleware(true, true, true);
-
 };

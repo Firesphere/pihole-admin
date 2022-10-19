@@ -13,7 +13,7 @@ class PiHole
     /**
      * @var array|false
      */
-    private array|false $parsedVersions;
+    private $parsedVersions;
 
     protected static $urls = [
         'coreUrl'   => 'https://github.com/pi-hole/pi-hole/releases',
@@ -104,5 +104,13 @@ class PiHole
         $body->write(json_encode($parts));
 
         return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * @return array|false
+     */
+    public function getParsedVersions(): bool|array
+    {
+        return $this->parsedVersions;
     }
 }
