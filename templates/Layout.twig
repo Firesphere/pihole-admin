@@ -22,5 +22,27 @@
     </div>
     {% include('Partials/Footer.twig') %}
 </div>
+{% block javascripts %}
+
+    <!-- scripts -->
+    <script src="scripts/vendor/jquery.min.js?{{ Rand }}"></script>
+    <script src="style/vendor/bootstrap/js/bootstrap.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/adminlte.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/bootstrap-notify.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/select2.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/datatables.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/datatables.select.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/datatables.buttons.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/moment.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/chart.min.js?{{ Rand }}"></script>
+    <script src="scripts/vendor/chartjs-adapter-moment.js?{{ Rand }}"></script>
+    <script src="style/vendor/font-awesome/js/all.min.js?{{ Rand }}"></script>
+    {{ assets({files: [
+        'Resources/js/utils.js',
+        'Resources/js/index.js'
+    ],
+        nonce: true}) }}
+{% endblock %}
+
 </body>
 </html>

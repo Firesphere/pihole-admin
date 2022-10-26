@@ -2,13 +2,12 @@
 
 namespace App\API;
 
-use Dotenv\Exception\InvalidFileException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class PiHole
 {
-    private const VERSION_FILE = '/var/www/pihole-admin/versions';
+    private const VERSION_FILE = '/var/www/html/versions';
 
     /**
      * @var array|false
@@ -29,7 +28,7 @@ class PiHole
     public function __construct()
     {
         if (!is_readable(static::VERSION_FILE)) {
-            throw new InvalidFileException('Version file not found');
+            throw new \InvalidArgumentException('Version file not found');
         }
 
         $this->parsedVersions = parse_ini_file(static::VERSION_FILE);

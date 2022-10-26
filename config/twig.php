@@ -3,6 +3,7 @@
 // Create Twig
 use App\API\PiHole;
 use App\SysInfo;
+use Odan\Twig\TwigAssetsExtension;
 use Slim\Views\Twig;
 
 $versions = (new PiHole())->getParsedVersions();
@@ -12,7 +13,14 @@ foreach ($versions as $key => &$value) {
 }
 unset($value);
 $twig = Twig::create(__DIR__ . '/../templates');
+$twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
+    'path' => __DIR__ . '/../public/cache',
+    // The public url base path
+    'url_base_path' => 'cache/',
+
+]));
 [$mem, $load, $cpu, $temp] = SysInfo::getAll();
+$rand = uniqid('', false);
 $twigEnv = $twig->getEnvironment();
 $twigEnv->addGlobal('hostname', 'Bababerry');
 $twigEnv->addGlobal('DockerVersion', $versions['DOCKER_VERSION'] ?? false);
@@ -25,4 +33,5 @@ $twigEnv->addGlobal('Load2', number_format($load[2], 2));
 $twigEnv->addGlobal('MemUse', number_format($mem, 4));
 $twigEnv->addGlobal('CPUCount', $cpu);
 $twigEnv->addGlobal('Temperature', $temp);
+$twigEnv->addGlobal('Rand', $rand);
 return $twig;

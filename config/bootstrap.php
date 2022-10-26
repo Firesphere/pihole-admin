@@ -17,7 +17,7 @@ $container->set('session', function () {
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
-$app->setBasePath('/pihole-admin');
+//$app->setBasePath('/pihole-admin');
 // Twig global vars setup
 $twig = require __DIR__ . '/twig.php';
 

@@ -1,4 +1,5 @@
 /* Pi-hole: A black hole for Internet advertisements
+ * echo test
  *  (c) 2017 Pi-hole, LLC (https://pi-hole.net)
  *  Network-wide ad blocking via your own hardware.
  *
@@ -8,7 +9,7 @@
 /* global utils:false, Chart:false */
 
 // Define global variables
-var timeLineChart, clientsChart;
+var timeLineChart, clientsChart; // Hello
 var queryTypePieChart, forwardDestinationPieChart;
 
 var THEME_COLORS = [
@@ -473,7 +474,7 @@ function updateForwardDestinationsPie() {
 }
 
 function updateTopClientsChart() {
-  $.getJSON("api.php?summaryRaw&getQuerySources&topClientsBlocked", function (data) {
+  $.getJSON("api/summaryRaw&getQuerySources&topClientsBlocked", function (data) {
     if ("FTLnotrunning" in data) {
       return;
     }
@@ -577,7 +578,7 @@ function updateTopClientsChart() {
 }
 
 function updateTopLists() {
-  $.getJSON("api.php?summaryRaw&topItems", function (data) {
+  $.getJSON("api/summaryRaw&topItems", function (data) {
     if ("FTLnotrunning" in data) {
       return;
     }
@@ -655,7 +656,7 @@ function updateSummaryData(runOnce) {
     }
   };
 
-  $.getJSON("api.php?summaryRaw", function (data) {
+  $.getJSON("api/summaryRaw", function (data) {
     if ("FTLnotrunning" in data) {
       data.dns_queries_today = "Lost";
       data.ads_blocked_today = "connection";
@@ -744,7 +745,7 @@ function doughnutTooltip(tooltipLabel) {
 
 var maxlogage = "24";
 function getMaxlogage() {
-  $.getJSON("api.php?getMaxlogage", function (data) {
+  $.getJSON("api/getMaxlogage", function (data) {
     if (!("FTLnotrunning" in data)) {
       maxlogage = data.maxlogage;
     }

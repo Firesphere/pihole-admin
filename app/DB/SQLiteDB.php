@@ -18,10 +18,10 @@ class SQLiteDB
      * @var string[]
      */
     private static $dbs = [
-        'GRAVITYDB' => '/var/www/pihole-admin/gravity.db',
-        'FTLDB'     => '/var/www/pihole-admin/pihole-FTL.db',
-        'USERDB'    => '/var/www/pihole-admin/users.db'
-];
+        'GRAVITYDB' => '/var/www/html/gravity.db',
+        'FTLDB'     => '/var/www/html/pihole-FTL.db',
+        'USERDB'    => '/var/www/html/users.db'
+    ];
 
     public function __construct($type, $mode = SQLITE3_OPEN_READONLY)
     {

@@ -1,6 +1,6 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <base href="//lampstack.vhost/pihole-admin" />
+{#  <base href="//lampstack.vhost/pihole-admin" />#}
   <!-- Usually browsers proactively perform domain name resolution on links that the user may choose to follow. We disable DNS prefetching here -->
   <meta http-equiv="x-dns-prefetch-control" content="off">
   <meta http-equiv="cache-control" content="max-age=60,private">
@@ -24,40 +24,21 @@
     html { background-color: #000; }
   </style>
 
-  <!-- Theme fonts -->
-  <link rel="stylesheet" href="style/vendor/fonts/ubuntu-mono/ubuntu-mono.css">
-  <link rel="stylesheet" href="style/vendor/fonts/antonio/antonio.css">
-
-  <!-- Common styles -->
-  <link rel="stylesheet" href="style/vendor/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="style/vendor/datatables.min.css">
-  <link rel="stylesheet" href="style/vendor/datatables_extensions.min.css">
-  <link rel="stylesheet" href="style/vendor/daterangepicker.min.css">
-  <link rel="stylesheet" href="style/vendor/AdminLTE.min.css">
-  <link rel="stylesheet" href="style/vendor/select2.min.css">
-
-  <!-- Group management styles -->
-  <link rel="stylesheet" href="style/vendor/animate.min.css">
-  <link rel="stylesheet" href="style/vendor/bootstrap-select.min.css">
-  <link rel="stylesheet" href="style/vendor/bootstrap-toggle.min.css">
-
-  <!-- Theme styles -->
-  <link rel="stylesheet" href="style/pi-hole.css">
-  <link rel="stylesheet" href="style/themes/lcars.css">
-
+  {% block styles %}
+    {{ assets({files: [
+      'Resources/style/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
+      'Resources/style/vendor/fonts/antonio/antonio.css',
+      'Resources/style/vendor/bootstrap/css/bootstrap.min.css',
+      'Resources/style/vendor/datatables.min.css',
+      'Resources/style/vendor/datatables_extensions.min.css',
+      'Resources/style/vendor/daterangepicker.min.css',
+      'Resources/style/vendor/AdminLTE.min.css',
+      'Resources/style/vendor/select2.min.css',
+      'Resources/style/vendor/animate.min.css',
+      'Resources/style/vendor/bootstrap-select.min.css',
+      'Resources/style/vendor/bootstrap-toggle.min.css',
+      'Resources/style/pi-hole.css',
+      'Resources/style/themes/lcars.css',
+    ], nonce: true}) }}
+  {% endblock %}
   <noscript><link rel="stylesheet" href="style/vendor/js-warn.css"></noscript>
-
-  <!-- scripts -->
-  <script src="scripts/vendor/jquery.min.js"></script>
-  <script src="style/vendor/bootstrap/js/bootstrap.min.js"></script>
-  <script src="scripts/vendor/adminlte.min.js"></script>
-  <script src="scripts/vendor/bootstrap-notify.min.js"></script>
-  <script src="scripts/vendor/select2.min.js"></script>
-  <script src="scripts/vendor/datatables.min.js"></script>
-  <script src="scripts/vendor/datatables.select.min.js"></script>
-  <script src="scripts/vendor/datatables.buttons.min.js"></script>
-  <script src="scripts/vendor/moment.min.js"></script>
-  <script src="scripts/vendor/chart.min.js"></script>
-  <script src="scripts/vendor/chartjs-adapter-moment.js"></script>
-  <script src="style/vendor/font-awesome/js/all.min.js"></script>
-  <script src="scripts/pi-hole/js/utils.js"></script>
