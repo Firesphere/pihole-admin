@@ -26,19 +26,19 @@
 
   {% block styles %}
     {{ assets({files: [
-      'Resources/style/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
-      'Resources/style/vendor/fonts/antonio/antonio.css',
-      'Resources/style/vendor/bootstrap/css/bootstrap.min.css',
-      'Resources/style/vendor/datatables.min.css',
-      'Resources/style/vendor/datatables_extensions.min.css',
-      'Resources/style/vendor/daterangepicker.min.css',
-      'Resources/style/vendor/AdminLTE.min.css',
-      'Resources/style/vendor/select2.min.css',
-      'Resources/style/vendor/animate.min.css',
-      'Resources/style/vendor/bootstrap-select.min.css',
-      'Resources/style/vendor/bootstrap-toggle.min.css',
+      'Resources/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
+      'Resources/vendor/fonts/antonio/antonio.css',
+      'Resources/vendor/bootstrap/css/bootstrap.min.css',
+      'Resources/vendor/datatables.min.css',
+      'Resources/vendor/datatables_extensions.min.css',
+      'Resources/vendor/daterangepicker.min.css',
+      'Resources/vendor/AdminLTE.min.css',
+      'Resources/vendor/select2.min.css',
+      'Resources/vendor/animate.min.css',
+      'Resources/vendor/bootstrap-select.min.css',
+      'Resources/vendor/bootstrap-toggle.min.css',
       'Resources/style/pi-hole.css',
       'Resources/style/themes/lcars.css',
-    ], nonce: true}) }}
+    ]}) }}
+    <noscript>{{ assets({files: ['Resources/vendor/js-warn.css']}) }}</noscript>
   {% endblock %}
-  <noscript><link rel="stylesheet" href="style/vendor/js-warn.css"></noscript>
