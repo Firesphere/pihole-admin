@@ -23,7 +23,6 @@ class FTLConnect
     protected $message = '';
 
 
-
     public function connectFTL()
     {
         // We only use the default IP

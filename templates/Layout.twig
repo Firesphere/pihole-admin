@@ -8,9 +8,8 @@
 *  Please see LICENSE file for your rights under this license.
 -->
 <html lang="en">
-<head>
-    {{ include('Partials/Head.twig') }}
-</head>
+{{ include('Partials/Head.twig') }}
+
 <body class="lcars hold-transition sidebar-mini logged-in">
 <div class="wrapper">
     {{ include('Partials/Header.twig') }}
@@ -18,6 +17,7 @@
     <div class="content-wrapper">
         <!-- Main content -->
         <section class="content">
+            {{ Page|raw }}
         </section>
     </div>
     {% include('Partials/Footer.twig') %}
@@ -26,8 +26,8 @@
 
     <!-- scripts -->
     {{ assets({files: [
-        'Resources/vendor/bootstrap/js/bootstrap.min.js',
         'Resources/vendor/jquery.min.js',
+        'Resources/vendor/bootstrap/js/bootstrap.min.js',
         'Resources/vendor/adminlte.min.js',
         'Resources/vendor/bootstrap-notify.min.js',
         'Resources/vendor/select2.min.js',
@@ -40,8 +40,7 @@
         'Resources/vendor/font-awesome/js/all.min.js',
         'Resources/js/utils.js',
         'Resources/js/index.js'
-    ]})
-    }}
+    ]}) }}
 {% endblock %}
 
 </body>

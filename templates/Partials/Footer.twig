@@ -15,18 +15,19 @@
                         {{ DockerVersion }}
                         {% if DockerUpdate %}
                             <a class="lookatme" lookatme-text="Update available!" href="{{ DockerURL }}/latest"
-                                        rel="noopener" target="_blank">Update available!</a>
+                               rel="noopener" target="_blank">Update available!</a>
                         {% endif %}
                     </li>
                 {% endif %}
                 <li>
                     <strong>Pi-hole</strong>
-                    <a href="https://github.com/pi-hole/pi-hole/releases/{{ CoreVersion }}" rel="noopener" target="_blank">
+                    <a href="https://github.com/pi-hole/pi-hole/releases/{{ CoreVersion }}" rel="noopener"
+                       target="_blank">
                         {{ CoreVersion }}
                     </a>
                     {% if CoreUpdate %}
                         <a class="lookatme" lookatme-text="Update available!" href="{{ CoreURL }}/latest'; ?>"
-                                    rel="noopener" target="_blank">Update available!</a>
+                           rel="noopener" target="_blank">Update available!</a>
                     {% endif %}
                 </li>
                 <li>
@@ -36,7 +37,7 @@
                     </a>
                     {% if FTLUpdate %}
                         <a class="lookatme" lookatme-text="Update available!" href="{{ FTLURL }}/latest'; ?>"
-                                    rel="noopener" target="_blank">Update available!</a>
+                           rel="noopener" target="_blank">Update available!</a>
                     {% endif %}
                 </li>
                 <li>
@@ -46,7 +47,7 @@
                     </a>
                     {% if WebUpdate %}
                         <a class="lookatme" lookatme-text="Update available!" href="{{ WebURL }}/latest'; ?>"
-                                    rel="noopener" target="_blank">Update available!</a>
+                           rel="noopener" target="_blank">Update available!</a>
                     {% endif %}
                 </li>
             </ul>

@@ -8,100 +8,100 @@
 var exact = "";
 
 function quietfilter(ta, data) {
-  var lines = data.split("\n");
-  for (var i = 0; i < lines.length; i++) {
-    if (lines[i].indexOf("results") !== -1 && lines[i].indexOf("0 results") === -1) {
-      var shortstring = lines[i].replace("::: /etc/pihole/", "");
-      // Remove "(x results)"
-      shortstring = shortstring.replace(/\(.*/, "");
-      ta.append(shortstring + "\n");
+    var lines = data.split("\n");
+    for (var i = 0; i < lines.length; i++) {
+        if (lines[i].indexOf("results") !== -1 && lines[i].indexOf("0 results") === -1) {
+            var shortstring = lines[i].replace("::: /etc/pihole/", "");
+            // Remove "(x results)"
+            shortstring = shortstring.replace(/\(.*/, "");
+            ta.append(shortstring + "\n");
+        }
     }
-  }
 }
 
 function eventsource() {
-  var ta = $("#output");
-  // process with the current visible domain input field
-  var domain = $("input[id^='domain']:visible").val().trim();
-  var q = $("#quiet");
+    var ta = $("#output");
+    // process with the current visible domain input field
+    var domain = $("input[id^='domain']:visible").val().trim();
+    var q = $("#quiet");
 
-  if (domain.length === 0) {
-    return;
-  }
+    if (domain.length === 0) {
+        return;
+    }
 
-  var quiet = false;
-  if (q.val() === "yes") {
-    quiet = true;
-    exact = "exact";
-  }
+    var quiet = false;
+    if (q.val() === "yes") {
+        quiet = true;
+        exact = "exact";
+    }
 
-  // IE does not support EventSource - load whole content at once
-  if (typeof EventSource !== "function") {
-    $.ajax({
-      method: "GET",
-      url: "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact + "&IE",
-      async: false,
-    }).done(function (data) {
-      ta.show();
-      ta.empty();
-      if (!quiet) {
-        ta.append(data);
-      } else {
-        quietfilter(ta, data);
-      }
-    });
-    return;
-  }
+    // IE does not support EventSource - load whole content at once
+    if (typeof EventSource !== "function") {
+        $.ajax({
+            method: "GET",
+            url: "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact + "&IE",
+            async: false,
+        }).done(function (data) {
+            ta.show();
+            ta.empty();
+            if (!quiet) {
+                ta.append(data);
+            } else {
+                quietfilter(ta, data);
+            }
+        });
+        return;
+    }
 
-  var source = new EventSource(
-    "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact
-  );
+    var source = new EventSource(
+        "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact
+    );
 
-  // Reset and show field
-  ta.empty();
-  ta.show();
+    // Reset and show field
+    ta.empty();
+    ta.show();
 
-  source.addEventListener(
-    "message",
-    function (e) {
-      if (!quiet) {
-        ta.append(e.data);
-      } else {
-        quietfilter(ta, e.data);
-      }
-    },
-    false
-  );
+    source.addEventListener(
+        "message",
+        function (e) {
+            if (!quiet) {
+                ta.append(e.data);
+            } else {
+                quietfilter(ta, e.data);
+            }
+        },
+        false
+    );
 
-  // Will be called when script has finished
-  source.addEventListener(
-    "error",
-    function () {
-      source.close();
-    },
-    false
-  );
+    // Will be called when script has finished
+    source.addEventListener(
+        "error",
+        function () {
+            source.close();
+        },
+        false
+    );
 
-  // Reset exact variable
-  exact = "";
+    // Reset exact variable
+    exact = "";
 }
 
 // Handle enter key
 $("#domain").keypress(function (e) {
-  if (e.which === 13) {
-    // Enter was pressed, and the input has focus
-    exact = "";
-    eventsource();
-  }
+    if (e.which === 13) {
+        // Enter was pressed, and the input has focus
+        exact = "";
+        eventsource();
+    }
 });
 
 // Handle search buttons
 $("button[id^='btnSearch']").on("click", function () {
-  exact = "";
+    exact = "";
 
-  if (this.id.match("^btnSearchExact")) {
-    exact = "exact";
-  }
+    if (this.id.match("^btnSearchExact")) {
+        exact = "exact";
+    }
 
-  eventsource();
+    eventsource();
 });

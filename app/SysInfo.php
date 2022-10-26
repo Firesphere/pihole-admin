@@ -26,6 +26,7 @@ class SysInfo
             }
         }
         $memused = $meminfo['MemTotal'] - $meminfo['MemFree'] - $meminfo['Buffers'] - $meminfo['Cached'];
+
         return $memused / $meminfo['MemTotal'];
     }
 
@@ -38,6 +39,7 @@ class SysInfo
     {
         $cpuinfo = file_get_contents('/proc/cpuinfo');
         preg_match_all('/^processor/m', $cpuinfo, $matches);
+
         return count($matches[0]);
     }
 

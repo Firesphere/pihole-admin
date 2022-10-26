@@ -10,11 +10,6 @@ class User
 
     private $user;
 
-    private function hashPassword($password)
-    {
-        return password_hash($password, PASSWORD_BCRYPT);
-    }
-
     /**
      * @param string $username
      * @return mixed
@@ -46,6 +41,11 @@ class User
         $password = $this->hashPassword($plaintextPassword);
 
         return hash_equals($password, $this->user['password']);
+    }
+
+    private function hashPassword($password)
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
     }
 
 }

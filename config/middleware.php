@@ -16,10 +16,10 @@ return static function (App $app, Twig $twig) {
     // Add session
     $app->add(
         new Session([
-            'name' => 'PHPSESSID',
+            'name'        => 'PHPSESSID',
             'autorefresh' => true,
-            'lifetime' => '24 hour',
-            'httponly' => false,
+            'lifetime'    => '24 hour',
+            'httponly'    => false,
         ])
     );
     /**
@@ -28,7 +28,6 @@ return static function (App $app, Twig $twig) {
      * @param bool $displayErrorDetails -> Should be set to false in production
      * @param bool $logErrors -> Parameter is passed to the default ErrorHandler
      * @param bool $logErrorDetails -> Display error details in error log
-
      * Note: This middleware should be added last. It will not handle any exceptions/errors
      * for middleware added after it.
      */

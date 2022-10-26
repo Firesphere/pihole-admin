@@ -9,11 +9,6 @@ use SQLite3Result;
 class SQLiteDB
 {
     /**
-     * @var SQLite3
-     */
-    private $db;
-
-    /**
      * Locations of the different DBs
      * @var string[]
      */
@@ -22,15 +17,14 @@ class SQLiteDB
         'FTLDB'     => '/var/www/html/pihole-FTL.db',
         'USERDB'    => '/var/www/html/users.db'
     ];
+    /**
+     * @var SQLite3
+     */
+    private $db;
 
     public function __construct($type, $mode = SQLITE3_OPEN_READONLY)
     {
         $this->db = new SQLite3($this->getDBLocation($type), $mode);
-    }
-
-    public function __destruct()
-    {
-        $this->db->close();
     }
 
     private function getDBLocation(string $type)
@@ -42,6 +36,11 @@ class SQLiteDB
             [];
 
         return $FTLsettings[$type] ?? static::$dbs[$type];
+    }
+
+    public function __destruct()
+    {
+        $this->db->close();
     }
 
     /**

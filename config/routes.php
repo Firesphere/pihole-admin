@@ -15,6 +15,9 @@ return static function (App $app) {
         $group->get('enable', [FTL::class, 'startstop']);
         $group->get('disable[/{time}]', [FTL::class, 'startstop']);
         $group->get('getMaxlogage', [FTL::class, 'getMaxlogage']);
+        $group->get('overTimeData', [FTL::class, 'overTimeData']);
+        $group->get('getQueryTypes', [FTL::class, 'getQueryTypes']);
+        $group->get('upstream', [FTL::class, 'getUpstreams']);
         $group->get('version', [PiHole::class, 'getVersion']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
