@@ -14,7 +14,7 @@ return static function (App $app) {
         $group->get('summaryRaw', [FTL::class, 'summary']);
         $group->get('enable', [FTL::class, 'startstop']);
         $group->get('disable[/{time}]', [FTL::class, 'startstop']);
-        $group->get('getMaxlogage', [FTL::class, 'getMaxlogage']);
+        $group->get('maxlogage', [FTL::class, 'getMaxlogage']);
         $group->get('overTimeData', [FTL::class, 'overTimeData']);
         $group->get('getQueryTypes', [FTL::class, 'getQueryTypes']);
         $group->get('upstream', [FTL::class, 'getUpstreams']);

@@ -49,10 +49,129 @@ class FTL
         $stats = $API->doCall('stats');
         $data = $this->formatStats($stats, $raw);
         $data['gravity_last_updated'] = Gravity::gravity_last_update($raw);
+        $query = $request->getUri()->getQuery();
+        parse_str($query, $params);
+        if (isset($params['topItems'])) {
+            $topItems = $this->getTopItems($API, $params);
+            $data = array_merge($data, $topItems);
+        }
+        if (isset($params['option'])) {
+            foreach ($params['option'] as $query => $value) {
+                $method = str_replace('Blocked', '', $query);
+                $callResult = $this->$method($API, $query, $value);
+                $data = array_merge($data, $callResult);
+            }
+        }
         $body = $response->getBody();
         $body->write(json_encode($data));
 
         return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * @param $API
+     * @param $params
+     * @return array|bool[]
+     */
+    protected function getTopItems($API, $params)
+    {
+        switch (true) {
+            case $params['topItems'] === 'audit':
+                $call = ' for audit';
+                break;
+            case is_numeric($params['topItems']):
+                $call = sprintf(' (%d)', $params['topItems']);
+                break;
+            default:
+                $call = '';
+        }
+        $items['top_queries'] = $API->doCall(sprintf('top-domains%s', $call));
+        $items['top_ads'] = $API->doCall(sprintf('top-ads%s', $call));
+
+
+        if (array_key_exists('FTLnotrunning', $items)) {
+            return ['FTLnotrunning' => true];
+        }
+        $return = [];
+        foreach ($items as $type => $lines) {
+            foreach ($lines as $line) {
+                $opt = '';
+                [$key, $count, $domain] = explode(' ', $line);
+                if (substr_count($line, ' ') === 3) {
+                    [$key, $count, $domain, $opt] = explode(' ', $line);
+                }
+                if (!empty($opt)) {
+                    $domain = sprintf('%s (%s)', $domain, $opt);
+                }
+                $domain = utf8_encode($domain);
+                $return[$type][$domain] = (int)$count;
+            }
+        }
+
+        return $return;
+    }
+
+    /**
+     * Stub for semantics
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    protected function getQuerySources($API, $method, $limit = 0)
+    {
+        return $this->getQuerySourceLists($API, $method, $limit);
+    }
+
+    /**
+     * Stub for semantics
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    protected function topClients($API, $method, $limit = 0)
+    {
+        return $this->getQuerySourceLists($API, $method, $limit);
+    }
+
+
+    /**
+     * Fetch a result list based on the given method and limit
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    private function getQuerySourceLists($API, $method, $limit)
+    {
+        $queryOptions = [
+            'getQuerySources'   => ['top-clients', 'top_sources'],
+            'topClientsBlocked' => ['top-clients blocked', 'top_sources_blocked'],
+        ];
+        $str = '';
+        if ($limit > 0) {
+            $str = sprintf(' (%d)', $limit);
+        }
+        $data = $API->doCall($queryOptions[$method][0] . $str);
+
+        if (array_key_exists('FTLnotrunning', $data)) {
+            return ['FTLnotrunning' => true];
+        }
+
+        $top_clients = [];
+        foreach ($data as $line) {
+            $tmp = explode(' ', $line);
+            $clientip = utf8_encode($tmp[2]);
+            if (count($tmp) > 3 && strlen($tmp[3]) > 0) {
+                $clientname = utf8_encode($tmp[3]);
+                $top_clients[$clientname . '|' . $clientip] = (int)$tmp[1];
+            } else {
+                $top_clients[$clientip] = (int)$tmp[1];
+            }
+        }
+
+        return [$queryOptions[$method][1] => $top_clients];
     }
 
     /**
@@ -257,9 +376,9 @@ class FTL
             }
             $forward_dest[$destKey] = (float)($count);
         }
-
+        arsort($forward_dest);
         $body = $response->getBody();
-        $body->write(json_encode(['forward_destinations' => arsort($forward_dest)], JSON_THROW_ON_ERROR));
+        $body->write(json_encode(['forward_destinations' => $forward_dest], JSON_THROW_ON_ERROR));
 
         return $response->withHeader('Content-Type', 'application/json');
     }

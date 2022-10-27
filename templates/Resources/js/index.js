@@ -476,7 +476,7 @@ function updateForwardDestinationsPie() {
 }
 
 function updateTopClientsChart() {
-    $.getJSON("api/summaryRaw&getQuerySources&topClientsBlocked", function (data) {
+    $.getJSON("api/summaryRaw?option[getQuerySources]=0&option[topClientsBlocked]=0", function (data) {
         if ("FTLnotrunning" in data) {
             return;
         }
@@ -580,7 +580,7 @@ function updateTopClientsChart() {
 }
 
 function updateTopLists() {
-    $.getJSON("api/summaryRaw&topItems", function (data) {
+    $.getJSON("api/summaryRaw?topItems=", function (data) {
         if ("FTLnotrunning" in data) {
             return;
         }
@@ -749,7 +749,7 @@ function doughnutTooltip(tooltipLabel) {
 var maxlogage = "24";
 
 function getMaxlogage() {
-    $.getJSON("api/getMaxlogage", function (data) {
+    $.getJSON("api/maxlogage", function (data) {
         if (!("FTLnotrunning" in data)) {
             maxlogage = data.maxlogage;
         }
