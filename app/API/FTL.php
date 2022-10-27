@@ -12,21 +12,13 @@ use Slim\Exception\HttpBadRequestException;
 class FTL
 {
     /**
-     * Return the requested data as JSON
+     * Start or Stop FTL
      * @param RequestInterface $request
      * @param ResponseInterface $response
-     * @param array $data
+     * @param $args
      * @return ResponseInterface
      * @throws \JsonException
      */
-    private function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
-    {
-        $body = $response->getBody();
-        $body->write(json_encode($data, JSON_THROW_ON_ERROR));
-
-        return $response->withHeader('Content-Type', 'application/json');
-    }
-
     public function startstop(RequestInterface $request, ResponseInterface $response, $args)
     {
         $id = false;
@@ -50,6 +42,23 @@ class FTL
     }
 
     /**
+     * Return the requested data as JSON
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param array $data
+     * @return ResponseInterface
+     * @throws \JsonException
+     */
+    private function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
+    {
+        $body = $response->getBody();
+        $body->write(json_encode($data, JSON_THROW_ON_ERROR));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    /**
+     * Get the summary of data from FTL
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
@@ -79,6 +88,34 @@ class FTL
         }
 
         return $this->returnAsJSON($request, $response, $data);
+    }
+
+    /**
+     * Convert the stats from the socket to an associative array
+     * @param array $data
+     * @param bool $raw
+     * @return array
+     */
+    private function formatStats($data, $raw = false)
+    {
+        $return = [];
+        foreach ($data as $line) {
+            [$key, $value] = explode(' ', $line);
+            // Exception for status, which is a string. All the others are numeric
+            if ($key === 'status') {
+                $return[$key] = $value;
+                continue;
+            }
+            $value = (float)$value;
+            if (!$raw) {
+                // Format percentages to no decimals.
+                $decimals = str_contains($key, 'percentage') ? 0 : 1;
+                $value = number_format($value, $decimals, '.', '');
+            }
+            $return[$key] = $value;
+        }
+
+        return $return;
     }
 
     /**
@@ -119,97 +156,6 @@ class FTL
                 $domain = utf8_encode($domain);
                 $return[$type][$domain] = (int)$count;
             }
-        }
-
-        return $return;
-    }
-
-    /**
-     * Stub for semantics
-     * @param $API
-     * @param $method
-     * @param $limit
-     * @return array[]|bool[]
-     */
-    protected function getQuerySources($API, $method, $limit = 0)
-    {
-        return $this->getQuerySourceLists($API, $method, $limit);
-    }
-
-    /**
-     * Stub for semantics
-     * @param $API
-     * @param $method
-     * @param $limit
-     * @return array[]|bool[]
-     */
-    protected function topClients($API, $method, $limit = 0)
-    {
-        return $this->getQuerySourceLists($API, $method, $limit);
-    }
-
-
-    /**
-     * Fetch a result list based on the given method and limit
-     * @param $API
-     * @param $method
-     * @param $limit
-     * @return array[]|bool[]
-     */
-    private function getQuerySourceLists($API, $method, $limit)
-    {
-        $queryOptions = [
-            'getQuerySources'   => ['top-clients', 'top_sources'],
-            'topClientsBlocked' => ['top-clients blocked', 'top_sources_blocked'],
-        ];
-        $str = '';
-        if ($limit > 0) {
-            $str = sprintf(' (%d)', $limit);
-        }
-        $data = $API->doCall($queryOptions[$method][0] . $str);
-
-        if (array_key_exists('FTLnotrunning', $data)) {
-            return ['FTLnotrunning' => true];
-        }
-
-        $top_clients = [];
-        foreach ($data as $line) {
-            $tmp = explode(' ', $line);
-            $clientip = utf8_encode($tmp[2]);
-            if (count($tmp) > 3 && !empty($tmp[3])) {
-                $clientname = utf8_encode($tmp[3]);
-                $top_clients[$clientname . '|' . $clientip] = (int)$tmp[1];
-            } else {
-                $top_clients[$clientip] = (int)$tmp[1];
-            }
-        }
-
-        return [$queryOptions[$method][1] => $top_clients];
-    }
-
-    /**
-     * Convert the stats from the socket to an associative array
-     * @param array $data
-     * @param bool $raw
-     * @return array
-     */
-    private function formatStats($data, $raw = false)
-    {
-        $return = [];
-        foreach ($data as $line) {
-            [$key, $value] = explode(' ', $line);
-            // Exception for status, which is a string. All the others are numeric
-            if ($key === 'status') {
-                $return[$key] = $value;
-                continue;
-            }
-            $value = (float)$value;
-            if (!$raw) {
-                // Format percentages to no decimals.
-                $decimals = str_contains($key, 'percentage') ? 0 : 1;
-                $value = number_format($value, $decimals, '.', '');
-            }
-            $return[$key] = $value;
         }
 
         return $return;
@@ -382,5 +328,67 @@ class FTL
         arsort($forward_dest);
 
         return $this->returnAsJSON($request, $response, ['forward_destinations' => $forward_dest]);
+    }
+
+    /**
+     * Stub for semantics
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    protected function getQuerySources($API, $method, $limit = 0)
+    {
+        return $this->getQuerySourceLists($API, $method, $limit);
+    }
+
+    /**
+     * Fetch a result list based on the given method and limit
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    private function getQuerySourceLists($API, $method, $limit)
+    {
+        $queryOptions = [
+            'getQuerySources'   => ['top-clients', 'top_sources'],
+            'topClientsBlocked' => ['top-clients blocked', 'top_sources_blocked'],
+        ];
+        $str = '';
+        if ($limit > 0) {
+            $str = sprintf(' (%d)', $limit);
+        }
+        $data = $API->doCall($queryOptions[$method][0] . $str);
+
+        if (array_key_exists('FTLnotrunning', $data)) {
+            return ['FTLnotrunning' => true];
+        }
+
+        $top_clients = [];
+        foreach ($data as $line) {
+            $tmp = explode(' ', $line);
+            $clientip = utf8_encode($tmp[2]);
+            if (count($tmp) > 3 && !empty($tmp[3])) {
+                $clientname = utf8_encode($tmp[3]);
+                $top_clients[$clientname . '|' . $clientip] = (int)$tmp[1];
+            } else {
+                $top_clients[$clientip] = (int)$tmp[1];
+            }
+        }
+
+        return [$queryOptions[$method][1] => $top_clients];
+    }
+
+    /**
+     * Stub for semantics
+     * @param $API
+     * @param $method
+     * @param $limit
+     * @return array[]|bool[]
+     */
+    protected function topClients($API, $method, $limit = 0)
+    {
+        return $this->getQuerySourceLists($API, $method, $limit);
     }
 }
