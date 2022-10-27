@@ -22,12 +22,12 @@
     {{ include('Partials/Upstream.twig') }}
 </div>
 <div class="row">
-    {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains'}) }}
-    {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains', 'DomainClient': 'Domain'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains', 'DomainClient': 'Domain'}) }}
 </div>
 <div class="row">
-    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)'}) }}
-    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)', 'DomainClient': 'Client'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)', 'DomainClient': 'Client'}) }}
 </div>
 {% endblock %}
 

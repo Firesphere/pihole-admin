@@ -504,7 +504,7 @@ function updateTopClientsChart() {
                 }
 
                 url =
-                    '<a href="queries.php?client=' +
+                    '<a href="queries?client=' +
                     clientip +
                     '" title="' +
                     clientip +
@@ -544,7 +544,7 @@ function updateTopClientsChart() {
                 }
 
                 url =
-                    '<a href="queries.php?client=' +
+                    '<a href="queries?client=' +
                     clientip +
                     '&type=blocked" title="' +
                     clientip +
@@ -600,7 +600,7 @@ function updateTopLists() {
                 }
 
                 domain = utils.escapeHtml(domain);
-                url = '<a href="queries.php?domain=' + domain + '">' + domain + "</a>";
+                url = '<a href="queries?domain=' + domain + '">' + domain + "</a>";
                 percentage = (data.top_queries[domain] / data.dns_queries_today) * 100;
                 domaintable.append(
                     "<tr> " +
@@ -626,7 +626,7 @@ function updateTopLists() {
                 }
 
                 domain = utils.escapeHtml(domain);
-                url = '<a href="queries.php?domain=' + domain + '">' + domain + "</a>";
+                url = '<a href="queries?domain=' + domain + '">' + domain + "</a>";
                 percentage = (data.top_ads[domain] / data.ads_blocked_today) * 100;
                 adtable.append(
                     "<tr> " +
@@ -831,9 +831,9 @@ const htmlLegendPlugin = {
 
             textLink.addEventListener("click", () => {
                 if (chart.canvas.id === "queryTypePieChart") {
-                    window.location.href = "queries.php?querytype=" + querytypeids[item.index];
+                    window.location.href = "queries?querytype=" + querytypeids[item.index];
                 } else if (chart.canvas.id === "forwardDestinationPieChart") {
-                    window.location.href = "queries.php?forwarddest=" + encodeURIComponent(item.text);
+                    window.location.href = "queries?forwarddest=" + encodeURIComponent(item.text);
                 }
             });
 
@@ -1077,7 +1077,7 @@ $(function () {
             //get value by index
             var from = label / 1000 - 300;
             var until = label / 1000 + 300;
-            window.location.href = "queries.php?from=" + from + "&until=" + until;
+            window.location.href = "queries?from=" + from + "&until=" + until;
         }
 
         return false;
@@ -1100,7 +1100,7 @@ $(function () {
             //get value by index
             var from = label / 1000 - 300;
             var until = label / 1000 + 300;
-            window.location.href = "queries.php?from=" + from + "&until=" + until;
+            window.location.href = "queries?from=" + from + "&until=" + until;
         }
 
         return false;

@@ -32,7 +32,7 @@ class Queries extends APIBase
             $param = $params['domain'];
         }
 
-        if (isset($params['client'], $params['type']) && $params['type'] === 'blocked') {
+        if (isset($params['client'])) {
             // Get specific client only
             $q = '-client';
             if (isset($params['type']) && $params['type'] === 'blocked') {

@@ -80,7 +80,7 @@ class Frontend
             $showing .= ' queries for domain ' . htmlentities($params['domain']);
         } elseif (isset($params['from']) || isset($params['until'])) {
             $showing .= ' queries within specified time interval';
-        } else {
+        } elseif (isset($params['limit'])) {
             $showing .= ' up to 100 queries';
             $showall = true;
         }
