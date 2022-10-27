@@ -57,14 +57,6 @@ class DNSControl
     }
 
     /**
-     * @return array
-     */
-    public static function getExistingRecords(): array
-    {
-        return self::$existing_records;
-    }
-
-    /**
      * Add a $name to point to $target, of $type
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -171,7 +163,13 @@ class DNSControl
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-
+    /**
+     * @return array
+     */
+    public static function getExistingRecords(): array
+    {
+        return self::$existing_records;
+    }
 
     public function deleteAll(ServerRequestInterface $request, ResponseInterface $response, $args)
     {

@@ -1,0 +1,31 @@
+<!-- Sourceing CSS colors from stylesheet to be used in JS code -->
+<span class="queries-permitted"></span>
+<span class="queries-blocked"></span>
+<span class="graphs-grid"></span>
+<span class="graphs-ticks"></span>
+<!-- Small boxes (Stat box) -->
+<div class="row">
+    {{ include('Partials/Overview.twig') }}
+</div>
+{% cache "JSPopulated" %}
+    <div class="row">
+        {{ include('Partials/TotalQueries.twig') }}
+    </div>
+    <div class="row">
+        {{ include('Partials/ClientActivity.twig') }}
+    </div>
+
+    <div class="row">
+        {{ include('Partials/QueryTypes.twig') }}
+        {{ include('Partials/Upstream.twig') }}
+    </div>
+    <div class="row">
+        {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains'}) }}
+        {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains'}) }}
+    </div>
+    <div class="row">
+        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)'}) }}
+        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)'}) }}
+    </div>
+    <!-- /.row -->
+{% endcache %}

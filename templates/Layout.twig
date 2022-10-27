@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--
+*  Pi-hole: A black hole for Internet advertisements
+*  (c) 2017 Pi-hole, LLC (https://pi-hole.net)
+*  Network-wide ad blocking via your own hardware.
+*
+*  This file is copyright under the latest version of the EUPL.
+*  Please see LICENSE file for your rights under this license.
+-->
+<html lang="en">
+{{ include('Partials/Head.twig') }}
+
+<body class="lcars hold-transition sidebar-mini logged-in">
+<div class="wrapper">
+    {{ include('Partials/Header.twig') }}
+    {{ include('Partials/LeftMenu.twig') }}
+    <div class="content-wrapper">
+        <!-- Main content -->
+        <section class="content">
+            {{ Page|raw }}
+        </section>
+    </div>
+    {% include('Partials/Footer.twig') %}
+</div>
+{% block javascripts %}
+
+    <!-- scripts -->
+    {{ assets({files: [
+        'Resources/vendor/jquery.min.js',
+        'Resources/vendor/bootstrap/js/bootstrap.min.js',
+        'Resources/vendor/adminlte.min.js',
+        'Resources/vendor/bootstrap-notify.min.js',
+        'Resources/vendor/select2.min.js',
+        'Resources/vendor/datatables.min.js',
+        'Resources/vendor/datatables.select.min.js',
+        'Resources/vendor/datatables.buttons.min.js',
+        'Resources/vendor/moment.min.js',
+        'Resources/vendor/chart.min.js',
+        'Resources/vendor/chartjs-adapter-moment.js',
+        'Resources/vendor/font-awesome/js/all.min.js',
+        'Resources/js/utils.js',
+        'Resources/js/index.js'
+    ]}) }}
+{% endblock %}
+
+</body>
+</html>

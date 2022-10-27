@@ -4,18 +4,20 @@
 use App\API\DNSControl;
 use App\API\FTL;
 use App\API\PiHole;
-use App\Frontend\Index;
+use App\Frontend\Frontend;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return static function (App $app) {
-    $app->get('/', [Index::class, 'index']);
     $app->group('/api/', function (RouteCollectorProxy $group) {
         $group->get('summary', [FTL::class, 'summary']);
         $group->get('summaryRaw', [FTL::class, 'summary']);
         $group->get('enable', [FTL::class, 'startstop']);
         $group->get('disable[/{time}]', [FTL::class, 'startstop']);
-        $group->get('getMaxlogage', [FTL::class, 'getMaxlogage']);
+        $group->get('maxlogage', [FTL::class, 'getMaxlogage']);
+        $group->get('overTimeData', [FTL::class, 'overTimeData']);
+        $group->get('getQueryTypes', [FTL::class, 'getQueryTypes']);
+        $group->get('upstream', [FTL::class, 'getUpstreams']);
         $group->get('version', [PiHole::class, 'getVersion']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
@@ -25,4 +27,5 @@ return static function (App $app) {
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']);
         });
     });
+    $app->get('/', [Frontend::class, 'index']);
 };

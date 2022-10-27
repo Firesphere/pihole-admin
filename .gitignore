@@ -4,6 +4,9 @@
 /vendor/
 /logs/*
 /cache
+/public/cache
+/public/style
+/public/scripts
 !/logs/README.md
 .phpunit.result.cache
 *.db

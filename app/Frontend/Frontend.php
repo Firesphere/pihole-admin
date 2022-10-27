@@ -6,17 +6,14 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
 
-class Index
+class Frontend
 {
 
     public function index(RequestInterface $request, ResponseInterface $response, $args)
     {
         $view = Twig::fromRequest($request);
+        $page = $view->getEnvironment()->render('Pages/Index.twig');
 
-        $str = $view->fetchFromString('<h1>Hello {{ name }}</h1>', [
-            'name' => 'Simon'
-        ]);
-        $response->getBody()->write($str);
-        return $response;
+        return $view->render($response, 'Layout.twig', ['Page' => $page]);
     }
 }
