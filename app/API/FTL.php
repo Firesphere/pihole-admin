@@ -297,7 +297,7 @@ class FTL
             $querytypes[$type] = (float)$value;
         }
 
-        $this->returnAsJSON($request, $response, ['querytypes' => $querytypes]);
+        return $this->returnAsJSON($request, $response, ['querytypes' => $querytypes]);
     }
 
     /**
