@@ -1,0 +1,3 @@
+{% block pagescript %}
+    {{ assets({files: {% for file in jsfiles %}{{ file }}{% endfor %} }) }}
+{% endblock %}

@@ -17,31 +17,12 @@
     <div class="content-wrapper">
         <!-- Main content -->
         <section class="content">
-            {{ Page|raw }}
+            {% block content %}{% endblock %}
         </section>
     </div>
     {% include('Partials/Footer.twig') %}
 </div>
-{% block javascripts %}
-
-    <!-- scripts -->
-    {{ assets({files: [
-        'Resources/vendor/jquery.min.js',
-        'Resources/vendor/bootstrap/js/bootstrap.min.js',
-        'Resources/vendor/adminlte.min.js',
-        'Resources/vendor/bootstrap-notify.min.js',
-        'Resources/vendor/select2.min.js',
-        'Resources/vendor/datatables.min.js',
-        'Resources/vendor/datatables.select.min.js',
-        'Resources/vendor/datatables.buttons.min.js',
-        'Resources/vendor/moment.min.js',
-        'Resources/vendor/chart.min.js',
-        'Resources/vendor/chartjs-adapter-moment.js',
-        'Resources/vendor/font-awesome/js/all.min.js',
-        'Resources/js/utils.js',
-        'Resources/js/index.js'
-    ]}) }}
-{% endblock %}
-
+{% include('Includes/javascript.twig') %}
+{% block pagescripts %}{% endblock %}
 </body>
 </html>

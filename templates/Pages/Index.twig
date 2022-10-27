@@ -1,3 +1,6 @@
+{% extends "Layout.twig" %}
+
+{% block content %}
 <!-- Sourceing CSS colors from stylesheet to be used in JS code -->
 <span class="queries-permitted"></span>
 <span class="queries-blocked"></span>
@@ -26,3 +29,10 @@
     {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)'}) }}
     {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)'}) }}
 </div>
+{% endblock %}
+
+{% block pagescripts %}
+{{ assets({files: [
+    'Resources/js/index.js'
+]}) }}
+{% endblock %}

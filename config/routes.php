@@ -4,6 +4,7 @@
 use App\API\DNSControl;
 use App\API\FTL;
 use App\API\PiHole;
+use App\API\Queries;
 use App\Frontend\Frontend;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -19,6 +20,7 @@ return static function (App $app) {
         $group->get('getQueryTypes', [FTL::class, 'getQueryTypes']);
         $group->get('upstream', [FTL::class, 'getUpstreams']);
         $group->get('version', [PiHole::class, 'getVersion']);
+        $group->get('getAllQueries', [Queries::class, 'getAll']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [PiHole::class, 'addRecord']);
@@ -28,4 +30,5 @@ return static function (App $app) {
         });
     });
     $app->get('/', [Frontend::class, 'index']);
+    $app->get('/queries', [Frontend::class, 'queries']);
 };

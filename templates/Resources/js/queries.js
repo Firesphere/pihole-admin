@@ -52,7 +52,7 @@ $(function () {
             GETDict[item.split("=")[0]] = item.split("=")[1];
         });
 
-    var APIstring = "api.php?getAllQueries";
+    var APIstring = "api/getAllQueries?";
 
     if ("from" in GETDict && "until" in GETDict) {
         APIstring += "&from=" + GETDict.from;
@@ -68,7 +68,7 @@ $(function () {
     }
     // If we don't ask filtering and also not for all queries, just request the most recent 100 queries
     else if (!("all" in GETDict)) {
-        APIstring += "=100";
+        APIstring += "limit=100";
     }
 
     if ("type" in GETDict) {

@@ -1,5 +1,6 @@
 .idea/
 .vscode/
+/setupVars.ini
 /coverage/
 /vendor/
 /logs/*

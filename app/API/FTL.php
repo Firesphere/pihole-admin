@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpBadRequestException;
 
-class FTL
+class FTL extends APIBase
 {
     /**
      * Start or Stop FTL
@@ -41,21 +41,6 @@ class FTL
         return $this->returnAsJSON($request, $response, ['response' => PiHole::execute($escaped)]);
     }
 
-    /**
-     * Return the requested data as JSON
-     * @param RequestInterface $request
-     * @param ResponseInterface $response
-     * @param array $data
-     * @return ResponseInterface
-     * @throws \JsonException
-     */
-    private function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
-    {
-        $body = $response->getBody();
-        $body->write(json_encode($data, JSON_THROW_ON_ERROR));
-
-        return $response->withHeader('Content-Type', 'application/json');
-    }
 
     /**
      * Get the summary of data from FTL
