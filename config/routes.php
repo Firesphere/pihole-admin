@@ -4,8 +4,11 @@
 use App\API\DNSControl;
 use App\API\FTL;
 use App\API\PiHole;
+use App\API\PiholeDB;
 use App\API\Queries;
-use App\Frontend\Frontend;
+use App\Frontend\Dashboard;
+use App\Frontend\Longterm;
+use App\Frontend\Queries as FrontendQueries;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
@@ -21,6 +24,8 @@ return static function (App $app) {
         $group->get('upstream', [FTL::class, 'getUpstreams']);
         $group->get('version', [PiHole::class, 'getVersion']);
         $group->get('getAllQueries', [Queries::class, 'getAll']);
+        $group->get('getMinTimestamp', [PiholeDB::class, 'getMinTimestamp']);
+        $group->get('getGraphData', [PiholeDB::class, 'getGraphData']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [PiHole::class, 'addRecord']);
@@ -29,6 +34,11 @@ return static function (App $app) {
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']);
         });
     });
-    $app->get('/', [Frontend::class, 'index']);
-    $app->get('/queries', [Frontend::class, 'queries']);
+    $app->get('/', [Dashboard::class, 'index']);
+    $app->get('/queries', [FrontendQueries::class, 'index']);
+    $app->group('/longterm', function (RouteCollectorProxy $group) {
+        $group->get('/graph', [Longterm::class, 'getGraph']);
+        $group->get('/queries', [Longterm::class, 'getQueries']);
+        $group->get('/list', [Longterm::class, 'getList']);
+    });
 };

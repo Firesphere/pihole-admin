@@ -17,7 +17,7 @@ var dateformat = "MMMM Do YYYY, HH:mm";
 
 // get the database min timestamp
 var mintimestamp;
-$.getJSON("api_db.php?getMinTimestamp", function (ts) {
+$.getJSON("api/getMinTimestamp", function (ts) {
     mintimestamp = ts.mintimestamp * 1000 || 0; // return the timestamp in milliseconds or zero (in case of NaN)
 });
 
@@ -142,7 +142,7 @@ function updateQueriesOverTime() {
     }
 
     $.getJSON(
-        "api_db.php?getGraphData&from=" + from + "&until=" + until + "&interval=" + interval,
+        "api/getGraphData?from=" + from + "&until=" + until + "&interval=" + interval,
         function (data) {
             // convert received objects to arrays
             data.domains_over_time = utils.objectToArray(data.domains_over_time);

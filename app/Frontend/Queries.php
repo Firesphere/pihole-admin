@@ -6,7 +6,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
 
-class Frontend
+class Queries
 {
     /**
      * @var array|false
@@ -18,12 +18,7 @@ class Frontend
         $this->setupVars = parse_ini_file(__DIR__ . '/../../setupVars.ini');
     }
 
-    public function index(RequestInterface $request, ResponseInterface $response, $args)
-    {
-        return Twig::fromRequest($request)->render($response, 'Pages/Index.twig');
-    }
-
-    public function queries(RequestInterface $request, ResponseInterface $response)
+    public function index(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
         parse_str($request->getUri()->getQuery(), $params);
@@ -80,7 +75,7 @@ class Frontend
             $showing .= ' queries for domain ' . htmlentities($params['domain']);
         } elseif (isset($params['from']) || isset($params['until'])) {
             $showing .= ' queries within specified time interval';
-        } elseif (isset($params['limit'])) {
+        } else {
             $showing .= ' up to 100 queries';
             $showall = true;
         }
