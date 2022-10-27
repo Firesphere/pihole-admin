@@ -18,7 +18,6 @@ $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
     // The public url base path
     'url_base_path' => 'cache/',
     'minify'        => 0
-
 ]));
 [$mem, $load, $cpu, $temp] = SysInfo::getAll();
 $twigEnv = $twig->getEnvironment();

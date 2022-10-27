@@ -16,11 +16,13 @@ class Longterm
 
     public function getQueries(RequestInterface $request, ResponseInterface $response, $args)
     {
+        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Queries.twig');
 
     }
 
     public function getList(RequestInterface $request, ResponseInterface $response, $args)
     {
+        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/List.twig');
 
     }
 }
