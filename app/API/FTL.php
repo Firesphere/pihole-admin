@@ -11,6 +11,22 @@ use Slim\Exception\HttpBadRequestException;
 
 class FTL
 {
+    /**
+     * Return the requested data as JSON
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @param array $data
+     * @return ResponseInterface
+     * @throws \JsonException
+     */
+    private function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
+    {
+        $body = $response->getBody();
+        $body->write(json_encode($data, JSON_THROW_ON_ERROR));
+
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function startstop(RequestInterface $request, ResponseInterface $response, $args)
     {
         $id = false;
@@ -23,8 +39,6 @@ class FTL
             }
         }
         if ($id === false) {
-            $body = $request->getBody();
-            $body->write('Action not allowed');
             throw new HttpBadRequestException($request, E_USER_ERROR);
         }
         $escaped = escapeshellcmd($requestParts[$id]);
@@ -32,7 +46,7 @@ class FTL
             $escaped = sprintf('disable %ds', (int)$args['time']);
         }
 
-        return PiHole::execute($escaped);
+        return $this->returnAsJSON($request, $response, ['response' => PiHole::execute($escaped)]);
     }
 
     /**
@@ -50,6 +64,7 @@ class FTL
         $data = $this->formatStats($stats, $raw);
         $data['gravity_last_updated'] = Gravity::gravity_last_update($raw);
         $query = $request->getUri()->getQuery();
+        // Check for extras that need to be included from params
         parse_str($query, $params);
         if (isset($params['topItems'])) {
             $topItems = $this->getTopItems($API, $params);
@@ -62,10 +77,8 @@ class FTL
                 $data = array_merge($data, $callResult);
             }
         }
-        $body = $response->getBody();
-        $body->write(json_encode($data));
 
-        return $response->withHeader('Content-Type', 'application/json');
+        return $this->returnAsJSON($request, $response, $data);
     }
 
     /**
@@ -163,7 +176,7 @@ class FTL
         foreach ($data as $line) {
             $tmp = explode(' ', $line);
             $clientip = utf8_encode($tmp[2]);
-            if (count($tmp) > 3 && strlen($tmp[3]) > 0) {
+            if (count($tmp) > 3 && !empty($tmp[3])) {
                 $clientname = utf8_encode($tmp[3]);
                 $top_clients[$clientname . '|' . $clientip] = (int)$tmp[1];
             } else {
@@ -220,10 +233,7 @@ class FTL
             $return = $this->getClientsPeriod($API, $params);
         }
 
-
-        $response->getBody()->write(json_encode($return, JSON_THROW_ON_ERROR));
-
-        return $response->withHeader('Content-Type', 'application/json');
+        return $this->returnAsJSON($request, $response, $return);
     }
 
     /**
@@ -270,22 +280,21 @@ class FTL
         foreach ($data as $line) {
             $tmp = explode(' ', $line);
             for ($i = 0; $i < count($tmp) - 1; ++$i) {
-                $over_time[intval($tmp[0])][$i] = floatval($tmp[$i + 1]);
+                $over_time[(int)$tmp[0]][$i] = (float)$tmp[$i + 1];
             }
         }
 
         return array_merge($result, ['over_time' => $over_time]);
-
     }
 
     protected function getClientNames($API)
     {
-        $return = $API->doCall('client-names');
-        if (array_key_exists('FTLnotrunning', $return)) {
+        $data = $API->doCall('client-names');
+        if (array_key_exists('FTLnotrunning', $data)) {
             return ['FTLnotrunning' => true];
         }
         $client_names = [];
-        foreach ($return as $line) {
+        foreach ($data as $line) {
             [$name, $ip] = explode(' ', $line);
             $client_names[] = [
                 'name' => utf8_encode($name),
@@ -307,17 +316,14 @@ class FTL
         $API = new CallAPI();
         $data = $API->doCall('maxlogage');
         if (array_key_exists('FTLnotrunning', $data)) {
-            return $data;
+            return $this->returnAsJSON($request, $response, $data);
         }
         // Convert seconds to hours and rounds to one decimal place.
         $age = round((int)$data[0] / 3600, 1);
         // Return 24h if value is 0, empty, null or non numeric.
         $age = $age ?: 24;
 
-        $body = $response->getBody();
-        $body->write(json_encode(['maxlogage' => $age], JSON_THROW_ON_ERROR));
-
-        return $response->withHeader('Content-Type', 'application/json');
+        return $this->returnAsJSON($request, $response, ['maxlogage' => $age]);
     }
 
     /**
@@ -345,10 +351,7 @@ class FTL
             $querytypes[$type] = (float)$value;
         }
 
-        $body = $response->getBody();
-        $body->write(json_encode(['querytypes' => $querytypes], JSON_THROW_ON_ERROR));
-
-        return $response->withHeader('Content-Type', 'application/json');
+        $this->returnAsJSON($request, $response, ['querytypes' => $querytypes]);
     }
 
     /**
@@ -377,9 +380,7 @@ class FTL
             $forward_dest[$destKey] = (float)($count);
         }
         arsort($forward_dest);
-        $body = $response->getBody();
-        $body->write(json_encode(['forward_destinations' => $forward_dest], JSON_THROW_ON_ERROR));
 
-        return $response->withHeader('Content-Type', 'application/json');
+        return $this->returnAsJSON($request, $response, ['forward_destinations' => $forward_dest]);
     }
 }

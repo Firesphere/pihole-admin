@@ -7,25 +7,22 @@
 <div class="row">
     {{ include('Partials/Overview.twig') }}
 </div>
-{% cache "JSPopulated" %}
-    <div class="row">
-        {{ include('Partials/TotalQueries.twig') }}
-    </div>
-    <div class="row">
-        {{ include('Partials/ClientActivity.twig') }}
-    </div>
+<div class="row">
+    {{ include('Partials/TotalQueries.twig') }}
+</div>
+<div class="row">
+    {{ include('Partials/ClientActivity.twig') }}
+</div>
 
-    <div class="row">
-        {{ include('Partials/QueryTypes.twig') }}
-        {{ include('Partials/Upstream.twig') }}
-    </div>
-    <div class="row">
-        {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains'}) }}
-        {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains'}) }}
-    </div>
-    <div class="row">
-        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)'}) }}
-        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)'}) }}
-    </div>
-    <!-- /.row -->
-{% endcache %}
+<div class="row">
+    {{ include('Partials/QueryTypes.twig') }}
+    {{ include('Partials/Upstream.twig') }}
+</div>
+<div class="row">
+    {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains'}) }}
+</div>
+<div class="row">
+    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)'}) }}
+    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)'}) }}
+</div>
