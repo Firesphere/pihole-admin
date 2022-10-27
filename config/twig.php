@@ -40,5 +40,4 @@ foreach ($globals as $key => $value) {
     $twigEnv->addGlobal($key, $value);
 }
 
-
 return $twig;

@@ -1,7 +1,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <base href="{{ baseHref }}" />
+    <base href="{{ baseHref }}"/>
     <!-- Usually browsers proactively perform domain name resolution on links that the user may choose to follow. We disable DNS prefetching here -->
     <meta http-equiv="x-dns-prefetch-control" content="off">
     <meta http-equiv="cache-control" content="max-age=60,private">
@@ -27,22 +27,21 @@
         }
     </style>
 
-    {% block styles %}
-        {{ assets({files: [
-            'Resources/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
-            'Resources/vendor/fonts/antonio/antonio.css',
-            'Resources/vendor/bootstrap/css/bootstrap.min.css',
-            'Resources/vendor/datatables.min.css',
-            'Resources/vendor/datatables_extensions.min.css',
-            'Resources/vendor/daterangepicker.min.css',
-            'Resources/vendor/AdminLTE.min.css',
-            'Resources/vendor/select2.min.css',
-            'Resources/vendor/animate.min.css',
-            'Resources/vendor/bootstrap-select.min.css',
-            'Resources/vendor/bootstrap-toggle.min.css',
-            'Resources/style/pi-hole.css',
-            'Resources/style/themes/lcars.css',
-        ]}) }}
-        <noscript>{{ assets({files: ['Resources/vendor/js-warn.css']}) }}</noscript>
-    {% endblock %}
+    {{ assets({files: [
+        'Resources/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
+        'Resources/vendor/fonts/antonio/antonio.css',
+        'Resources/vendor/bootstrap/css/bootstrap.min.css',
+        'Resources/vendor/datatables.min.css',
+        'Resources/vendor/datatables_extensions.min.css',
+        'Resources/vendor/daterangepicker.min.css',
+        'Resources/vendor/AdminLTE.min.css',
+        'Resources/vendor/select2.min.css',
+        'Resources/vendor/animate.min.css',
+        'Resources/vendor/bootstrap-select.min.css',
+        'Resources/vendor/bootstrap-toggle.min.css',
+        'Resources/vendor/icheck-bootstrap.min.css',
+        'Resources/style/pi-hole.css',
+        'Resources/style/themes/lcars.css',
+    ]}) }}
+    <noscript>{{ assets({files: ['Resources/vendor/js-warn.css']}) }}</noscript>
 </head>
