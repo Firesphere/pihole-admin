@@ -15,7 +15,7 @@ $(function () {
 
     table = $("#groupsTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             data: {action: "get_groups", token: token},
             type: "POST",
         },

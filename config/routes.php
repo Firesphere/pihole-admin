@@ -7,6 +7,7 @@ use App\API\PiHole;
 use App\API\PiholeDB;
 use App\API\Queries;
 use App\Frontend\Dashboard;
+use App\Frontend\Group;
 use App\Frontend\Longterm;
 use App\Frontend\Queries as FrontendQueries;
 use Slim\App;
@@ -30,6 +31,7 @@ return static function (App $app) {
         $group->get('topClients', [PiholeDB::class, 'getTopClients']);
         $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
         $group->get('topAds', [PiholeDB::class, 'getTopAds']);
+        $group->post('groups', [Gro])
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [PiHole::class, 'addRecord']);
@@ -44,5 +46,11 @@ return static function (App $app) {
         $group->get('/graph', [Longterm::class, 'getGraph']);
         $group->get('/queries', [Longterm::class, 'getQueries']);
         $group->get('/lists', [Longterm::class, 'getList']);
+    });
+    $app->group('/groups', function (RouteCollectorProxy $group) {
+        $group->get('', [Group::class, 'index']);
+        $group->get('/clients',[Group::class, 'getClients']);
+        $group->get('/domains',[Group::class, 'getDomains']);
+        $group->get('/adlists', [Group::class, 'getLists']);
     });
 };
