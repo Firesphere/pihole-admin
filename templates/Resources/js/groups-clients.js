@@ -13,7 +13,7 @@ var token = $("#token").text();
 
 function reloadClientSuggestions() {
     $.post(
-        "scripts/pi-hole/php/groups.php",
+        "api/groups",
         {action: "get_unconfigured_clients", token: token},
         function (data) {
             var sel = $("#select");
@@ -54,7 +54,7 @@ function reloadClientSuggestions() {
 
 function getGroups() {
     $.post(
-        "scripts/pi-hole/php/groups.php",
+        "api/groups",
         {action: "get_groups", token: token},
         function (data) {
             groups = data.data;
@@ -85,7 +85,7 @@ $(function () {
 function initTable() {
     table = $("#clientsTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             data: {action: "get_clients", token: token},
             type: "POST",
         },
@@ -365,7 +365,7 @@ function delItems(ids) {
     utils.showAlert("info", "", "Deleting clients: " + idstring, "...");
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {action: "delete_client", id: JSON.stringify(ids), token: token},
@@ -432,7 +432,7 @@ function addClient() {
     }
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {action: "add_client", ip: ip, comment: comment, token: token},
@@ -487,7 +487,7 @@ function editClient() {
     utils.disableAll();
     utils.showAlert("info", "", "Editing client...", ip);
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {

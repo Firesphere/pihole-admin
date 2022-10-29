@@ -39,7 +39,7 @@ class PiholeDB extends APIBase
      */
     public function getGraphData(RequestInterface $request, ResponseInterface $response)
     {
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         $limit = $this->getLimit($params);
 
         $interval = 600;
@@ -89,7 +89,7 @@ class PiholeDB extends APIBase
      */
     public function getQueryLogs(RequestInterface $request, ResponseInterface $response)
     {
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         if (!isset($params['par'])) {
             $limit = $this->getLimit($params);
 
@@ -191,7 +191,7 @@ class PiholeDB extends APIBase
 
     public function getTopClients(RequestInterface $request, ResponseInterface $response)
     {
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         $limit = $this->getLimit($params);
 
         $dbquery = "
@@ -234,7 +234,7 @@ SELECT CASE typeof(client)
 
     public function getTopAds(RequestInterface $request, ResponseInterface $response)
     {
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         $limit = $this->getLimit($params);
         $binds = [
             ':from'  => (int)$params['from'],
@@ -260,7 +260,7 @@ SELECT domain, count(domain)
 
     public function getTopDomains(RequestInterface $request, ResponseInterface $response)
     {
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         $limit = $this->getLimit($params);
         $binds = [
             ':from'  => (int)$params['from'],

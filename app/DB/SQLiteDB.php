@@ -64,4 +64,12 @@ class SQLiteDB
 
         return $this->db->query($query);
     }
+
+    /**
+     * @return SQLite3
+     */
+    public function getDb(): SQLite3
+    {
+        return $this->db;
+    }
 }

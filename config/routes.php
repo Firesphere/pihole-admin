@@ -3,7 +3,7 @@
 
 use App\API\DNSControl;
 use App\API\FTL;
-use App\API\Group;
+use App\API\GroupPostHandler;
 use App\API\PiHole;
 use App\API\PiholeDB;
 use App\API\Queries;
@@ -29,7 +29,7 @@ return static function (App $app) {
         $group->get('topClients', [PiholeDB::class, 'getTopClients']);
         $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
         $group->get('topAds', [PiholeDB::class, 'getTopAds']);
-        $group->post('groups', [Group::class, 'postHandler']);
+        $group->post('groups', [GroupPostHandler::class, 'postHandler']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [PiHole::class, 'addRecord']);

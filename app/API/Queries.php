@@ -64,10 +64,9 @@ class Queries extends APIBase
 
     public function getAll(RequestInterface $request, ResponseInterface $response)
     {
-        $params = $request->getUri()->getQuery();
-        parse_str($params, $query);
+        $params = $request->getQueryParams();
 
-        $q = $this->createFTLQuery($query);
+        $q = $this->createFTLQuery($params);
 
         $api = new CallAPI();
         $data = $api->doCall($q);

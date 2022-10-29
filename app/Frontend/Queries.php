@@ -11,7 +11,7 @@ class Queries extends Frontend
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        parse_str($request->getUri()->getQuery(), $params);
+        $params = $request->getQueryParams();
         $this->menuItems['Queries'] = 'active menu-open';
         $this->getShowingString($params);
 
@@ -106,15 +106,16 @@ class Queries extends Frontend
                 case 'from':
                 case 'until':
                     break;
-                default:
-                    $showing[] = 'up to 100 queries';
-                    $showall = true;
-                    break;
             }
 
             if (isset($paramTypes[$param])) {
                 $showing[] = sprintf($paramTypes[$param][$tmpParam], $replace);
             }
+        }
+
+        if (count($showing) === 1) {
+            $showing[] = 'up to 100 queries';
+            $showall = true;
         }
 
         if (!empty($showing)) {
