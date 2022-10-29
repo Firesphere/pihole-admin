@@ -6,7 +6,6 @@ use App\DB\SQLiteDB;
 use App\Frontend\Frontend;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Psr7\Stream;
 
 /**
  * @todo clean up some things here
@@ -85,10 +84,12 @@ class PiholeDB extends APIBase
         return $this->returnAsJSON($request, $response, $data);
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function getQueryLogs(RequestInterface $request, ResponseInterface $response)
     {
         parse_str($request->getUri()->getQuery(), $params);
-        $return = ['data' => []];
         if (!isset($params['par'])) {
             $limit = $this->getLimit($params);
 
@@ -156,12 +157,16 @@ class PiholeDB extends APIBase
             ];
             $results = $this->db->doQuery($dbquery, $binds);
 
-            // Start the JSON string
-
             if (!is_bool($results)) {
+                header('Content-Type: application/json');
+                $first = true;
+                echo '{"data":[';
                 while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+                    ob_start();
+                    // If not the first row, echo a comma
+                    echo (!$first ? ',' : '');
                     // Insert into array and output it in JSON format
-                    $return['data'][] = json_encode([
+                    echo json_encode([
                         $row['timestamp'],
                         Frontend::getQueryTypeString($row['type']),
                         utf8_encode(str_replace('~', ' ', $row['domain'])),
@@ -172,14 +177,16 @@ class PiholeDB extends APIBase
                         $row['reply_time'],
                         $row['dnssec']
                     ], JSON_THROW_ON_ERROR);
+                    ob_end_flush();
+                    $first = false;
                 }
+                echo "]}";
+                exit;
             }
         }
         // The return arary is such an immense list, it requires a lot of memory
-        ini_set('memory_limit', '-1');
 
-
-        return $this->returnAsJSON($request, $response, $return);
+        return $this->returnAsJSON($request, $response, ['data' => []]);
     }
 
     public function getTopClients(RequestInterface $request, ResponseInterface $response)

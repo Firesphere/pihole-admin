@@ -19,7 +19,6 @@ class APIBase
      */
     protected function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
     {
-
         $body = $response->getBody();
         $body->write(json_encode($data, JSON_THROW_ON_ERROR));
 

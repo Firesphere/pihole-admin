@@ -95,17 +95,17 @@
             }) }}
         {{ include('Partials/LongtermQueryBlock.twig',
             {
-                'colour': 'bg-yellow',
-                'id': 'queries_percentage_today',
-                'title': 'Queries Blocked (%)',
-                'icon': 'fa-chart-pie',
-            }) }}
-        {{ include('Partials/LongtermQueryBlock.twig',
-            {
                 'colour': 'bg-green',
                 'id': 'dns_queries',
                 'title': 'Queries Total',
                 'icon': 'fa-globe-americas',
+            }) }}
+        {{ include('Partials/LongtermQueryBlock.twig',
+            {
+                'colour': 'bg-yellow',
+                'id': 'queries_percentage_today',
+                'title': 'Queries Blocked (%)',
+                'icon': 'fa-chart-pie',
             }) }}
     </div>
 
