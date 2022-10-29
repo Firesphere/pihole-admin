@@ -4,6 +4,7 @@ namespace App\API;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Psr7\Stream;
 
 class APIBase
 {
@@ -18,6 +19,7 @@ class APIBase
      */
     protected function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
     {
+
         $body = $response->getBody();
         $body->write(json_encode($data, JSON_THROW_ON_ERROR));
 

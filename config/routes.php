@@ -26,6 +26,10 @@ return static function (App $app) {
         $group->get('getAllQueries', [Queries::class, 'getAll']);
         $group->get('getMinTimestamp', [PiholeDB::class, 'getMinTimestamp']);
         $group->get('getGraphData', [PiholeDB::class, 'getGraphData']);
+        $group->get('getQueryLog', [PiholeDB::class, 'getQueryLogs']);
+        $group->get('topClients', [PiholeDB::class, 'getTopClients']);
+        $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
+        $group->get('topAds', [PiholeDB::class, 'getTopAds']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [PiHole::class, 'addRecord']);
@@ -39,6 +43,6 @@ return static function (App $app) {
     $app->group('/longterm', function (RouteCollectorProxy $group) {
         $group->get('/graph', [Longterm::class, 'getGraph']);
         $group->get('/queries', [Longterm::class, 'getQueries']);
-        $group->get('/list', [Longterm::class, 'getList']);
+        $group->get('/lists', [Longterm::class, 'getList']);
     });
 };

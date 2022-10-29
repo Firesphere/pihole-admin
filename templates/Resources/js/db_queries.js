@@ -202,7 +202,7 @@ var reloadCallback = function () {
 function refreshTableData() {
     timeoutWarning.show();
     reloadBox.hide();
-    var APIstring = "api/getAllQueries?from=" + from + "&until=" + until;
+    var APIstring = "api/getQueryLog?from=" + from + "&until=" + until;
     // If status types should be excluded ("unchecked") we add them to the query
     var statusType = excludeStatusTypes();
     if (statusType.length > 0) {
@@ -215,8 +215,8 @@ function refreshTableData() {
 
 $(function () {
     var APIstring = instantquery
-        ? "api/getAllQueries?from=" + from + "&until=" + until
-        : "api/getAllQueries?par=empty";
+        ? "api/getQueryLog?from=" + from + "&until=" + until
+        : "api/getQueryLog?par=empty";
 
     // If status types should be excluded ("unchecked") we add them to the query
     var statusType = excludeStatusTypes();

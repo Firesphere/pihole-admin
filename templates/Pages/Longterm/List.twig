@@ -1,0 +1,47 @@
+{% extends 'Layout.twig' %}
+
+{% block content %}
+    <!-- Sourceing CSS colors from stylesheet to be used in JS code -->
+    <span class="queries-permitted"></span>
+    <span class="queries-blocked"></span>
+
+    {{ include('Partials/LongtermTitle.twig') }}
+
+    {{ include('Partials/LongtermDTRange.twig') }}
+
+    {{ include('Partials/Notification.twig') }}
+
+    <div class="row">
+        {{ include('Partials/LongtermBox.twig',
+            {
+                'id': 'domain-frequency',
+                'title': 'Top domains',
+                'th1': 'Domain',
+                'th2': 'Hits',
+                'th3': 'Frequency'
+            }) }}
+        {{ include('Partials/LongtermBox.twig',
+            {
+                'id': 'ad-frequency',
+                'title': 'Top Blocked domains',
+                'th1': 'Domain',
+                'th2': 'Hits',
+                'th3': 'Frequency'
+            }) }}
+        {{ include('Partials/LongtermBox.twig',
+            {
+                'id': 'client-frequency',
+                'title': 'Top Clients',
+                'th1': 'Client',
+                'th2': 'Requests',
+                'th3': 'Frequency'
+            }) }}
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ assets({files: [
+        'Resources/vendor/daterangepicker.min.js',
+        'Resources/js/db_lists.js',
+    ]}) }}
+{% endblock %}

@@ -8,25 +8,6 @@ use Slim\Views\Twig;
 
 class Queries extends Frontend
 {
-    protected static $querytypes = [
-        'A',
-        'AAAA',
-        'ANY',
-        'SRV',
-        'SOA',
-        'PTR',
-        'TXT',
-        'NAPTR',
-        'MX',
-        'DS',
-        'RRSIG',
-        'DNSKEY',
-        'NS',
-        'OTHER',
-        'SVCB',
-        'HTTPS'
-    ];
-
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
@@ -36,22 +17,6 @@ class Queries extends Frontend
 
 
         return $view->render($response, 'Pages/Queries.twig', $this->menuItems);
-    }
-
-    /**
-     * Determine the query type by position in array.
-     * Kind of "fingers crossed" method, but seems to work.
-     * @param $query
-     * @return string
-     */
-    protected function getQueryTypeString($query)
-    {
-        $qtype = (int)$query;
-        if ($qtype > 0 && $qtype <= count(static::$querytypes)) {
-            return static::$querytypes[$qtype - 1];
-        }
-
-        return 'TYPE' . ($qtype - 100);
     }
 
     /**
@@ -118,7 +83,7 @@ class Queries extends Frontend
                     $replace = htmlentities($params['forwarddest']);
                     break;
                 case 'querytype':
-                    $replace = $this->getQueryTypeString($params['querytype']);
+                    $replace = self::getQueryTypeString($params['querytype']);
                     break;
                 case 'client':
                     $type = 'type=blocked';
