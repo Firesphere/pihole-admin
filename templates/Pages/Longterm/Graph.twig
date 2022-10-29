@@ -1,0 +1,48 @@
+{% extends "Layout.twig" %}
+
+{% block content %}
+    {{ include('Partials/LongtermTitle.twig') }}
+    <span class="queries-permitted"></span>
+    <span class="queries-blocked"></span>
+    <span class="graphs-grid"></span>
+    <span class="graphs-ticks"></span>
+    {{ include('Partials/LongtermDTRange.twig') }}
+
+
+    <div class="row">
+        <div class="col-md-12">
+            {{ include('Partials/Notification.twig') }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box" id="queries-over-time">
+                <div class="box-header with-border">
+                    <h3 class="box-title">
+                        Queries over the selected time period
+                    </h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="chart">
+                                <canvas id="queryOverTimeChart" width="800" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="overlay" hidden>
+                    <i class="fa fa-sync fa-spin"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block pagescripts %}
+    {{ assets({files: [
+        'Resources/js/db_graph.js',
+        'Resources/vendor/daterangepicker.min.js'
+    ]}) }}
+{% endblock %}
