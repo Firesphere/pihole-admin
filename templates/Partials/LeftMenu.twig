@@ -31,7 +31,7 @@
         <ul class="sidebar-menu" data-widget="tree">
             <li class="header text-uppercase">Main</li>
             <!-- Home Page -->
-            <li class="menu-main">
+            <li class="menu-main {{ Dashboard }}">
                 <a href="/">
                     <i class="fa fa-fw menu-icon fa-home"></i> <span>Dashboard</span>
                 </a>
@@ -39,13 +39,13 @@
 
             <li class="header text-uppercase">Analysis</li>
             <!-- Query Log -->
-            <li class="menu-analysis">
+            <li class="menu-analysis {{ Queries }}">
                 <a href="/queries">
                     <i class="fa fa-fw menu-icon fa-file-alt"></i> <span>Query Log</span>
                 </a>
             </li>
             <!-- Long-term database -->
-            <li class="menu-analysis treeview">
+            <li class="menu-analysis treeview {{ Longterm }}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-history"></i> <span>Long-term Data</span>
                     <span class="pull-right-container">
@@ -53,17 +53,17 @@
                         </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="">
+                    <li class="{{ LongtermGraph }}">
                         <a href="longterm/graph">
                             <i class="fa fa-fw menu-icon fa-chart-bar"></i> Graphics
                         </a>
                     </li>
-                    <li class="">
+                    <li class="{{ LongtermQueryLog }}">
                         <a href="longterm/queries">
                             <i class="fa fa-fw menu-icon fa-file-alt"></i> Query Log
                         </a>
                     </li>
-                    <li class="">
+                    <li class="{{ LongtermList }}">
                         <a href="longterm/lists">
                             <i class="fa fa-fw menu-icon fa-list"></i> Top Lists
                         </a>

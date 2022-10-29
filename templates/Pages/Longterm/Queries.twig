@@ -1,10 +1,7 @@
 {% extends 'Layout.twig' %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Specify date range to be queried from the Pi-hole query database</h1>
-</div>
-
+{{ include('Partials/LongtermTitle.twig') }}
 <div class="row">
     <div class="col-md-12">
         <div class="box">
@@ -68,58 +65,38 @@
 
 <!-- Small boxes (Stat box) -->
 <div class="row">
-    <div class="col-lg-3 col-xs-12">
-        <!-- small box -->
-        <div class="small-box bg-aqua no-user-select">
-            <div class="inner">
-                <h3 class="statistic" id="queries_blocked_exact">---</h3>
-                <p>Queries Blocked</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-hand-paper"></i>
-            </div>
-        </div>
-    </div>
-    <!-- ./col -->
-    <div class="col-lg-3 col-xs-12">
-        <!-- small box -->
-        <div class="small-box bg-aqua no-user-select">
-            <div class="inner">
-                <h3 class="statistic" id="queries_wildcard_blocked">---</h3>
-                <p>Queries Blocked (Wildcards)</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-hand-paper"></i>
-            </div>
-        </div>
-    </div>
-    <!-- ./col -->
-    <div class="col-lg-3 col-xs-12">
-        <!-- small box -->
-        <div class="small-box bg-green no-user-select">
-            <div class="inner">
-                <h3 class="statistic" id="dns_queries">---</h3>
-                <p>Queries Total</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-globe-americas"></i>
-            </div>
-        </div>
-    </div>
-    <!-- ./col -->
-    <div class="col-lg-3 col-xs-12">
-        <!-- small box -->
-        <div class="small-box bg-yellow no-user-select">
-            <div class="inner">
-                <h3 class="statistic" id="queries_percentage_today">---</h3>
-                <p>Queries Blocked</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-chart-pie"></i>
-            </div>
-        </div>
-    </div>
-    <!-- ./col -->
+    {{ include('Partials/LongtermQueryBlock.twig',
+        {
+            'colour': 'bg-aqua',
+            'id': 'queries_blocked_exact',
+            'title': 'Queries Blocked',
+            'icon': 'fa-hand-paper',
+        })
+    }}
+    {{ include('Partials/LongtermQueryBlock.twig',
+        {
+            'colour': 'bg-aqua',
+            'id': 'queries_wildcard_blocked',
+            'title': 'Queries Blocked (Wildcards)',
+            'icon': 'fa-hand-paper',
+        })
+    }}
+    {{ include('Partials/LongtermQueryBlock.twig',
+        {
+            'colour': 'bg-yellow',
+            'id': 'queries_percentage_today',
+            'title': 'Queries Blocked (%)',
+            'icon': 'fa-chart-pie',
+        })
+    }}
+    {{ include('Partials/LongtermQueryBlock.twig',
+        {
+            'colour': 'bg-green',
+            'id': 'dns_queries',
+            'title': 'Queries Total',
+            'icon': 'fa-globe-americas',
+        })
+    }}
 </div>
 
 <!-- Alert Modal -->

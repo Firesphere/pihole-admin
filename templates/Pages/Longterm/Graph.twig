@@ -1,15 +1,13 @@
 {% extends "Layout.twig" %}
 
 {% block content %}
-<span class="queries-permitted"></span>
+{{ include('Partials/LongtermTitle.twig') }}
+
+    <span class="queries-permitted"></span>
 <span class="queries-blocked"></span>
 <span class="graphs-grid"></span>
 <span class="graphs-ticks"></span>
-
-<div class="page-header">
-    <h1>Compute graphical statistics from the Pi-hole query database</h1>
-</div>
-<div class="row">
+    <div class="row">
     <div class="col-md-12">
         <div class="box">
             <div class="box-header with-border">
