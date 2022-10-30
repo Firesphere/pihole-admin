@@ -15,7 +15,7 @@ $(function () {
 
     table = $("#groupsTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             data: {action: "get_groups", token: token},
             type: "POST",
         },
@@ -227,7 +227,7 @@ function delItems(ids) {
     utils.showAlert("info", "", "Deleting groups: " + idstring, "...");
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {action: "delete_group", id: JSON.stringify(ids), token: token},
@@ -276,7 +276,7 @@ function addGroup() {
     }
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {action: "add_group", name: name, desc: desc, token: token},
@@ -338,7 +338,7 @@ function editGroup() {
     utils.disableAll();
     utils.showAlert("info", "", "Editing group...", name);
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {

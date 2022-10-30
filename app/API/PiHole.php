@@ -2,6 +2,7 @@
 
 namespace App\API;
 
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -26,7 +27,7 @@ class PiHole
     public function __construct()
     {
         if (!is_readable(static::VERSION_FILE)) {
-            throw new \InvalidArgumentException('Version file not found');
+            throw new InvalidArgumentException('Version file not found');
         }
 
         $this->parsedVersions = parse_ini_file(static::VERSION_FILE);

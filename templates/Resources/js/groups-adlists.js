@@ -14,7 +14,7 @@ var GETDict = {};
 
 function getGroups() {
     $.post(
-        "scripts/pi-hole/php/groups.php",
+        "api/groups",
         {action: "get_groups", token: token},
         function (data) {
             groups = data.data;
@@ -118,7 +118,7 @@ function format(data) {
 function initTable() {
     table = $("#adlistsTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             data: {action: "get_adlists", token: token},
             type: "POST",
         },
@@ -517,7 +517,7 @@ function addAdlist() {
     }
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {

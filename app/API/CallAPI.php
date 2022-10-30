@@ -4,7 +4,6 @@ namespace App\API;
 
 class CallAPI
 {
-
     protected $connection;
 
     public function __construct()
@@ -64,5 +63,4 @@ class CallAPI
 
         return $response;
     }
-
 }

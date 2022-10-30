@@ -8,6 +8,11 @@ use SQLite3Result;
 
 class SQLiteDB
 {
+    public const LISTTYPE_WHITELIST = 0;
+    public const LISTTYPE_BLACKLIST = 1;
+    public const LISTTYPE_REGEX_WHITELIST = 2;
+    public const LISTTYPE_REGEX_BLACKLIST = 3;
+
     /**
      * Locations of the different DBs
      * @var string[]
@@ -29,7 +34,6 @@ class SQLiteDB
 
     private function getDBLocation(string $type)
     {
-
         // Get possible non-standard location of FTL's database, if found
         $FTLsettings = file_exists(PiHole::DEFAULT_FTLCONFFILE) ?
             parse_ini_file(PiHole::DEFAULT_FTLCONFFILE) :
@@ -63,5 +67,13 @@ class SQLiteDB
         }
 
         return $this->db->query($query);
+    }
+
+    /**
+     * @return SQLite3
+     */
+    public function getDb(): SQLite3
+    {
+        return $this->db;
     }
 }

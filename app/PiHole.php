@@ -2,6 +2,8 @@
 
 namespace App;
 
+use RuntimeException;
+
 /**
  *
  */
@@ -39,9 +41,15 @@ class PiHole
 
     public static function execute($command)
     {
+        exec('pihole -v', $output, $returnstatus);
+        if ($returnstatus !== 0) {
+            // pihole is not available
+            return 'Did not restart Pi-hole, as it is not available on this system.';
+        }
+        $command = sprintf('sudo pihole %s', $command);
         exec($command, $output, $returnstatus);
         if ($returnstatus !== 0) {
-            throw new \RuntimeException("Executing {$command} failed.", E_USER_WARNING);
+            throw new RuntimeException("Executing {$command} failed.", E_USER_WARNING);
         }
 
         return $output;

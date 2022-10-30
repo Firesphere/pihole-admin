@@ -3,6 +3,7 @@
 namespace App\API;
 
 use App\Model\DNSRecord;
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -70,13 +71,13 @@ class DNSControl
         $type = 'A';
         // Validate domain and IP of target
         if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
-            throw new \InvalidArgumentException('Invalid domain name');
+            throw new InvalidArgumentException('Invalid domain name');
         }
         if (
             !filter_var($target, FILTER_VALIDATE_DOMAIN) &&
             !filter_var($target, FILTER_VALIDATE_IP)
         ) {
-            throw new \InvalidArgumentException('Invalid target');
+            throw new InvalidArgumentException('Invalid target');
         }
         if (filter_var($target, FILTER_VALIDATE_DOMAIN)) {
             $type = 'CNAME';
@@ -97,7 +98,7 @@ class DNSControl
                 $existing->getTarget() === $target &&
                 $existing->getType() === $type
             ) {
-                throw new \InvalidArgumentException('Record already exists');
+                throw new InvalidArgumentException('Record already exists');
             }
         }
 
@@ -124,13 +125,13 @@ class DNSControl
         $target = $args['target'];
         // Validate domain and IP of the domain
         if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
-            throw new \InvalidArgumentException('Invalid domain name');
+            throw new InvalidArgumentException('Invalid domain name');
         }
         if (
             (!filter_var($target, FILTER_VALIDATE_DOMAIN)) &&
             (!filter_var($target, FILTER_VALIDATE_IP))
         ) {
-            throw new \InvalidArgumentException('Invalid target');
+            throw new InvalidArgumentException('Invalid target');
         }
         /** @var DNSRecord $existing */
         foreach (static::$existing_records as $key => $existing) {
@@ -146,7 +147,6 @@ class DNSControl
         $body->write(json_encode(['success' => true, 'message' => '']));
 
         return $response->withHeader('Content-Type', 'application/json');
-
     }
 
     /**
@@ -186,5 +186,4 @@ class DNSControl
 
         return $response->withHeader('Content-Type', 'application/json');
     }
-
 }

@@ -26,7 +26,6 @@ class Longterm extends Frontend
         $this->menuItems['LongtermQueryLog'] = 'active';
 
         return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Queries.twig', $this->menuItems);
-
     }
 
     public function getList(RequestInterface $request, ResponseInterface $response, $args)

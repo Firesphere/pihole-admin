@@ -3,10 +3,14 @@
 namespace App\API;
 
 use App\API\Gravity\Gravity;
+use App\Helper\Helper;
 use App\PiHole;
+use Exception;
+use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RuntimeException;
 use Slim\Exception\HttpBadRequestException;
 
 class FTL extends APIBase
@@ -17,7 +21,7 @@ class FTL extends APIBase
      * @param ResponseInterface $response
      * @param $args
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function startstop(RequestInterface $request, ResponseInterface $response, $args)
     {
@@ -37,8 +41,13 @@ class FTL extends APIBase
         if ($escaped === 'disable' && $args['time']) {
             $escaped = sprintf('disable %ds', (int)$args['time']);
         }
+        try {
+            $result = PiHole::execute($escaped);
+        } catch (RuntimeException $e) {
+            Helper::returnJSONError($e->getMessage());
+        }
 
-        return $this->returnAsJSON($request, $response, ['response' => PiHole::execute($escaped)]);
+        return $this->returnAsJSON($request, $response, ['success' => true, 'response' => $result]);
     }
 
 
@@ -47,7 +56,7 @@ class FTL extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function summary(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -151,7 +160,7 @@ class FTL extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return array|ResponseInterface|null
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function overTimeData(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -240,7 +249,7 @@ class FTL extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return array|ResponseInterface|null
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getMaxlogage(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -262,7 +271,7 @@ class FTL extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return bool[]|ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getQueryTypes(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -289,7 +298,7 @@ class FTL extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return bool[]|ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getUpstreams(ServerRequestInterface $request, ResponseInterface $response)
     {

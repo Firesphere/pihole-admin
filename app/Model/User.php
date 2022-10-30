@@ -28,7 +28,6 @@ class User
 
     public function createUser()
     {
-
     }
 
     /**
@@ -47,5 +46,4 @@ class User
     {
         return password_hash($password, PASSWORD_BCRYPT);
     }
-
 }

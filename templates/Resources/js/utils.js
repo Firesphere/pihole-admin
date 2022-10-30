@@ -300,7 +300,7 @@ function addFromQueryLog(domain, list) {
     // add Domain to List after Modal has faded in
     alertModal.one("shown.bs.modal", function () {
         $.ajax({
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             method: "post",
             data: {
                 domain: domain,
@@ -365,7 +365,7 @@ function checkMessages() {
     var ignoreNonfatal = localStorage
         ? localStorage.getItem("hideNonfatalDnsmasqWarnings_chkbox") === "true"
         : false;
-    $.getJSON("api_db.php?status" + (ignoreNonfatal ? "&ignore=DNSMASQ_WARN" : ""), function (data) {
+    $.getJSON("api/status" + (ignoreNonfatal ? "&ignore=DNSMASQ_WARN" : ""), function (data) {
         if ("message_count" in data && data.message_count > 0) {
             var more = '\nAccess "Tools/Pi-hole diganosis" for further details.';
             var title =

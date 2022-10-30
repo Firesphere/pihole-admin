@@ -11,6 +11,7 @@ class Dashboard extends Frontend
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $this->menuItems['Dashboard'] = 'active';
+
         return Twig::fromRequest($request)->render($response, 'Pages/Index.twig', $this->menuItems);
     }
 }

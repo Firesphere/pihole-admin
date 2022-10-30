@@ -1,4 +1,5 @@
 <?php
+
 // unused
 // Should be set to 0 in production
 error_reporting(E_ALL);
