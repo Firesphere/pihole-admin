@@ -717,9 +717,9 @@ function updateSummaryData(runOnce) {
     })
         .done(function () {
             if (!FTLoffline) {
-                setTimer(1);
+                setTimer(5);
             } else {
-                setTimer(10);
+                setTimer(15);
             }
         })
         .fail(function () {

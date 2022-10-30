@@ -365,7 +365,7 @@ function checkMessages() {
     var ignoreNonfatal = localStorage
         ? localStorage.getItem("hideNonfatalDnsmasqWarnings_chkbox") === "true"
         : false;
-    $.getJSON("api_db.php?status" + (ignoreNonfatal ? "&ignore=DNSMASQ_WARN" : ""), function (data) {
+    $.getJSON("api/status" + (ignoreNonfatal ? "&ignore=DNSMASQ_WARN" : ""), function (data) {
         if ("message_count" in data && data.message_count > 0) {
             var more = '\nAccess "Tools/Pi-hole diganosis" for further details.';
             var title =

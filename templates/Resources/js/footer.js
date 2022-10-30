@@ -120,7 +120,7 @@ function testCookies() {
 function initCheckboxRadioStyle() {
     function getCheckboxURL(style) {
         var extra = style.startsWith("material-") ? "material" : "bootstrap";
-        return "style/vendor/icheck-" + extra + ".min.css";
+        return "styles/icheck-" + extra + ".min.css";
     }
 
     function applyCheckboxRadioStyle(style) {
