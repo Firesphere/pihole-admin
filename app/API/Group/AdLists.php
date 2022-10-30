@@ -31,7 +31,7 @@ class AdLists extends GroupPostHandler
      * @param $postData
      * @return array|array[]
      */
-    public function getAdlists($postData)
+    public function getAdLists($postData)
     {
         $query = $this->gravity->doQuery('SELECT * FROM adlist;');
 
@@ -70,7 +70,7 @@ class AdLists extends GroupPostHandler
         $ignored_list = [];
         foreach ($addresses as $address) {
             // Silently skip this entry when it is empty or not a string (e.g. NULL)
-            if (!is_string($address) || strlen($address) == 0) {
+            if (!is_string($address) || $address === '') {
                 continue;
             }
 
@@ -79,7 +79,11 @@ class AdLists extends GroupPostHandler
             $check_address = preg_replace('|([^:/]*://)?([^/]+)@|', '$1$2', $address, 1);
 
             if (preg_match('/[^a-zA-Z0-9:\\/?&%=~._()-;]/', $check_address) !== 0) {
-                $exc = sprintf('<strong>Invalid adlist URL %s</strong><br>Added %d out of %d adlists', htmlentities($added_list), $added, $total);
+                $exc = sprintf('<strong>Invalid adlist URL %s</strong><br>Added %d out of %d adlists',
+                    htmlentities(implode('', $added_list)),
+                    $added,
+                    $total
+                );
                 throw new InvalidArgumentException($exc);
             }
 
@@ -142,6 +146,43 @@ class AdLists extends GroupPostHandler
 
         // Delete from: adlists
         $this->gravity->doQuery('DELETE FROM adlist WHERE id IN (' . implode(',', $ids) . ')');
+
+        return ['success' => true];
+    }
+
+    public function editAdList($postData)
+    {
+
+        $updateQuery = 'UPDATE adlist SET enabled=:enabled, comment=:comment WHERE id = :id';
+
+        $status = (int)$postData['status'] === 0 ? 0 : 1;
+        $params = [
+            ':enabled' => $status,
+        ];
+
+
+        $params[':comment'] = html_entity_decode((string)$postData['comment']);
+        $params[':id'] = (int)$postData['id'];
+
+        $this->gravity->doQuery($updateQuery, $params);
+
+
+        $this->gravity->doQuery(
+            'DELETE FROM adlist_by_group WHERE adlist_id = :id',
+            [':id' => $params[':id']]
+        );
+
+        if (isset($postData['groups'])) {
+            $groups = $postData['groups'];
+            $query = 'INSERT INTO adlist_by_group (adlist_id,group_id) VALUES(:id,:gid);';
+            $params = [
+                ':id' => (int)$postData['id']
+            ];
+            foreach ($groups as $gid) {
+                $params[':gid'] = $gid;
+                $this->gravity->doQuery($query, $params);
+            }
+        }
 
         return ['success' => true];
     }

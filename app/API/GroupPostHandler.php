@@ -84,7 +84,7 @@ class GroupPostHandler extends APIBase
             $handler = new AdLists();
             switch ($postData['action']) {
                 case 'get_adlists':
-                    $return = $handler->getAdlists($postData);
+                    $return = $handler->getAdLists($postData);
                     break;
                 case 'add_adlist':
                     $return = $handler->addAdLists($postData);
@@ -95,7 +95,7 @@ class GroupPostHandler extends APIBase
                     $reload = true;
                     break;
                 case 'edit_adlist':
-                    $return = $handler->editClient($postData);
+                    $return = $handler->editAdList($postData);
                     $reload = true;
                     break;
                 default:
