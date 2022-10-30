@@ -39,6 +39,11 @@ class PiHole
 
     public static function execute($command)
     {
+        exec('pihole -v', $output, $returnstatus);
+        if ($returnstatus !== 0) {
+            // pihole is not available
+            return 'Did not restart Pi-hole, as it is not available on this system.';
+        }
         $command = sprintf('sudo pihole %s', $command);
         exec($command, $output, $returnstatus);
         if ($returnstatus !== 0) {

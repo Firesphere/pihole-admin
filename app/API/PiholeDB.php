@@ -23,6 +23,26 @@ class PiholeDB extends APIBase
         $this->db = new SQLiteDB('FTLDB');
     }
 
+
+    public function status(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getQueryParams();
+
+        $extra = ';';
+        if (isset($params['ignore']) && $params['ignore'] === 'DNSMASQ_WARN') {
+            $extra = "WHERE type != 'DNSMASQ_WARN';";
+        }
+        $query = sprintf('SELECT COUNT(*) FROM message %s', $extra);
+        $results = $this->db->doQuery($query);
+
+        if (!is_bool($results)) {
+            return $this->returnAsJSON($request, $response, ['message_count' => $results->fetchArray()[0]]);
+        }
+
+        return $this->returnAsJSON($request, $response, []);
+
+    }
+
     public function getMinTimestamp(RequestInterface $request, ResponseInterface $response)
     {
         $results = $this->db->doQuery('SELECT MIN(timestamp) FROM queries');

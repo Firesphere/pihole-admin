@@ -28,7 +28,7 @@ class GroupPostHandler extends APIBase
     {
         $postData = $request->getParsedBody();
         $reload = false;
-        $return = ['data' => []];
+        $return = ['data' => [], 'message' => ''];
         if (strpos($postData['action'], 'group') > 0) {
             $handler = new Group();
             switch ($postData['action']) {
@@ -108,7 +108,7 @@ class GroupPostHandler extends APIBase
 
 
         if ($reload) {
-            GlobalPiHole::execute('restartdns reload-lists');
+            $return['message'] = GlobalPiHole::execute('restartdns reload-lists');
         }
 
         return $this->returnAsJSON($request, $response, $return);

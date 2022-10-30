@@ -13,6 +13,7 @@ use Slim\Routing\RouteCollectorProxy;
 
 return static function (App $app) {
     $app->group('/api/', function (RouteCollectorProxy $group) {
+        $group->get('status', [PiholeDB::class, 'status']);
         $group->get('summary', [FTL::class, 'summary']);
         $group->get('summaryRaw', [FTL::class, 'summary']);
         $group->get('enable', [FTL::class, 'startstop']);

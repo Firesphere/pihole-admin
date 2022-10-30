@@ -411,11 +411,9 @@ $.fn.dataTable.ext.search.push(function (settings, searchData, index, rowData) {
         })
         .get();
 
-    if (types.indexOf(rowData.type.toString()) !== -1) {
-        return true;
-    }
+    return types.indexOf(rowData.type.toString()) !== -1;
 
-    return false;
+
 });
 $(".filter_types input:checkbox").on("change", function () {
     table.draw();
@@ -456,7 +454,7 @@ function delItems(ids) {
 
     utils.disableAll();
     var idstring = ids.join(", ");
-    utils.showAlert("info", "", "Deleting items: " + idstring, "...");
+    utils.showAlert("info", "", "Deleting items with IDs: " + idstring, "...");
 
     $.ajax({
         url: "api/groups",
@@ -470,7 +468,7 @@ function delItems(ids) {
                 utils.showAlert(
                     "success",
                     "far fa-trash-alt",
-                    "Successfully deleted items: " + idstring,
+                    "Successfully deleted items with IDs: " + idstring,
                     "<ul>" + items + "</ul>"
                 );
                 for (var id in ids) {
@@ -479,7 +477,7 @@ function delItems(ids) {
                     }
                 }
             } else {
-                utils.showAlert("error", "", "Error while deleting items: " + idstring, response.message);
+                utils.showAlert("error", "", "Error while deleting items with IDs: " + idstring, response.message);
             }
 
             // Clear selection after deletion

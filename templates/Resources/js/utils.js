@@ -300,7 +300,7 @@ function addFromQueryLog(domain, list) {
     // add Domain to List after Modal has faded in
     alertModal.one("shown.bs.modal", function () {
         $.ajax({
-            url: "scripts/pi-hole/php/groups.php",
+            url: "api/groups",
             method: "post",
             data: {
                 domain: domain,

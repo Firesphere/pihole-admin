@@ -250,8 +250,8 @@ class Domain extends GroupPostHandler
         $groups = json_decode($postData['id'], true, 512, JSON_THROW_ON_ERROR);
         $groups = implode(',', $groups);
         $tables = [
-            'Domain_by_group' => 'group_id',
-            'Domain'          => 'id'
+            'domainlist_by_group' => 'domainlist_id',
+            'domainlist'          => 'id'
         ]; // quote reserved word
         foreach ($tables as $table => $column) {
             $query = sprintf('DELETE FROM %s WHERE %s IN (%s)', $table, $column, $groups);
@@ -267,29 +267,7 @@ class Domain extends GroupPostHandler
      */
     public function editDomain($postData)
     {
-        $query = 'UPDATE Domain SET comment=:comment WHERE id = :id';
-        // Update the comment
-        $params = [
-            ':comment' => html_entity_decode($postData['comment']),
-            ':id'      => $postData['id']
-        ];
-        $this->gravity->doQuery($query, $params);
 
-
-        // Update the groups
-        $groupQuery = 'DELETE FROM Domain_by_group WHERE Domain_id = :id';
-        $this->gravity->doQuery($groupQuery, [':id' => $postData['id']]);
-
-        if (isset($postData['groups'])) {
-            foreach ($postData['groups'] as $gid) {
-                $insertGroupQuery = 'INSERT INTO Domain_by_group (Domain_id,group_id) VALUES(:id,:gid);';
-                $params = [
-                    ':id'  => $postData['id'],
-                    ':gid' => $gid
-                ];
-                $this->gravity->doQuery($insertGroupQuery, $params);
-            }
-        }
 
         return ['success' => true];
     }
