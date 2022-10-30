@@ -8,23 +8,29 @@ use App\Helper\Helper;
 
 class Group extends GroupPostHandler
 {
+    /**
+     * @var SQLiteDB
+     */
+    protected $gravity;
 
+    /**
+     *
+     */
     public function __construct()
     {
-        $this->db = new SQLiteDB('GRAVITYDB', SQLITE3_OPEN_READWRITE);
+        $this->gravity = new SQLiteDB('GRAVITYDB', SQLITE3_OPEN_READWRITE);
+        $this->db = new SQLiteDB('FTLDB', SQLITE3_OPEN_READWRITE);
     }
 
     public function getGroups($postData)
     {
-
-        $resultSet = $this->db->doQuery('SELECT * FROM "group";');
+        $resultSet = $this->gravity->doQuery('SELECT * FROM "group";');
         $data = ['data' => []];
         while ($res = $resultSet->fetchArray(SQLITE3_ASSOC)) {
             $data['data'][] = $res;
         }
 
         return $data;
-
     }
 
     public function addGroup($postData)
@@ -34,7 +40,7 @@ class Group extends GroupPostHandler
         $total = count($names);
         $added = 0;
         $query = 'INSERT INTO "group" (name, description) VALUES (:name,:desc)';
-        $stmt = $this->db->getDb()->prepare($query);
+        $stmt = $this->gravity->getDb()->prepare($query);
 
         $desc = $postData['desc'];
         if ($desc === '') {
@@ -61,7 +67,6 @@ class Group extends GroupPostHandler
         }
 
         return Helper::returnJSONError('Not all groups added successfully', $postData);
-
     }
 
     public function editGroup($postData)
@@ -78,7 +83,7 @@ class Group extends GroupPostHandler
             ':id'      => (int)$postData['id']
         ];
 
-        $this->db->doQuery($query, $queryParams);
+        $this->gravity->doQuery($query, $queryParams);
 
         return ['success' => true];
     }
@@ -94,12 +99,13 @@ class Group extends GroupPostHandler
             '"group"'             => 'id'
         ]; // quote reserved word
         foreach ($tables as $table => $column) {
-            $query = sprintf('DELETE FROM %s WHERE %s IN (%s)',
+            $query = sprintf(
+                'DELETE FROM %s WHERE %s IN (%s)',
                 $table,
                 $column,
                 $groups
             );
-            $this->db->doQuery($query);
+            $this->gravity->doQuery($query);
         }
 
         return ['success' => true];

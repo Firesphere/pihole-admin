@@ -7,7 +7,6 @@ use Psr\Http\Message\ResponseInterface;
 
 class Queries extends APIBase
 {
-
     /**
      * Check all the options and build the correct
      * FTL Query from it

@@ -2,6 +2,7 @@
 
 namespace App\API;
 
+use App\API\Group\AdLists;
 use App\API\Group\Client;
 use App\API\Group\Domain;
 use App\API\Group\Group;
@@ -78,6 +79,29 @@ class GroupPostHandler extends APIBase
                     break;
             }
         }
+        if (strpos($postData['action'], 'adlist') > 0) {
+            $handler = new AdLists();
+            switch ($postData['action']) {
+                case 'get_adlists':
+                    $return = $handler->getAdlists($postData);
+                    break;
+                case 'add_adlist':
+                    $return = $handler->addAdLists($postData);
+                    $reload = true;
+                    break;
+                case 'delete_adlist':
+                    $return = $handler->deleteAdList($postData);
+                    $reload = true;
+                    break;
+                case 'edit_adlist':
+                    $return = $handler->editClient($postData);
+                    $reload = true;
+                    break;
+                default:
+                    $return = Helper::returnJSONError('No valid parameters supplied');
+                    break;
+            }
+        }
         if (strpos($postData['action'], 'domain') > 0) {
             $handler = new Domain();
             switch ($postData['action']) {
@@ -105,6 +129,7 @@ class GroupPostHandler extends APIBase
                     break;
             }
         }
+
 
 
         if ($reload) {

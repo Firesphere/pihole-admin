@@ -12,7 +12,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class PiholeDB extends APIBase
 {
-
     /**
      * @var SQLiteDB
      */
@@ -40,7 +39,6 @@ class PiholeDB extends APIBase
         }
 
         return $this->returnAsJSON($request, $response, []);
-
     }
 
     public function getMinTimestamp(RequestInterface $request, ResponseInterface $response)
@@ -184,7 +182,7 @@ class PiholeDB extends APIBase
                 while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
                     ob_start();
                     // If not the first row, echo a comma
-                    echo (!$first ? ',' : '');
+                    echo(!$first ? ',' : '');
                     // Insert into array and output it in JSON format
                     echo json_encode([
                         $row['timestamp'],

@@ -146,7 +146,6 @@ class DNSControl
         $body->write(json_encode(['success' => true, 'message' => '']));
 
         return $response->withHeader('Content-Type', 'application/json');
-
     }
 
     /**
@@ -186,5 +185,4 @@ class DNSControl
 
         return $response->withHeader('Content-Type', 'application/json');
     }
-
 }

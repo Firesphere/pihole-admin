@@ -25,7 +25,8 @@
         "odan/twig-assets": "^3.2"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest"
+        "roave/security-advisories": "dev-latest",
+        "friendsofphp/php-cs-fixer": "^3"
     },
     "autoload": {
         "psr-4": {

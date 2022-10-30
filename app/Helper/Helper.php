@@ -4,10 +4,20 @@ namespace App\Helper;
 
 class Helper
 {
-
     public static function returnJSONError($error, $params = [])
     {
         $response = ['success' => false, 'message' => $error];
+        if (!empty($params['action'])) {
+            $response['action'] = $params['action'];
+        }
+
+
+        return $response;
+    }
+
+    public static function returnJSONWarning($error, $params = [])
+    {
+        $response = ['success' => true, 'warning' => true, 'message' => $error];
         if (!empty($params['action'])) {
             $response['action'] = $params['action'];
         }
@@ -86,5 +96,4 @@ class Helper
         // everything is okay
         return true;
     }
-
 }

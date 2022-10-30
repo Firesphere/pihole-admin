@@ -8,7 +8,6 @@ use Slim\Psr7\Stream;
 
 class APIBase
 {
-
     /**
      * Return the requested data as JSON
      * @param RequestInterface $request

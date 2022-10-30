@@ -165,7 +165,7 @@ class Domain extends GroupPostHandler
                 $msg = 'Added %s.';
             }
             $msg = sprintf($msg, $domain);
-        } else if ($difference !== $total) {
+        } elseif ($difference !== $total) {
             $msgPart = ' (skipped duplicates)';
         }
         if (!isset($msg)) {
@@ -198,7 +198,6 @@ class Domain extends GroupPostHandler
         $comment = html_entity_decode($postData['comment']);
 
         foreach ($domains as $domain) {
-
             // Check statement will reveal any group associations for a given (domain,type) which do NOT belong to the default group
             $check_stmt = '
                     SELECT EXISTS(
