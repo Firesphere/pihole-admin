@@ -2,9 +2,9 @@
 
 namespace App\API;
 
+use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Psr7\Stream;
 
 class APIBase
 {
@@ -14,7 +14,7 @@ class APIBase
      * @param ResponseInterface $response
      * @param array $data
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     protected function returnAsJSON(RequestInterface $request, ResponseInterface $response, $data): ResponseInterface
     {

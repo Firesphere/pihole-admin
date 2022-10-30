@@ -9,6 +9,7 @@ use App\API\Group\Group;
 use App\DB\SQLiteDB;
 use App\Helper\Helper;
 use App\PiHole as GlobalPiHole;
+use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -23,7 +24,7 @@ class GroupPostHandler extends APIBase
     protected $db;
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function postHandler(RequestInterface $request, ResponseInterface $response, $args)
     {
@@ -129,7 +130,6 @@ class GroupPostHandler extends APIBase
                     break;
             }
         }
-
 
 
         if ($reload) {

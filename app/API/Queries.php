@@ -7,6 +7,34 @@ use Psr\Http\Message\ResponseInterface;
 
 class Queries extends APIBase
 {
+    public function getAll(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getQueryParams();
+
+        $q = $this->createFTLQuery($params);
+
+        $api = new CallAPI();
+        $data = $api->doCall($q);
+        if (array_key_exists('FTLnotrunning', $data)) {
+            return $this->returnAsJSON($request, $response, $data);
+        }
+        $return = ['data' => []];
+
+        // This is a bit unwieldy, but I don't see a way around it
+        foreach ($data as $line) {
+            $list = explode(' ', $line);
+            // UTF-8 encode domain
+            $list[2] = utf8_encode(str_replace('~', ' ', $list[2]));
+            // UTF-8 encode client host name
+            $list[3] = utf8_encode($list[3]);
+            $list[11] = str_replace('"', '', $list[11]);
+
+            $return['data'][] = $list;
+        }
+
+        return $this->returnAsJSON($request, $response, $return);
+    }
+
     /**
      * Check all the options and build the correct
      * FTL Query from it
@@ -59,33 +87,5 @@ class Queries extends APIBase
 
         // Get all queries
         return sprintf('%s%s %s', $base, $q, $param);
-    }
-
-    public function getAll(RequestInterface $request, ResponseInterface $response)
-    {
-        $params = $request->getQueryParams();
-
-        $q = $this->createFTLQuery($params);
-
-        $api = new CallAPI();
-        $data = $api->doCall($q);
-        if (array_key_exists('FTLnotrunning', $data)) {
-            return $this->returnAsJSON($request, $response, $data);
-        }
-        $return = ['data' => []];
-
-        // This is a bit unwieldy, but I don't see a way around it
-        foreach ($data as $line) {
-            $list = explode(' ', $line);
-            // UTF-8 encode domain
-            $list[2] = utf8_encode(str_replace('~', ' ', $list[2]));
-            // UTF-8 encode client host name
-            $list[3] = utf8_encode($list[3]);
-            $list[11] = str_replace('"', '', $list[11]);
-
-            $return['data'][] = $list;
-        }
-
-        return $this->returnAsJSON($request, $response, $return);
     }
 }

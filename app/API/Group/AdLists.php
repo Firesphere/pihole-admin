@@ -2,10 +2,11 @@
 
 namespace App\API\Group;
 
-use App\API\APIBase;
 use App\API\GroupPostHandler;
 use App\DB\SQLiteDB;
 use App\Helper\Helper;
+use InvalidArgumentException;
+use JsonException;
 
 /**
  *
@@ -79,7 +80,7 @@ class AdLists extends GroupPostHandler
 
             if (preg_match('/[^a-zA-Z0-9:\\/?&%=~._()-;]/', $check_address) !== 0) {
                 $exc = sprintf('<strong>Invalid adlist URL %s</strong><br>Added %d out of %d adlists', htmlentities($added_list), $added, $total);
-                throw new \InvalidArgumentException($exc);
+                throw new InvalidArgumentException($exc);
             }
 
             $params['address'] = $address;
@@ -122,7 +123,7 @@ class AdLists extends GroupPostHandler
     /**
      * @param $postData
      * @return bool[]
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function deleteAdList($postData)
     {
@@ -132,15 +133,15 @@ class AdLists extends GroupPostHandler
         // Exploit prevention: Ensure all entries in the ID array are integers
         foreach ($ids as $value) {
             if (!is_numeric($value)) {
-                throw new \InvalidArgumentException('Invalid payload: id contains non-numeric entries');
+                throw new InvalidArgumentException('Invalid payload: id contains non-numeric entries');
             }
         }
 
         // Delete from: adlists_by_group
-        $this->gravity->doQuery('DELETE FROM adlist_by_group WHERE adlist_id IN ('.implode(',', $ids).')');
+        $this->gravity->doQuery('DELETE FROM adlist_by_group WHERE adlist_id IN (' . implode(',', $ids) . ')');
 
         // Delete from: adlists
-        $this->gravity->doQuery('DELETE FROM adlist WHERE id IN ('.implode(',', $ids).')');
+        $this->gravity->doQuery('DELETE FROM adlist WHERE id IN (' . implode(',', $ids) . ')');
 
         return ['success' => true];
     }

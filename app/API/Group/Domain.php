@@ -5,6 +5,9 @@ namespace App\API\Group;
 use App\API\GroupPostHandler;
 use App\DB\SQLiteDB;
 use App\Helper\Helper;
+use InvalidArgumentException;
+use JsonException;
+use SQLiteException;
 
 /**
  *
@@ -129,7 +132,7 @@ class Domain extends GroupPostHandler
                     }
                     $errormsg = sprintf('Domain %s is not a valid domain because: %s.', $converted, $msg);
                     $exc = sprintf('%s<br />Added %d out of %d domains.', $errormsg, $added, $total);
-                    throw new \InvalidArgumentException($exc);
+                    throw new InvalidArgumentException($exc);
                 }
             }
 
@@ -210,7 +213,7 @@ class Domain extends GroupPostHandler
 
             if (!$check_result) {
                 $exc = sprintf('While executing check: <strong>%s</strong>,<br />replaced %d out of %d domains', $this->gravity->getDb()->lastErrorMsg(), $added, $total);
-                throw new \SQLiteException($exc);
+                throw new SQLiteException($exc);
             }
             $params = [
                 ':domain'  => $domain,
@@ -242,7 +245,7 @@ class Domain extends GroupPostHandler
     /**
      * @param $postData
      * @return bool[]
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function deleteDomain($postData)
     {
@@ -294,7 +297,7 @@ class Domain extends GroupPostHandler
             $groupQuery = 'INSERT INTO domainlist_by_group (domainlist_id,group_id) VALUES(:id,:gid);';
             foreach ($groups as $gid) {
                 $params = [
-                    ':id' => $id,
+                    ':id'  => $id,
                     ':gid' => $gid
                 ];
                 $this->gravity->doQuery($groupQuery, $params);

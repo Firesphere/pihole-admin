@@ -4,8 +4,10 @@ namespace App\API;
 
 use App\DB\SQLiteDB;
 use App\Frontend\Frontend;
+use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use SQLite3Result;
 
 /**
  * @todo clean up some things here
@@ -53,7 +55,7 @@ class PiholeDB extends APIBase
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getGraphData(RequestInterface $request, ResponseInterface $response)
     {
@@ -103,7 +105,74 @@ class PiholeDB extends APIBase
     }
 
     /**
-     * @throws \JsonException
+     * @param array $params
+     * @return string
+     */
+    public function getLimit(array $params): string
+    {
+        $limitArr = [
+            'from'  => '',
+            'glue'  => '',
+            'until' => ''
+        ];
+
+        if (isset($params['from'])) {
+            $limitArr['from'] = 'timestamp >= :from';
+        }
+        if (isset($params['until'])) {
+            $limitArr['until'] = 'timestamp <= :until';
+        }
+        if (isset($params['from'], $params['until'])) {
+            $limitArr['glue'] = 'AND';
+        }
+
+        return trim(implode(' ', array_values($limitArr)));
+    }
+
+    /**
+     * Parse the DB result into graph data, filling in missing interval sections with zero
+     * @param SQLite3Result|bool $results
+     * @param $interval
+     * @param $from
+     * @param $until
+     * @return array[]
+     */
+    private function parseDBData($results, $interval, $from, $until)
+    {
+        $domains = [];
+        $blocked = [];
+        $first_db_timestamp = -1;
+
+        if (!is_bool($results)) {
+            // Read in the data
+            while ($row = $results->fetchArray()) {
+                $domains[$row['interval']] = (int)$row['domains'];
+                $blocked[$row['interval']] = (int)$row['blocked'];
+                if ($first_db_timestamp === -1) {
+                    $first_db_timestamp = (int)$row[0];
+                }
+            }
+        }
+
+        // It is unpredictable what the first timestamp returned by the database will be.
+        // This depends on live data. The bar graph can handle "gaps", but the Area graph can't.
+        // Hence, we're filling the "missing" timeslots with 0 to avoid wrong graphic render.
+        // (https://github.com/pi-hole/AdminLTE/pull/2374#issuecomment-1261865428)
+        $aligned_from = $from + (($first_db_timestamp - $from) % $interval);
+
+        // Fill gaps in returned data
+        for ($i = $aligned_from; $i < $until; $i += $interval) {
+            if (!array_key_exists($i, $domains)) {
+                $domains[$i] = 0;
+                $blocked[$i] = 0;
+            }
+        }
+
+        return ['domains_over_time' => $domains, 'ads_over_time' => $blocked];
+    }
+
+    /**
+     * @throws JsonException
      */
     public function getQueryLogs(RequestInterface $request, ResponseInterface $response)
     {
@@ -202,6 +271,7 @@ class PiholeDB extends APIBase
                 exit;
             }
         }
+
         // The return arary is such an immense list, it requires a lot of memory
 
         return $this->returnAsJSON($request, $response, ['data' => []]);
@@ -248,6 +318,31 @@ SELECT CASE typeof(client)
         $counts = array_slice($counts, 0, 10);
 
         return $this->returnAsJSON($request, $response, ['top_sources' => $counts]);
+    }
+
+    /**
+     * @param bool|SQLite3Result $results
+     * @return array
+     */
+    public function getCounts(bool|SQLite3Result $results): array
+    {
+        $counts = [];
+
+        if ($results instanceof SQLite3Result) {
+            while ($row = $results->fetchArray()) {
+                $client = utf8_encode(strtolower($row[0]));
+                // $row[0] is the client IP
+                if (array_key_exists($client, $counts)) {
+                    // Entry already exists, add to it
+                    $counts[$client] += (int)$row[1];
+                } else {
+                    // Entry does not yet exist
+                    $counts[$client] = (int)$row[1];
+                }
+            }
+        }
+
+        return $counts;
     }
 
     public function getTopAds(RequestInterface $request, ResponseInterface $response)
@@ -301,97 +396,5 @@ SELECT domain, count(domain)
         $domains = array_slice($domains, 0, 10);
 
         return $this->returnAsJSON($request, $response, ['top_domains' => $domains]);
-    }
-
-    /**
-     * Parse the DB result into graph data, filling in missing interval sections with zero
-     * @param \SQLite3Result|bool $results
-     * @param $interval
-     * @param $from
-     * @param $until
-     * @return array[]
-     */
-    private function parseDBData($results, $interval, $from, $until)
-    {
-        $domains = [];
-        $blocked = [];
-        $first_db_timestamp = -1;
-
-        if (!is_bool($results)) {
-            // Read in the data
-            while ($row = $results->fetchArray()) {
-                $domains[$row['interval']] = (int)$row['domains'];
-                $blocked[$row['interval']] = (int)$row['blocked'];
-                if ($first_db_timestamp === -1) {
-                    $first_db_timestamp = (int)$row[0];
-                }
-            }
-        }
-
-        // It is unpredictable what the first timestamp returned by the database will be.
-        // This depends on live data. The bar graph can handle "gaps", but the Area graph can't.
-        // Hence, we're filling the "missing" timeslots with 0 to avoid wrong graphic render.
-        // (https://github.com/pi-hole/AdminLTE/pull/2374#issuecomment-1261865428)
-        $aligned_from = $from + (($first_db_timestamp - $from) % $interval);
-
-        // Fill gaps in returned data
-        for ($i = $aligned_from; $i < $until; $i += $interval) {
-            if (!array_key_exists($i, $domains)) {
-                $domains[$i] = 0;
-                $blocked[$i] = 0;
-            }
-        }
-
-        return ['domains_over_time' => $domains, 'ads_over_time' => $blocked];
-    }
-
-    /**
-     * @param array $params
-     * @return string
-     */
-    public function getLimit(array $params): string
-    {
-        $limitArr = [
-            'from'  => '',
-            'glue'  => '',
-            'until' => ''
-        ];
-
-        if (isset($params['from'])) {
-            $limitArr['from'] = 'timestamp >= :from';
-        }
-        if (isset($params['until'])) {
-            $limitArr['until'] = 'timestamp <= :until';
-        }
-        if (isset($params['from'], $params['until'])) {
-            $limitArr['glue'] = 'AND';
-        }
-
-        return trim(implode(' ', array_values($limitArr)));
-    }
-
-    /**
-     * @param bool|\SQLite3Result $results
-     * @return array
-     */
-    public function getCounts(bool|\SQLite3Result $results): array
-    {
-        $counts = [];
-
-        if ($results instanceof \SQLite3Result) {
-            while ($row = $results->fetchArray()) {
-                $client = utf8_encode(strtolower($row[0]));
-                // $row[0] is the client IP
-                if (array_key_exists($client, $counts)) {
-                    // Entry already exists, add to it
-                    $counts[$client] += (int)$row[1];
-                } else {
-                    // Entry does not yet exist
-                    $counts[$client] = (int)$row[1];
-                }
-            }
-        }
-
-        return $counts;
     }
 }

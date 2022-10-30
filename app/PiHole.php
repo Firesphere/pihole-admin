@@ -2,6 +2,8 @@
 
 namespace App;
 
+use RuntimeException;
+
 /**
  *
  */
@@ -47,7 +49,7 @@ class PiHole
         $command = sprintf('sudo pihole %s', $command);
         exec($command, $output, $returnstatus);
         if ($returnstatus !== 0) {
-            throw new \RuntimeException("Executing {$command} failed.", E_USER_WARNING);
+            throw new RuntimeException("Executing {$command} failed.", E_USER_WARNING);
         }
 
         return $output;

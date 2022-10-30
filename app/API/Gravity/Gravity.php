@@ -3,13 +3,15 @@
 namespace App\API\Gravity;
 
 use App\DB\SQLiteDB;
+use DateTime;
+use Exception;
 
 class Gravity
 {
     /**
      * @param $raw
      * @return array|false[]|string
-     * @throws \Exception
+     * @throws Exception
      */
     public static function gravity_last_update($raw = false)
     {
@@ -28,8 +30,8 @@ class Gravity
         // Destruct the SQLiteDB object
         $db = null;
         // Convert the UNIX timestamp to a Datetime and DateDiff
-        $date_file_created = new \DateTime('@' . $date_file_created_unix['value']);
-        $date_now = new \DateTime('now');
+        $date_file_created = new DateTime('@' . $date_file_created_unix['value']);
+        $date_now = new DateTime('now');
         $gravitydiff = date_diff($date_file_created, $date_now);
         if ($raw) {
             // Array output

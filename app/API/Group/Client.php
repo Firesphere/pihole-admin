@@ -5,6 +5,7 @@ namespace App\API\Group;
 use App\API\GroupPostHandler;
 use App\DB\SQLiteDB;
 use App\Helper\Helper;
+use JsonException;
 
 class Client extends GroupPostHandler
 {
@@ -177,7 +178,7 @@ class Client extends GroupPostHandler
     /**
      * @param $postData
      * @return bool[]
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function deleteClient($postData)
     {
