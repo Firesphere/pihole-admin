@@ -52,4 +52,8 @@ return static function (App $app) {
         $group->get('/domains', [Frontend\Group::class, 'getDomains']);
         $group->get('/adlists', [Frontend\Group::class, 'getList']);
     });
+    $app->group('/dns', function (RouteCollectorProxy $group) {
+        $group->get('/dns', [Frontend\DNS::class, 'getDNSRecords']);
+        $group->get('/cname', [Frontend\DNS::class, 'getCNAMERecords']);
+    });
 };

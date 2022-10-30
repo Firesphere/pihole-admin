@@ -158,7 +158,7 @@
                         </span>
                 </a>
             </li>
-            <li class="menu-dns treeview">
+            <li class="menu-dns treeview {{ DNS }}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-address-book"></i> <span>Local DNS</span>
                     <span class="pull-right-container">
@@ -166,13 +166,13 @@
                         </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="">
-                        <a href="dns_records.php">
+                    <li class="{{ DNSRecords }}">
+                        <a href="dns/dns">
                             <i class="fa fa-fw menu-icon fa-address-book"></i> DNS Records
                         </a>
                     </li>
-                    <li class="">
-                        <a href="cname_records.php">
+                    <li class="{{ CNAMERecords }}">
+                        <a href="dns/cname">
                             <i class="fa fa-fw menu-icon fa-address-book"></i> CNAME Records
                         </a>
                     </li>
