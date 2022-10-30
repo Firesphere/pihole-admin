@@ -12,10 +12,11 @@ var groups = [];
 var token = $("#token").text();
 var GETDict = {};
 
+// Ehm, why is this here?
 function getGroups() {
     $.post(
-        "scripts/pi-hole/php/groups.php",
-        {action: "get_groups", token: token},
+        "api/groups",
+        { action: "get_groups", token: token },
         function (data) {
             groups = data.data;
             initTable();
@@ -110,20 +111,20 @@ function hideSuggestDomains() {
 function initTable() {
     table = $("#domainsTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/groups.php",
-            data: {action: "get_domains", token: token},
+            url: "api/groups",
+            data: { action: "get_domains", token: token },
             type: "POST",
         },
         order: [[0, "asc"]],
         columns: [
-            {data: "id", visible: false},
-            {data: null, visible: true, orderable: false, width: "15px"},
-            {data: "domain"},
-            {data: "type", searchable: false},
-            {data: "enabled", searchable: false},
-            {data: "comment"},
-            {data: "groups", searchable: false},
-            {data: null, width: "22px", orderable: false},
+            { data: "id", visible: false },
+            { data: null, visible: true, orderable: false, width: "15px" },
+            { data: "domain" },
+            { data: "type", searchable: false },
+            { data: "enabled", searchable: false },
+            { data: "comment" },
+            { data: "groups", searchable: false },
+            { data: null, width: "22px", orderable: false },
         ],
         columnDefs: [
             {
@@ -140,7 +141,7 @@ function initTable() {
         ],
         drawCallback: function () {
             // Hide buttons if all domains were deleted
-            var hasRows = this.api().rows({filter: "applied"}).data().length > 0;
+            var hasRows = this.api().rows({ filter: "applied" }).data().length > 0;
             $(".datatable-bt").css("visibility", hasRows ? "visible" : "hidden");
 
             $('button[id^="deleteDomain_"]').on("click", deleteDomain);
@@ -300,7 +301,7 @@ function initTable() {
                 titleAttr: "Select All",
                 className: "btn-sm datatable-bt selectAll",
                 action: function () {
-                    table.rows({page: "current"}).select();
+                    table.rows({ page: "current" }).select();
                 },
             },
             {
@@ -308,7 +309,7 @@ function initTable() {
                 titleAttr: "Select All",
                 className: "btn-sm datatable-bt selectMore",
                 action: function () {
-                    table.rows({page: "current"}).select();
+                    table.rows({ page: "current" }).select();
                 },
             },
             {
@@ -364,7 +365,7 @@ function initTable() {
         initComplete: function () {
             if ("domainid" in GETDict) {
                 var pos = table
-                    .column(0, {order: "current"})
+                    .column(0, { order: "current" })
                     .data()
                     .indexOf(parseInt(GETDict.domainid, 10));
                 if (pos >= 0) {
@@ -458,10 +459,10 @@ function delItems(ids) {
     utils.showAlert("info", "", "Deleting items: " + idstring, "...");
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
-        data: {action: "delete_domain", id: JSON.stringify(ids), token: token},
+        data: { action: "delete_domain", id: JSON.stringify(ids), token: token },
     })
         .done(function (response) {
             utils.enableAll();
@@ -544,7 +545,7 @@ function addDomain() {
     }
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {
@@ -630,7 +631,7 @@ function editDomain() {
     utils.disableAll();
     utils.showAlert("info", "", "Editing " + domainRegex + "...", name);
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {

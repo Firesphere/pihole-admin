@@ -8,6 +8,11 @@ use SQLite3Result;
 
 class SQLiteDB
 {
+    public const LISTTYPE_WHITELIST = 0;
+    public const LISTTYPE_BLACKLIST = 1;
+    public const LISTTYPE_REGEX_WHITELIST = 2;
+    public const LISTTYPE_REGEX_BLACKLIST = 3;
+
     /**
      * Locations of the different DBs
      * @var string[]

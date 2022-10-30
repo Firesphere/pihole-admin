@@ -3,6 +3,7 @@
 namespace App\API;
 
 use App\API\Gravity\Gravity;
+use App\Helper\Helper;
 use App\PiHole;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -37,8 +38,13 @@ class FTL extends APIBase
         if ($escaped === 'disable' && $args['time']) {
             $escaped = sprintf('disable %ds', (int)$args['time']);
         }
+        try {
+            $result = PiHole::execute($escaped);
+        } catch (\RuntimeException $e) {
+            Helper::returnJSONError($e->getMessage());
+        }
 
-        return $this->returnAsJSON($request, $response, ['response' => PiHole::execute($escaped)]);
+        return $this->returnAsJSON($request, $response, ['success' => true, 'response' => $result]);
     }
 
 

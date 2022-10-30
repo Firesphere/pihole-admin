@@ -3,6 +3,7 @@
 namespace App\API;
 
 use App\API\Group\Client;
+use App\API\Group\Domain;
 use App\API\Group\Group;
 use App\DB\SQLiteDB;
 use App\Helper\Helper;
@@ -70,6 +71,33 @@ class GroupPostHandler extends APIBase
                     break;
                 case 'edit_client':
                     $return = $handler->editClient($postData);
+                    $reload = true;
+                    break;
+                default:
+                    $return = Helper::returnJSONError('No valid parameters supplied');
+                    break;
+            }
+        }
+        if (strpos($postData['action'], 'domain') > 0) {
+            $handler = new Domain();
+            switch ($postData['action']) {
+                case 'get_domains':
+                    $return = $handler->getDomains($postData);
+                    break;
+                case 'add_domain':
+                    $return = $handler->addDomain($postData);
+                    $reload = true;
+                    break;
+                case 'replace_domain':
+                    $return = $handler->replaceDomain($postData);
+                    $reload = true;
+                    break;
+                case 'edit_domain':
+                    $return = $handler->editDomain($postData);
+                    $reload = true;
+                    break;
+                case 'delete_domain':
+                    $return = $handler->deleteDomain($postData);
                     $reload = true;
                     break;
                 default:

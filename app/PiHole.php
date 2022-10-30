@@ -39,6 +39,7 @@ class PiHole
 
     public static function execute($command)
     {
+        $command = sprintf('sudo pihole %s', $command);
         exec($command, $output, $returnstatus);
         if ($returnstatus !== 0) {
             throw new \RuntimeException("Executing {$command} failed.", E_USER_WARNING);
