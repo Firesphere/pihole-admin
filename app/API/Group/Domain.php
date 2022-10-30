@@ -267,7 +267,40 @@ class Domain extends GroupPostHandler
      */
     public function editDomain($postData)
     {
+        $updateQuery = '
+            UPDATE domainlist 
+            SET 
+                enabled=:enabled, 
+                comment=:comment, 
+                type=:type 
+            WHERE id = :id';
 
+
+        $status = (int)$postData['status'] === 0 ? 0 : 1;
+        $params = [
+            ':enabled' => $status,
+        ];
+
+        $params['comment'] = html_entity_decode((string)$postData['comment']);
+        $params[':type'] = (int)$postData['type'];
+        $id = (int)$postData['id'];
+        $params[':id'] = $id;
+
+        $this->gravity->doQuery($updateQuery, $params);
+
+        $this->gravity->doQuery('DELETE FROM domainlist_by_group WHERE domainlist_id = :id', [':id' => $id]);
+
+        if (isset($postData['groups'])) {
+            $groups = $postData['groups'];
+            $groupQuery = 'INSERT INTO domainlist_by_group (domainlist_id,group_id) VALUES(:id,:gid);';
+            foreach ($groups as $gid) {
+                $params = [
+                    ':id' => $id,
+                    ':gid' => $gid
+                ];
+                $this->gravity->doQuery($groupQuery, $params);
+            }
+        }
 
         return ['success' => true];
     }

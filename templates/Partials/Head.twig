@@ -21,11 +21,6 @@
     <!-- Theme styles -->
     <meta name="theme-color" content="#367fa9">
 
-    <style>
-        html {
-            background-color: #000;
-        }
-    </style>
 
     {{ assets({files: [
         'Resources/vendor/fonts/ubuntu-mono/ubuntu-mono.css',
@@ -40,6 +35,9 @@
         'Resources/vendor/bootstrap-select.min.css',
         'Resources/vendor/bootstrap-toggle.min.css',
         'Resources/style/pi-hole.css',
+    ]}) }}
+{#    // Theme selection#}
+    {{ assets({files: [
         'Resources/style/themes/lcars.css',
     ]}) }}
     <noscript>{{ assets({files: ['Resources/vendor/js-warn.css']}) }}</noscript>
