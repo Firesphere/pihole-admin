@@ -15,9 +15,9 @@ $(function () {
 
     table = $("#customDNSTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/customdns.php",
-            data: {action: "get", token: token},
-            type: "POST",
+            url: "api/customdns/getjson?type=ip",
+            data: {token: token},
+            type: "GET",
         },
         columns: [{}, {type: "ip-address"}, {orderable: false, searchable: false}],
         columnDefs: [

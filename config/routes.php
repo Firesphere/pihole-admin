@@ -33,10 +33,11 @@ return static function (App $app) {
         $group->post('groups', [GroupPostHandler::class, 'postHandler']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
-            $dnsGroup->post('add', [PiHole::class, 'addRecord']);
+            $dnsGroup->post('add', [DNSControl::class, 'addRecord']);
             $dnsGroup->post('delete', [DNSControl::class, 'deleteRecord']);
-            $dnsGroup->get('get', [DNSControl::class, 'getAllAsJSON']);
-            $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']);
+            $dnsGroup->get('get', [DNSControl::class, 'getExistingRecords']);
+            $dnsGroup->get('getjson', [DNSControl::class, 'getAsJSON']);
+            $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']); //??
         });
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);

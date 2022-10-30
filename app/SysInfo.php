@@ -16,16 +16,14 @@ class SysInfo
 
     public static function getMemoryUse()
     {
-        $file = fopen('/proc/meminfo', 'r');
+        $file = fopen('/proc/meminfo', 'rb');
         $meminfo = [];
         while ($line = fgets($file)) {
-            $expl = explode(':', $line);
-            if (count($expl) == 2) {
-                $kb = rtrim(trim($expl[1]), ' kB');
-                $meminfo[rtrim($expl[0], ':')] = $kb;
-            }
+            [$name, $value] = explode(':', $line);
+            $kb = rtrim(trim($value), ' kB');
+            $meminfo[$name] = $kb;
         }
-        $memused = $meminfo['MemTotal'] - $meminfo['MemFree'] - $meminfo['Buffers'] - $meminfo['Cached'];
+        $memused = ($meminfo['MemTotal'] - $meminfo['MemFree'] - $meminfo['Buffers'] - $meminfo['Cached']);
 
         return $memused / $meminfo['MemTotal'];
     }
@@ -37,10 +35,15 @@ class SysInfo
 
     public static function getCPUCount()
     {
-        $cpuinfo = file_get_contents('/proc/cpuinfo');
-        preg_match_all('/^processor/m', $cpuinfo, $matches);
+        $file = fopen('/proc/cpuinfo', 'rb');
+        $cpucount = 0;
+        while ($line = fgets($file)) {
+            if (substr($line, 0, 9) === 'processor') {
+                $cpucount++;
+            }
+        }
 
-        return count($matches[0]);
+        return $cpucount;
     }
 
     public static function getTemperature()

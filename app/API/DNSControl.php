@@ -2,12 +2,13 @@
 
 namespace App\API;
 
+use App\Helper\Helper;
 use App\Model\DNSRecord;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class DNSControl
+class DNSControl extends APIBase
 {
     private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
     private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
@@ -31,7 +32,7 @@ class DNSControl
 
     public static function readEntries($file)
     {
-        $handle = fopen($file, 'r');
+        $handle = fopen($file, 'rb');
         $type = ($file === static::CUSTOM_CNAME_FILE) ? 'CNAME' : 'IP';
         $explode = $type === 'IP' ? ' ' : ',';
         while ($line = fgets($handle)) {
@@ -42,16 +43,21 @@ class DNSControl
                 continue;
             }
 
-            if ($type === 'A' && !filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $type = 'AAAA';
+            $recordType = $type === 'IP' ? 'A' : 'CNAME';
+
+            // A record but not an IPv4
+            if ($recordType === 'A' &&
+                !filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+            ) {
+                $recordType = 'AAAA';
             }
 
             $data = new DNSRecord([
                 'name'   => $explodedLine[0],
                 'target' => $explodedLine[1],
-                'type'   => $type
+                'type'   => $recordType
             ]);
-            static::$existing_records[] = $data;
+            static::$existing_records[$type] = $data;
         }
 
         fclose($handle);
@@ -154,13 +160,19 @@ class DNSControl
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function getAllAsJSON(ServerRequestInterface $request, ResponseInterface $response)
+    public function getAsJSON(ServerRequestInterface $request, ResponseInterface $response)
     {
+        $params = $request->getQueryParams();
+        $type = strtoupper($params['type']);
         $list = static::getExistingRecords();
-        $body = $response->getBody();
-        $body->write(json_encode($list));
 
-        return $response->withHeader('Content-Type', 'application/json');
+        if (!isset($list[$type])) {
+            $msg = Helper::returnJSONError('No custom records');
+            $return = array_merge($msg, ['data' => []]);
+            return $this->returnAsJSON($request, $response, $return);
+        }
+
+        return $this->returnAsJSON($request, $response, $list[$type]);
     }
 
     /**
