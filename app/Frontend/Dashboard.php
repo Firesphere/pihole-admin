@@ -2,7 +2,6 @@
 
 namespace App\Frontend;
 
-
 use App\Frontend\Modules\Module;
 use app\Frontend\Modules\ModuleInterface;
 use Psr\Http\Message\RequestInterface;

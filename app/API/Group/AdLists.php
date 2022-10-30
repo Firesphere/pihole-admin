@@ -79,7 +79,8 @@ class AdLists extends GroupPostHandler
             $check_address = preg_replace('|([^:/]*://)?([^/]+)@|', '$1$2', $address, 1);
 
             if (preg_match('/[^a-zA-Z0-9:\\/?&%=~._()-;]/', $check_address) !== 0) {
-                $exc = sprintf('<strong>Invalid adlist URL %s</strong><br>Added %d out of %d adlists',
+                $exc = sprintf(
+                    '<strong>Invalid adlist URL %s</strong><br>Added %d out of %d adlists',
                     htmlentities(implode('', $added_list)),
                     $added,
                     $total
@@ -152,7 +153,6 @@ class AdLists extends GroupPostHandler
 
     public function editAdList($postData)
     {
-
         $updateQuery = 'UPDATE adlist SET enabled=:enabled, comment=:comment WHERE id = :id';
 
         $status = (int)$postData['status'] === 0 ? 0 : 1;

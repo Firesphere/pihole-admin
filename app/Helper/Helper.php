@@ -105,7 +105,8 @@ class Helper
      * @param $parent
      * @return array
      */
-    public static function getSubclassesOf($parent) {
+    public static function getSubclassesOf($parent)
+    {
         $result = [];
         $classes = get_declared_classes();
         foreach ($classes as $class) {

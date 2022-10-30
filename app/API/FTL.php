@@ -15,7 +15,6 @@ use Slim\Exception\HttpBadRequestException;
 
 class FTL extends APIBase
 {
-
     public static function getFTLStatus()
     {
         $port = PiHole::execute('dns-port');

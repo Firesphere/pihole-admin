@@ -19,7 +19,6 @@ class DNS extends Frontend
         $this->menuItems['DNSRecords'] = 'active';
 
         return Twig::fromRequest($request)->render($response, 'Pages/DNS/Records.twig', $this->menuItems);
-
     }
 
     public function getCNAMERecords(RequestInterface $request, ResponseInterface $response)
@@ -27,6 +26,5 @@ class DNS extends Frontend
         $this->menuItems['CNAMERecords'] = 'active';
 
         return Twig::fromRequest($request)->render($response, 'Pages/DNS/CNAME.twig', $this->menuItems);
-
     }
 }
