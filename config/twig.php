@@ -1,6 +1,7 @@
 <?php
 
 // Create Twig
+use App\API\FTL;
 use App\API\PiHole;
 use App\SysInfo;
 use Odan\Twig\TwigAssetsExtension;
@@ -24,6 +25,7 @@ $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
 $globals = [
     'baseHref'      => '/',
     'hostname'      => gethostname(),
+    'PiholeStatus'  => FTL::getFTLStatus(),
     'DockerVersion' => $versions['DOCKER_VERSION'] ?? false,
     'CoreVersion'   => $versions['CORE_VERSION'],
     'FTLVersion'    => $versions['FTL_VERSION'],

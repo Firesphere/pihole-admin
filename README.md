@@ -9,18 +9,32 @@ The goal is to rebuild/recreate the PiHole admin interface, but using Slim4 fram
 Todos:
 - [ ] API*
 - [ ] Interface*
-- [ ] DNS Record management*
+- [x] DNS Record management*
 - [ ] User management
 - [ ] Preferences
-- [ ] Enable/disable
+- [x] Enable/disable
 - [ ] Update from interface
 - [ ] Manage DHCP/DNS
 - [ ] Import/export
-- [ ] Javascript calls updates
-- [ ] Group and system management
-- [ ] Adlist management
+- [x] Javascript calls updates
+- [x] Group and system management
+- [x] Adlist management
 - [ ] Logging outputs
-- [ ] Network list
+- [x] Network list
 
 
 * Partially done, e.g. some calls or options exist but need frontend implementations
+
+# Adding modules
+
+Create a module like `ClientActivity`;
+
+Register it
+`Module::registerModule("My\\Namespaced\\Class")` or `Module::registerModule(MyClass::class)`
+
+Set the sort property to wherever you want it sorted
+
+Override the folder and template location to where you want it.
+
+You should be set to go and your module should be included now.
+

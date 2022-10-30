@@ -2,6 +2,8 @@
 
 namespace App\Frontend;
 
+use App\Frontend\Modules\Module;
+use App\Helper\Helper;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;

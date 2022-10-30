@@ -15,6 +15,35 @@ use Slim\Exception\HttpBadRequestException;
 
 class FTL extends APIBase
 {
+
+    public static function getFTLStatus()
+    {
+        $port = PiHole::execute('dns-port');
+
+        // Retrieve FTL status
+        $FTLstats = PiHole::execute('stats');
+
+        if (array_key_exists('FTLnotrunning', $port) || array_key_exists('FTLnotrunning', $FTLstats)) {
+            // FTL is not running
+            return -1;
+        }
+        if (in_array('status enabled', $FTLstats, true)) {
+            // FTL is enabled
+            if ((int)$port[0] <= 0) {
+                // Port=0; FTL is not listening
+                return -1;
+            }
+            // FTL is running on this port
+            return (int)$port[0];
+        }
+        if (in_array('status disabled', $FTLstats, true)) {
+            // FTL is disabled
+            return 0;
+        }
+
+        // All options exhausted, it's dead
+        return -2;
+    }
     /**
      * Start or Stop FTL
      * @param RequestInterface $request
@@ -43,11 +72,16 @@ class FTL extends APIBase
         }
         try {
             $result = PiHole::execute($escaped);
+            $return = ['success' => true, 'response' => $result];
         } catch (RuntimeException $e) {
-            Helper::returnJSONError($e->getMessage());
+            $this->returnAsJSON($request, $response, ['success' => false, 'status' => Helper::returnJSONError($e->getMessage())]);
         }
 
-        return $this->returnAsJSON($request, $response, ['success' => true, 'response' => $result]);
+        $return['status'] = str_contains($escaped, 'enable') ? 'enabled' : 'disabled';
+
+
+
+        return $this->returnAsJSON($request, $response, $return);
     }
 
 
