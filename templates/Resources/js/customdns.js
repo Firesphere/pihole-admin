@@ -73,7 +73,7 @@ function addCustomDNS() {
     utils.showAlert("info", "", "Adding custom DNS entry...", "");
 
     $.ajax({
-        url: "scripts/pi-hole/php/customdns.php",
+        url: "api/customdns/add",
         method: "post",
         dataType: "json",
         data: {action: "add", ip: ip, domain: domain, token: token},

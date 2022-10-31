@@ -82,12 +82,12 @@ class DNSRecord
     public function save()
     {
         $action = $this->type === 'CNAME' ? 'addcustomcname' : 'addcustomdns';
-        PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
+        return PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
     }
 
     public function delete()
     {
         $action = $this->type === 'CNAME' ? 'removecustomcname' : 'removecustomdns';
-        PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
+        return PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
     }
 }

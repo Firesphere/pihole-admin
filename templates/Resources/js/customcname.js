@@ -15,7 +15,7 @@ $(function () {
 
     table = $("#customCNAMETable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/customcname.php",
+            url: "api/customdns?",
             data: {action: "get", token: token},
             type: "POST",
         },
@@ -74,7 +74,7 @@ function addCustomCNAME() {
     utils.showAlert("info", "", "Adding custom CNAME record...", "");
 
     $.ajax({
-        url: "scripts/pi-hole/php/customcname.php",
+        url: "api/customdns/add",
         method: "post",
         dataType: "json",
         data: {action: "add", domain: domain, target: target, token: token},
