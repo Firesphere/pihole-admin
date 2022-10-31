@@ -21,7 +21,7 @@ class FTL extends APIBase
         $port = $api->doCall('dns-port');
 
         // Retrieve FTL status
-        $FTLstats = $api->doCall('status');
+        $FTLstats = $api->doCall('stats');
 
         if (array_key_exists('FTLnotrunning', $port) || array_key_exists('FTLnotrunning', $FTLstats)) {
             // FTL is not running
