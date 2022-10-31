@@ -468,7 +468,7 @@ function delItems(ids) {
     utils.showAlert("info", "", "Deleting Adlists: " + idstring, "...");
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {action: "delete_adlist", id: JSON.stringify(ids), token: token},
@@ -594,7 +594,7 @@ function editAdlist() {
     utils.showAlert("info", "", "Editing adlist...", address);
 
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         dataType: "json",
         data: {
