@@ -89,8 +89,6 @@ class DNSControl extends APIBase
     public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $params = $request->getParsedBody();
-        $type = '';
-        $to = $params['target'] ?? $params['ip'];
         // Validate domain and IP of target
         if (!filter_var($params['domain'], FILTER_VALIDATE_DOMAIN) &&
             !filter_var($params['domain'], FILTER_VALIDATE_IP)
@@ -98,26 +96,26 @@ class DNSControl extends APIBase
             return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid domain name']);
         }
         if (
-            !filter_var($to, FILTER_VALIDATE_DOMAIN) &&
-            !filter_var($to, FILTER_VALIDATE_IP)
+            !filter_var($params['target'], FILTER_VALIDATE_DOMAIN) &&
+            !filter_var($params['target'], FILTER_VALIDATE_IP)
         ) {
             return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
         }
 
         // IPv6 type checking
-        if (filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $type = 'A';
-        } elseif (filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        } elseif (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $type = 'AAAA';
-        } elseif (filter_var($to, FILTER_VALIDATE_DOMAIN)) {
+        } elseif (filter_var($params['target'], FILTER_VALIDATE_DOMAIN)) {
             $type = 'CNAME';
         } else {
-            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
+            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target type']);
         }
 
         foreach (static::$existing_records as $existing) {
             if ($existing->getName() === $params['domain'] &&
-                $existing->getTarget() === $to &&
+                $existing->getTarget() === $params['target'] &&
                 $existing->getType() === $type
             ) {
                 return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Record already exists']);
@@ -125,7 +123,7 @@ class DNSControl extends APIBase
         }
         $record = new DNSRecord([
             'type'   => $type,
-            'target' => $to,
+            'target' => $params['target'],
             'name'   => $params['domain']
         ]);
 

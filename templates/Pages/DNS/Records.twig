@@ -12,28 +12,13 @@
     <div class="row">
         <div class="col-md-12">
             <div class="box">
-                <!-- /.box-header -->
-                <div class="box-header with-border">
-                    <h3 class="box-title">
-                        Add a new domain/IP combination
-                    </h3>
-                </div>
-                <!-- /.box-header -->
-                <div class="box-body">
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            <label for="domain">Domain:</label>
-                            <input id="domain" type="url" class="form-control"
-                                   placeholder="Add a domain (example.com or sub.example.com)" autocomplete="off"
-                                   spellcheck="false" autocapitalize="none" autocorrect="off">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="ip">IP Address:</label>
-                            <input id="ip" type="text" class="form-control" placeholder="Associated IP address"
-                                   autocomplete="off" spellcheck="false" autocapitalize="none" autocorrect="off">
-                        </div>
-                    </div>
-                </div>
+                {{ include('Partials/DNS/Form.twig', {
+                    'Title': 'Add a new domain/IP combination',
+                    'Origin': 'Domain',
+                    'Target': 'IP Address',
+                    'Placeholder': 'Associated IP Address',
+                    'fieldtype': 'text',
+                }) }}
                 <div class="box-footer clearfix">
                     <strong>Note:</strong>
                     <p>The order of locally defined DNS records is: </p>
@@ -50,10 +35,11 @@
             </div>
         </div>
     </div>
-    {{ include('Partials/DNS/ListBox.twig', {'Title': 'List of local DNS domains', 'Target': 'ip', 'id': 'customDNSTable'}) }}
+    {{ include('Partials/DNS/ListBox.twig', {'Title': 'List of local DNS domains', 'Target': 'ip'}) }}
 {% endblock %}
 
 {% block pagescripts %}
+    <script type="text/javascript">window.dnstype="DNS"</script>
     {{ assets({files: [
         'Resources/js/ip-address-sorting.js',
         'Resources/js/customdns.js'
