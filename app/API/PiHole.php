@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class PiHole
 {
-    private const VERSION_FILE = '/var/www/html/versions';
+    private const VERSION_FILE = '/etc/pihole/versions';
     protected static $urls = [
         'coreUrl'   => 'https://github.com/pi-hole/pi-hole/releases',
         'webUrl'    => 'https://github.com/pi-hole/AdminLTE/releases',
