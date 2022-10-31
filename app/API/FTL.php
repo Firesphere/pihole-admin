@@ -17,16 +17,17 @@ class FTL extends APIBase
 {
     public static function getFTLStatus()
     {
-        $port = PiHole::execute('dns-port');
+        $api = new CallAPI();
+        $port = $api->doCall('dns-port');
 
         // Retrieve FTL status
-        $FTLstats = PiHole::execute('stats');
+        $FTLstats = $api->doCall('status');
 
         if (array_key_exists('FTLnotrunning', $port) || array_key_exists('FTLnotrunning', $FTLstats)) {
             // FTL is not running
             return -1;
         }
-        if (in_array('status enabled', $FTLstats, true)) {
+        if (in_array('status enabled', $FTLstats, false)) {
             // FTL is enabled
             if ((int)$port[0] <= 0) {
                 // Port=0; FTL is not listening
@@ -35,7 +36,7 @@ class FTL extends APIBase
             // FTL is running on this port
             return (int)$port[0];
         }
-        if (in_array('status disabled', $FTLstats, true)) {
+        if (in_array('status disabled', $FTLstats, false)) {
             // FTL is disabled
             return 0;
         }
