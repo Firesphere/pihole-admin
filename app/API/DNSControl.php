@@ -8,9 +8,18 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ *
+ */
 class DNSControl extends APIBase
 {
+    /**
+     * Location of custom DNS records
+     */
     private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
+    /**
+     * Location of custom CNAME records
+     */
     private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
 
     /**
@@ -18,22 +27,28 @@ class DNSControl extends APIBase
      */
     protected static array $existing_records = [];
 
+    /**
+     *
+     */
     public function __construct()
     {
         if (!count(static::$existing_records)) {
             if (file_exists(static::CUSTOM_DNS_FILE)) {
-                static::readEntries(static::CUSTOM_CNAME_FILE);
+                $this->readEntries(static::CUSTOM_CNAME_FILE, 'CNAME');
             }
             if (file_exists(static::CUSTOM_DNS_FILE)) {
-                static::readEntries(static::CUSTOM_DNS_FILE);
+                $this->readEntries(static::CUSTOM_DNS_FILE, 'IP');
             }
         }
     }
 
-    public static function readEntries($file)
+    /**
+     * @param $file
+     * @return void
+     */
+    protected function readEntries($file, $type)
     {
         $handle = fopen($file, 'rb');
-        $type = ($file === static::CUSTOM_CNAME_FILE) ? 'CNAME' : 'IP';
         $explode = $type === 'IP' ? ' ' : ',';
         while ($line = fgets($handle)) {
             $line = str_replace('cname=', '', trim($line));
@@ -47,7 +62,7 @@ class DNSControl extends APIBase
 
             // A record but not an IPv4
             if ($recordType === 'A' &&
-                !filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+                filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
             ) {
                 $recordType = 'AAAA';
             }
@@ -69,6 +84,7 @@ class DNSControl extends APIBase
      * @param ResponseInterface $response
      * @param $args
      * @return ResponseInterface
+     * @throws \JsonException
      */
     public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
@@ -79,22 +95,24 @@ class DNSControl extends APIBase
         if (!filter_var($params['domain'], FILTER_VALIDATE_DOMAIN) &&
             !filter_var($params['domain'], FILTER_VALIDATE_IP)
         ) {
-            throw new InvalidArgumentException('Invalid domain name');
+            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid domain name']);
         }
         if (
             !filter_var($to, FILTER_VALIDATE_DOMAIN) &&
             !filter_var($to, FILTER_VALIDATE_IP)
         ) {
-            throw new InvalidArgumentException('Invalid target');
+            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
         }
 
         // IPv6 type checking
-        if ($type === '' && filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             $type = 'A';
-        } elseif ($type === '' && filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        } elseif (filter_var($to, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
             $type = 'AAAA';
         } elseif (filter_var($to, FILTER_VALIDATE_DOMAIN)) {
             $type = 'CNAME';
+        } else {
+            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
         }
 
         foreach (static::$existing_records as $existing) {
@@ -188,6 +206,13 @@ class DNSControl extends APIBase
         return self::$existing_records;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param $args
+     * @return ResponseInterface
+     * @throws \JsonException
+     */
     public function deleteAll(ServerRequestInterface $request, ResponseInterface $response, $args)
     {
         $type = $args['type'];
@@ -198,9 +223,6 @@ class DNSControl extends APIBase
             }
         }
 
-        $body = $response->getBody();
-        $body->write(json_encode(['success' => true, 'message' => '']));
-
-        return $response->withHeader('Content-Type', 'application/json');
+        return $this->returnAsJSON($request, $response, ['success' => true]);
     }
 }
