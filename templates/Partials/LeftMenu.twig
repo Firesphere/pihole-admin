@@ -14,15 +14,15 @@
                         {% if PiHoleStatus == 53 %}text-green-light{% elseif PiHoleStatus > 0 %}text-orange{% else %}text-red{% endif %}
                     "></i>
                     {% if PiHoleStatus == 53 %}
-                    Active
+                        Active
                     {% elseif PiHoleStatus == 0 %}
-                    Blocking disabled
+                        Blocking disabled
                     {% elseif PiHoleStatus == -1 %}
-                    DNS Service not running
+                        DNS Service not running
                     {% elseif PiHoleStatus == -2 %}
-                    Status unknown
+                        Status unknown
                     {% else %}
-                    DNS Service on port {{ PiHoleStatus }}
+                        DNS Service on port {{ PiHoleStatus }}
                     {% endif %}
                 </span>
                 <br/>
@@ -113,7 +113,8 @@
             <li class="header text-uppercase">DNS Control</li>
             <!-- Local DNS Records -->
             <!-- Enable/Disable Blocking -->
-            <li id="pihole-disable" class="menu-dns treeview" style="{% if PiHoleStatus <= 0 %}display: none;{% else %}display: list-item;{% endif %}">
+            <li id="pihole-disable" class="menu-dns treeview"
+                style="{% if PiHoleStatus <= 0 %}display: none;{% else %}display: list-item;{% endif %}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-stop"></i> <span>Disable Blocking&nbsp;&nbsp;&nbsp;<span
                                 id="flip-status-disable"></span></span>
@@ -150,7 +151,8 @@
                 </ul>
                 <!-- <a href="#" id="flip-status"><i class="fa fa-stop"></i> <span>Disable</span></a> -->
             </li>
-            <li id="pihole-enable" class="menu-dns treeview" style="{% if PiHoleStatus > 0 %}display: none;{% else %}display: list-item;{% endif %}">
+            <li id="pihole-enable" class="menu-dns treeview"
+                style="{% if PiHoleStatus > 0 %}display: none;{% else %}display: list-item;{% endif %}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-play"></i>
                     <span id="enableLabel">Enable Blocking&nbsp;&nbsp;&nbsp;
@@ -158,7 +160,7 @@
                         </span>
                 </a>
             </li>
-            <li class="menu-dns treeview">
+            <li class="menu-dns treeview {{ DNS }}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-address-book"></i> <span>Local DNS</span>
                     <span class="pull-right-container">
@@ -166,13 +168,13 @@
                         </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li class="">
-                        <a href="dns_records.php">
+                    <li class="{{ DNSRecords }}">
+                        <a href="dns/dns">
                             <i class="fa fa-fw menu-icon fa-address-book"></i> DNS Records
                         </a>
                     </li>
-                    <li class="">
-                        <a href="cname_records.php">
+                    <li class="{{ CNAMERecords }}">
+                        <a href="dns/cname">
                             <i class="fa fa-fw menu-icon fa-address-book"></i> CNAME Records
                         </a>
                     </li>
@@ -181,7 +183,7 @@
 
             <li class="header text-uppercase">System</li>
             <!-- Tools -->
-            <li class="menu-system treeview">
+            <li class="menu-system treeview {{ Tools }}">
                 <a href="#">
                     <i class="fa fa-fw menu-icon fa-tools"></i> <span>Tools</span>
                     <span class="warning-count hidden"></span>
@@ -191,33 +193,33 @@
                 </a>
                 <ul class="treeview-menu">
                     <!-- Pi-hole diagnosis -->
-                    <li class="">
-                        <a href="messages.php">
+                    <li class="{{ Message }}">
+                        <a href="tools/messages">
                             <i class="fa fa-fw menu-icon fa-file-medical-alt"></i> Pi-hole diagnosis
                             <span class="pull-right-container warning-count hidden"></span>
                         </a>
                     </li>
                     <!-- Run gravity.sh -->
-                    <li class="">
-                        <a href="gravity.php">
+                    <li class="{{ Gravity }}">
+                        <a href="tools/gravity">
                             <i class="fa fa-fw menu-icon fa-arrow-circle-down"></i> Update Gravity
                         </a>
                     </li>
                     <!-- Query Lists -->
-                    <li class="">
-                        <a href="queryads.php">
+                    <li class=" {{ AdlistSearch }}">
+                        <a href="tools/adlistsearch">
                             <i class="fa fa-fw menu-icon fa-search"></i> Search Adlists
                         </a>
                     </li>
                     <!-- Audit log -->
-                    <li class="">
-                        <a href="auditlog.php">
+                    <li class="{{ Auditlog }}">
+                        <a href="tools/auditlog">
                             <i class="fa fa-fw menu-icon fa-balance-scale"></i> Audit log
                         </a>
                     </li>
                     <!-- Tail pihole.log -->
-                    <li class="">
-                        <a href="taillog.php">
+                    <li class="{{ Taillog }}">
+                        <a href="tools/taillog">
                             <svg class="svg-inline--fa fa-fw menu-icon" style="height: 1.25em">
                                 <use xlink:href="img/pihole_icon.svg#pihole-svg-logo"/>
                             </svg>
@@ -225,8 +227,8 @@
                         </a>
                     </li>
                     <!-- Tail FTL.log -->
-                    <li class="">
-                        <a href="taillog-FTL.php">
+                    <li class="{{ TailFTL }}">
+                        <a href="tools/tailftl">
                             <svg class="svg-inline--fa fa-fw menu-icon" style="height: 1.25em">
                                 <use xlink:href="img/pihole_icon.svg#pihole-svg-logo"/>
                             </svg>
@@ -234,22 +236,22 @@
                         </a>
                     </li>
                     <!-- Generate debug log -->
-                    <li class="">
-                        <a href="debug.php">
+                    <li class="{{ Debug }}">
+                        <a href="tools/debug">
                             <i class="fa fa-fw menu-icon fa-ambulance"></i> Generate debug log
                         </a>
                     </li>
                     <!-- Network -->
-                    <li class="">
-                        <a href="network.php">
+                    <li class="{{ Network }}">
+                        <a href="tools/network">
                             <i class="fa fa-fw menu-icon fa-network-wired"></i> Network
                         </a>
                     </li>
                 </ul>
             </li>
             <!-- Settings -->
-            <li class="menu-system">
-                <a href="settings.php">
+            <li class="menu-system {{ Settings }}">
+                <a href="settings">
                     <i class="fa fa-fw menu-icon fa-cog"></i> <span>Settings</span>
                 </a>
             </li>

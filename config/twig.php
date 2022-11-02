@@ -25,7 +25,7 @@ $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
 $globals = [
     'baseHref'      => '/',
     'hostname'      => gethostname(),
-    'PiholeStatus'  => FTL::getFTLStatus(),
+    'PiHoleStatus'  => FTL::getFTLStatus(),
     'DockerVersion' => $versions['DOCKER_VERSION'] ?? false,
     'CoreVersion'   => $versions['CORE_VERSION'],
     'FTLVersion'    => $versions['FTL_VERSION'],

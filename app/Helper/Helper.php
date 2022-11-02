@@ -2,9 +2,6 @@
 
 namespace App\Helper;
 
-use Composer\Autoload\ClassLoader;
-use Slim\Factory\AppFactory;
-
 class Helper
 {
     public static function returnJSONError($error, $params = [])
@@ -105,7 +102,8 @@ class Helper
      * @param $parent
      * @return array
      */
-    public static function getSubclassesOf($parent) {
+    public static function getSubclassesOf($parent)
+    {
         $result = [];
         $classes = get_declared_classes();
         foreach ($classes as $class) {
@@ -113,6 +111,7 @@ class Helper
                 $result[] = $class;
             }
         }
+
         return $result;
     }
 }

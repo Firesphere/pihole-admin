@@ -10,19 +10,19 @@ class DNSRecord
      * CNAME, A, AAAA
      * @var string
      */
-    private $type;
+    public $type;
 
     /**
      * Name to resolve
      * @var string
      */
-    private $name;
+    public $name;
 
     /**
      * Target, e.g. an IP or a domain in case of a CNAME
      * @var string
      */
-    private $target;
+    public $target;
 
     public function __construct($params)
     {
@@ -82,12 +82,12 @@ class DNSRecord
     public function save()
     {
         $action = $this->type === 'CNAME' ? 'addcustomcname' : 'addcustomdns';
-        PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
+        return PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
     }
 
     public function delete()
     {
         $action = $this->type === 'CNAME' ? 'removecustomcname' : 'removecustomdns';
-        PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
+        return PiHole::execute(sprintf('-a %s %s %s', $action, $this->name, $this->target));
     }
 }

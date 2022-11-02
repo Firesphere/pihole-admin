@@ -5,6 +5,8 @@ namespace App\API\Gravity;
 use App\DB\SQLiteDB;
 use DateTime;
 use Exception;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class Gravity
 {
@@ -60,5 +62,35 @@ class Gravity
         $str = sprintf('Adlists updated %s%%H:%%I (hh:mm) ago', $str);
 
         return $gravitydiff->format($str);
+    }
+
+    public function updateGravity(RequestInterface $request, ResponseInterface $response)
+    {
+        ob_end_flush();
+        ini_set('output_buffering', '0');
+        ob_implicit_flush(true);
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        $proc = popen('sudo pihole -g', 'r');
+        while (!feof($proc)) {
+            $this->printStream(fread($proc, 4096));
+        }
+
+        exit; // Hard exit
+    }
+
+    protected function printStream($datatext)
+    {
+        // Detect ${OVER} and replace it with something we can safely transmit
+        $datatext = str_replace("\r[K", '<------', $datatext);
+        $pos = strpos($datatext, '<------');
+        // Detect if the ${OVER} line is within this line, e.g.
+        // "Pending: String to replace${OVER}Done: String has been replaced"
+        // If this is the case, we have to remove everything before ${OVER}
+        // and return only the text thereafter
+        if ($pos !== false && $pos !== 0) {
+            $datatext = substr($datatext, $pos);
+        }
+        echo 'data: ' . implode("\ndata: ", explode("\n", $datatext)) . "\n\n";
     }
 }

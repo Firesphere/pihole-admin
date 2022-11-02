@@ -11,23 +11,23 @@ var table;
 var token = $("#token").text();
 
 $(function () {
-    $("#btnAdd").on("click", addCustomDNS);
+    $("#btnAdd").on("click", addCustom);
 
-    table = $("#customDNSTable").DataTable({
+    table = $("#customEntriesTable").DataTable({
         ajax: {
-            url: "scripts/pi-hole/php/customdns.php",
-            data: {action: "get", token: token},
-            type: "POST",
+            url: "api/customdns/getjson?type="+window.dnstype.toLowerCase(),
+            data: {token: token},
+            type: "GET",
         },
-        columns: [{}, {type: "ip-address"}, {orderable: false, searchable: false}],
+        columns: [{}, {type: window.dnstype+'-address'}, {orderable: false, searchable: false}],
         columnDefs: [
             {
                 targets: 2,
                 render: function (data, type, row) {
                     return (
-                        '<button type="button" class="btn btn-danger btn-xs deleteCustomDNS" data-domain=\'' +
+                        '<button type="button" class="btn btn-danger btn-xs deleteCustom" data-origin=\'' +
                         row[0] +
-                        "' data-ip='" +
+                        "' data-target='" +
                         row[1] +
                         "'>" +
                         '<span class="far fa-trash-alt"></span>' +
@@ -48,15 +48,16 @@ $(function () {
         stateSave: true,
         stateDuration: 0,
         stateSaveCallback: function (settings, data) {
-            utils.stateSaveCallback("LocalDNSTable", data);
+            utils.stateSaveCallback("Local"+window.dnstype+"Table", data);
         },
         stateLoadCallback: function () {
-            return utils.stateLoadCallback("LocalDNSTable");
+            return utils.stateLoadCallback("Local"+window.dnstype+"Table");
         },
         drawCallback: function () {
-            $(".deleteCustomDNS").on("click", deleteCustomDNS);
+            $(".deleteCustom").on("click", deleteCustom);
         },
     });
+
     // Disable autocorrect in the search box
     var input = document.querySelector("input[type=search]");
     input.setAttribute("autocomplete", "off");
@@ -65,55 +66,64 @@ $(function () {
     input.setAttribute("spellcheck", false);
 });
 
-function addCustomDNS() {
-    var ip = utils.escapeHtml($("#ip").val());
-    var domain = utils.escapeHtml($("#domain").val());
+function addCustom() {
+    var origin = utils.escapeHtml($("#origin").val());
+    var target = utils.escapeHtml($("#target").val());
 
     utils.disableAll();
-    utils.showAlert("info", "", "Adding custom DNS entry...", "");
+    utils.showAlert("info", "", "Adding custom "+window.dnstype+" record...", "");
 
     $.ajax({
-        url: "scripts/pi-hole/php/customdns.php",
+        url: "api/customdns/add",
         method: "post",
         dataType: "json",
-        data: {action: "add", ip: ip, domain: domain, token: token},
+        data: {action: "add", "domain": origin, "target": target, type: window.dnstype, token: token},
         success: function (response) {
             utils.enableAll();
             if (response.success) {
-                utils.showAlert("success", "far fa-check-circle", "Custom DNS added", domain + ": " + ip);
+                utils.showAlert(
+                    "success",
+                    "far fa-check-circle",
+                    "Custom "+window.dnstype+" added",
+                    origin + ": " + target
+                );
 
                 // Clean up field values and reload table data
-                $("#domain").val("");
-                $("#ip").val("");
+                $("#origin").val("").focus();
+                $("#target").val("");
                 table.ajax.reload();
-                $("#domain").focus();
             } else {
                 utils.showAlert("error", "fas fa-times", "Failure! Something went wrong", response.message);
             }
         },
         error: function () {
             utils.enableAll();
-            utils.showAlert("error", "fas fa-times", "Error while adding custom DNS entry", "");
+            utils.showAlert("error", "fas fa-times", "Error while adding custom "+window.dnstype+" record", "");
         },
     });
 }
 
-function deleteCustomDNS() {
-    var ip = $(this).attr("data-ip");
-    var domain = $(this).attr("data-domain");
+function deleteCustom() {
+    var target = $(this).attr("data-target");
+    var origin = $(this).attr("data-origin");
 
     utils.disableAll();
-    utils.showAlert("info", "", "Deleting custom DNS entry...", "");
+    utils.showAlert("info", "", "Deleting custom "+window.dnstype+" record...", "");
 
     $.ajax({
-        url: "scripts/pi-hole/php/customdns.php",
+        url: "api/customdns/delete",
         method: "post",
         dataType: "json",
-        data: {action: "delete", domain: domain, ip: ip, token: token},
+        data: {action: "delete", domain: origin, target: target, type: window.dnstype, token: token},
         success: function (response) {
             utils.enableAll();
             if (response.success) {
-                utils.showAlert("success", "far fa-check-circle", "Custom DNS deleted", domain + ": " + ip);
+                utils.showAlert(
+                    "success",
+                    "far fa-check-circle",
+                    "Custom "+window.dnstype+" record deleted",
+                    origin + ": " + target
+                );
                 table.ajax.reload();
             } else {
                 utils.showAlert("error", "fas fa-times", "Failure! Something went wrong", response.message);
@@ -121,7 +131,10 @@ function deleteCustomDNS() {
         },
         error: function (jqXHR, exception) {
             utils.enableAll();
-            utils.showAlert("error", "fas fa-times", "Error while deleting custom DNS entry", "");
+            utils.showAlert(
+                "error",
+                "fas fa-times",
+                "Error while deleting custom "+window.dnstype+" record", "");
             console.log(exception); // eslint-disable-line no-console
         },
     });

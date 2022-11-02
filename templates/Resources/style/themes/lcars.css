@@ -853,7 +853,8 @@ p.login-box-msg,
 }
 
 .sidebar-menu li a > svg {
-    display: none;
+    float: right;
+    margin: 5px 0 0 5px;
 }
 
 .menu-icon {

@@ -3,6 +3,7 @@
 
 use App\API\DNSControl;
 use App\API\FTL;
+use App\API\Gravity\Gravity;
 use App\API\GroupPostHandler;
 use App\API\PiHole;
 use App\API\PiholeDB;
@@ -33,11 +34,15 @@ return static function (App $app) {
         $group->post('groups', [GroupPostHandler::class, 'postHandler']);
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
-            $dnsGroup->post('add', [PiHole::class, 'addRecord']);
+            $dnsGroup->post('add', [DNSControl::class, 'addRecord']);
             $dnsGroup->post('delete', [DNSControl::class, 'deleteRecord']);
-            $dnsGroup->get('get', [DNSControl::class, 'getAllAsJSON']);
-            $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']);
+            $dnsGroup->get('get', [DNSControl::class, 'getExistingRecords']);
+            $dnsGroup->get('getjson', [DNSControl::class, 'getAsJSON']);
+            $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']); //??
         });
+        $group->post('messages', [PiholeDB::class, 'deleteMessages']);
+        $group->get('messages', [PiholeDB::class, 'getMessages']);
+        $group->get('gravity/update', [Gravity::class, 'updateGravity']);
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);
     $app->get('/queries', [Frontend\Queries::class, 'index']);
@@ -51,5 +56,13 @@ return static function (App $app) {
         $group->get('/clients', [Frontend\Group::class, 'getClients']);
         $group->get('/domains', [Frontend\Group::class, 'getDomains']);
         $group->get('/adlists', [Frontend\Group::class, 'getList']);
+    });
+    $app->group('/dns', function (RouteCollectorProxy $group) {
+        $group->get('/dns', [Frontend\DNS::class, 'getDNSRecords']);
+        $group->get('/cname', [Frontend\DNS::class, 'getCNAMERecords']);
+    });
+    $app->group('/tools', function (RouteCollectorProxy $group) {
+        $group->get('/messages', [Frontend\Tools::class, 'getMessages']);
+        $group->get('/gravity', [Frontend\Tools::class, 'gravity']);
     });
 };

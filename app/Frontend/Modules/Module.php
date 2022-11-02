@@ -14,6 +14,7 @@ class Module
     }
 
     /**
+     * @param $obj
      * @return int
      */
     public function getSortOrder($obj): int

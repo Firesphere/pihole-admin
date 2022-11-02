@@ -2,10 +2,8 @@
 
 namespace App\Frontend;
 
-
-
 use App\Frontend\Modules\Module;
-use App\Helper\Helper;
+use app\Frontend\Modules\ModuleInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
@@ -17,12 +15,11 @@ class Dashboard extends Frontend
         $modules = (new Module())->getModules();
         $twig = Twig::fromRequest($request);
         $this->menuItems['Dashboard'] = 'active';
-        $this->menuItems['includes'] = [];
+        $this->menuItems['Includes'] = [];
         $env = $twig->getEnvironment();
-        /** @var Module $subclass */
+        /** @var ModuleInterface $module */
         foreach ($modules as $module) {
-            $path = $module->getBaseFolder() . $module->getTemplate();
-            $this->menuItems['includes'][$module->sort] = $env->render($path);
+            $this->menuItems['includes'][$module->sort] = $module->renderTemplate($env);
         }
 
 

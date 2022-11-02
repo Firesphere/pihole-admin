@@ -5,9 +5,11 @@
 /vendor/
 /logs/*
 /cache
-/public/cache
-/public/style
-/public/scripts
+/public/cache/*.js
+/public/cache/*.css
+!.gitkeep
 !/logs/README.md
 .phpunit.result.cache
 *.db
+*.conf
+*.list
