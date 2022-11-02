@@ -29,4 +29,12 @@ class Tools extends Frontend
 
         return $view->render($response, 'Pages/Tools/Gravity.twig', $this->menuItems);
     }
+
+    public function getAdlistSearch(RequestInterface $request, ResponseInterface $response)
+    {
+        $view = Twig::fromRequest($request);
+        $this->menuItems['AdlistSearch'] = 'active';
+
+        return $view->render($response, 'Pages/Tools/AdlistSearch.twig', $this->menuItems);
+    }
 }

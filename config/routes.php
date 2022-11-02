@@ -32,6 +32,7 @@ return static function (App $app) {
         $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
         $group->get('topAds', [PiholeDB::class, 'getTopAds']);
         $group->post('groups', [GroupPostHandler::class, 'postHandler']);
+
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [DNSControl::class, 'addRecord']);
@@ -40,9 +41,14 @@ return static function (App $app) {
             $dnsGroup->get('getjson', [DNSControl::class, 'getAsJSON']);
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']); //??
         });
+
         $group->post('messages', [PiholeDB::class, 'deleteMessages']);
         $group->get('messages', [PiholeDB::class, 'getMessages']);
-        $group->get('gravity/update', [Gravity::class, 'updateGravity']);
+
+        $group->group('gravity', function (RouteCollectorProxy $gravityGroup) {
+            $gravityGroup->get('/update', [Gravity::class, 'updateGravity']);
+            $gravityGroup->get('/search', [Gravity::class, 'searchGravity']);
+        });
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);
     $app->get('/queries', [Frontend\Queries::class, 'index']);
@@ -64,5 +70,6 @@ return static function (App $app) {
     $app->group('/tools', function (RouteCollectorProxy $group) {
         $group->get('/messages', [Frontend\Tools::class, 'getMessages']);
         $group->get('/gravity', [Frontend\Tools::class, 'gravity']);
+        $group->get('/search', [Frontend\Tools::class, 'getAdlistSearch']);
     });
 };
