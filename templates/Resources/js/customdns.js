@@ -25,7 +25,7 @@ $(function () {
                 targets: 2,
                 render: function (data, type, row) {
                     return (
-                        '<button type="button" class="btn btn-danger btn-xs deleteCustom'+window.dnstype+'" data-domain=\'' +
+                        '<button type="button" class="btn btn-danger btn-xs deleteCustom" data-origin=\'' +
                         row[0] +
                         "' data-target='" +
                         row[1] +
@@ -77,7 +77,7 @@ function addCustom() {
         url: "api/customdns/add",
         method: "post",
         dataType: "json",
-        data: {action: "add", domain: origin, target: target, type: window.dnstype, token: token},
+        data: {action: "add", "domain": origin, "target": target, type: window.dnstype, token: token},
         success: function (response) {
             utils.enableAll();
             if (response.success) {
@@ -89,10 +89,9 @@ function addCustom() {
                 );
 
                 // Clean up field values and reload table data
-                $("#origin").val("");
+                $("#origin").val("").focus();
                 $("#target").val("");
                 table.ajax.reload();
-                $("#domain").focus();
             } else {
                 utils.showAlert("error", "fas fa-times", "Failure! Something went wrong", response.message);
             }
@@ -106,16 +105,16 @@ function addCustom() {
 
 function deleteCustom() {
     var target = $(this).attr("data-target");
-    var origin = $(this).attr("data-domain");
+    var origin = $(this).attr("data-origin");
 
     utils.disableAll();
     utils.showAlert("info", "", "Deleting custom "+window.dnstype+" record...", "");
 
     $.ajax({
-        url: "api/dns/delete",
+        url: "api/customdns/delete",
         method: "post",
         dataType: "json",
-        data: {action: "delete", domain: domain, target: target, type: window.dnstype, token: token},
+        data: {action: "delete", domain: origin, target: target, type: window.dnstype, token: token},
         success: function (response) {
             utils.enableAll();
             if (response.success) {
@@ -123,7 +122,7 @@ function deleteCustom() {
                     "success",
                     "far fa-check-circle",
                     "Custom "+window.dnstype+" record deleted",
-                    domain + ": " + target
+                    origin + ": " + target
                 );
                 table.ajax.reload();
             } else {

@@ -16,11 +16,11 @@ class DNSControl extends APIBase
     /**
      * Location of custom DNS records
      */
-    private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
+    private const CUSTOM_DNS_FILE = '/var/www/html/custom.list';
     /**
      * Location of custom CNAME records
      */
-    private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
+    private const CUSTOM_CNAME_FILE = '/var/www/html/05-pihole-custom-cname.conf';
 
     /**
      * @var array|DNSRecord[]
@@ -68,11 +68,11 @@ class DNSControl extends APIBase
             }
 
             $data = new DNSRecord([
-                'name'   => $explodedLine[0],
-                'target' => $explodedLine[1],
+                'name'   => $explodedLine[1],
+                'target' => $explodedLine[0],
                 'type'   => $recordType
             ]);
-            static::$existing_records[$type] = $data;
+            static::$existing_records[$type][] = $data;
         }
 
         fclose($handle);
@@ -113,7 +113,9 @@ class DNSControl extends APIBase
             return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target type']);
         }
 
-        foreach (static::$existing_records as $existing) {
+        $existingType = $type === 'CNAME' ? 'CNAME' : 'IP';
+
+        foreach (static::$existing_records[$existingType] as $existing) {
             if ($existing->getName() === $params['domain'] &&
                 $existing->getTarget() === $params['target'] &&
                 $existing->getType() === $type
@@ -144,11 +146,11 @@ class DNSControl extends APIBase
      * Delete a $name to point to $target, of $type
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param $args
      * @return ResponseInterface
      */
-    public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response, $args)
+    public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response)
     {
+        $args = $request->getParsedBody();
         $name = $args['domain'];
         $target = $args['target'];
         // Validate domain and IP of the domain
@@ -161,15 +163,21 @@ class DNSControl extends APIBase
         ) {
             throw new InvalidArgumentException('Invalid target');
         }
+        $argType = $args['type'] === 'DNS' ? 'IP' : 'CNAME';
         /** @var DNSRecord $existing */
-        foreach (static::$existing_records as $key => $existing) {
+        foreach (static::$existing_records[$argType] as $key => $existing) {
             if ($existing->getName() === $name &&
                 $existing->getTarget() === $target
             ) {
-                $existing->delete();
+                $result = $existing->delete();
                 unset(static::$existing_records[$key]);
                 break;
             }
+        }
+        if (isset($result['FTLnotrunning'])) {
+            $result['success'] = false;
+
+            return $this->returnAsJSON($request, $response, $result);
         }
 
         return $this->returnAsJSON($request, $response, ['success' => true]);
@@ -183,7 +191,7 @@ class DNSControl extends APIBase
     public function getAsJSON(ServerRequestInterface $request, ResponseInterface $response)
     {
         $params = $request->getQueryParams();
-        $type = strtoupper($params['type']);
+        $type = strtoupper($params['type']) === 'DNS' ? 'IP' : 'CNAME';
         $list = static::getExistingRecords();
 
         if (!isset($list[$type])) {
@@ -192,8 +200,16 @@ class DNSControl extends APIBase
 
             return $this->returnAsJSON($request, $response, $return);
         }
+        $data = [];
+        /** @var DNSRecord $item */
+        foreach ($list[$type] as $item) {
+            $data[] = [
+                $item->name,
+                $item->target
+            ];
+        }
 
-        return $this->returnAsJSON($request, $response, $list[$type]);
+        return $this->returnAsJSON($request, $response, ['data' => $data]);
     }
 
     /**

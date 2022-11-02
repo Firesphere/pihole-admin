@@ -10,19 +10,19 @@ class DNSRecord
      * CNAME, A, AAAA
      * @var string
      */
-    private $type;
+    public $type;
 
     /**
      * Name to resolve
      * @var string
      */
-    private $name;
+    public $name;
 
     /**
      * Target, e.g. an IP or a domain in case of a CNAME
      * @var string
      */
-    private $target;
+    public $target;
 
     public function __construct($params)
     {

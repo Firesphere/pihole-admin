@@ -2,6 +2,16 @@
 
 PiHole admin on Slim 4
 
+# Installation
+
+git clone this repository
+
+Run `composer install --no-dev --prefer-dist`
+
+Create a webserver-writeable folder `mkdir -p public/cache`
+
+You should now be ready to go.
+
 # Work in progress
 
 The goal is to rebuild/recreate the PiHole admin interface, but using Slim4 framework, to make it more extensible and configurable.
@@ -12,7 +22,7 @@ Todos:
 - [x] DNS Record management*
 - [ ] User management
 - [ ] Preferences
-- [x] Enable/disable
+- [x] Enable/disable features/PiHole
 - [ ] Update from interface
 - [ ] Manage DHCP/DNS
 - [ ] Import/export

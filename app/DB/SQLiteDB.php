@@ -18,9 +18,9 @@ class SQLiteDB
      * @var string[]
      */
     private static $dbs = [
-        'GRAVITYDB' => '/etc/pihole/gravity.db',
-        'FTLDB'     => '/etc/pihole/pihole-FTL.db',
-        'USERDB'    => '/etc/pihole/users.db'
+        'GRAVITYDB' => '/var/www/html/gravity.db',
+        'FTLDB'     => '/var/www/html/pihole-FTL.db',
+        'USERDB'    => '/var/www/html/users.db'
     ];
     /**
      * @var SQLite3

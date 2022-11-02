@@ -21,7 +21,7 @@ class PiholeDB extends APIBase
 
     public function __construct()
     {
-        $this->db = new SQLiteDB('FTLDB');
+        $this->db = new SQLiteDB('FTLDB', SQLITE3_OPEN_READWRITE);
     }
 
 
@@ -41,6 +41,50 @@ class PiholeDB extends APIBase
         }
 
         return $this->returnAsJSON($request, $response, []);
+    }
+
+
+    public function getMessages(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getQueryParams();
+        $extra = '';
+        if (isset($params['ignore']) && $params['ignore'] === 'DNSMASQ_WARN') {
+            $extra = "WHERE type != 'DNSMASQ_WARN';";
+        }
+
+        $messages = array();
+        $results = $this->db->doQuery(sprintf('SELECT * FROM message %s', $extra));
+
+        while ($res = $results->fetchArray(SQLITE3_ASSOC)) {
+            // Convert string to to UTF-8 encoding to ensure php-json can handle it.
+            // Furthermore, convert special characters to HTML entities to prevent XSS attacks.
+            foreach ($res as $key => $value) {
+                if (is_string($value)) {
+                    $res[$key] = htmlspecialchars(utf8_encode($value));
+                }
+            }
+            $messages[] = $res;
+        }
+
+        return $this->returnAsJSON($request, $response, ['messages' => $messages]);
+    }
+
+    public function deleteMessages(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getParsedBody();
+        $ids = json_decode($params['id'], true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($ids)) {
+            throw new \InvalidArgumentException('Invalid payload: id is not an array');
+        }
+        // Exploit prevention: Ensure all entries in the ID array are integers
+        foreach ($ids as $value) {
+            if (!is_numeric($value)) {
+                throw new \InvalidArgumentException('Invalid payload: id contains non-numeric entries');
+            }
+        }
+        $this->db->doQuery('DELETE FROM message WHERE id IN (:ids);', [':ids' => implode(',', $ids)]);
+
+        return $this->returnAsJSON($request, $response, ['success' => true]);
     }
 
     public function getMinTimestamp(RequestInterface $request, ResponseInterface $response)

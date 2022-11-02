@@ -3,6 +3,7 @@
 
 use App\API\DNSControl;
 use App\API\FTL;
+use App\API\Gravity\Gravity;
 use App\API\GroupPostHandler;
 use App\API\PiHole;
 use App\API\PiholeDB;
@@ -39,6 +40,9 @@ return static function (App $app) {
             $dnsGroup->get('getjson', [DNSControl::class, 'getAsJSON']);
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']); //??
         });
+        $group->post('messages', [PiholeDB::class, 'deleteMessages']);
+        $group->get('messages', [PiholeDB::class, 'getMessages']);
+        $group->get('gravity/update', [Gravity::class, 'updateGravity']);
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);
     $app->get('/queries', [Frontend\Queries::class, 'index']);
@@ -56,5 +60,9 @@ return static function (App $app) {
     $app->group('/dns', function (RouteCollectorProxy $group) {
         $group->get('/dns', [Frontend\DNS::class, 'getDNSRecords']);
         $group->get('/cname', [Frontend\DNS::class, 'getCNAMERecords']);
+    });
+    $app->group('/tools', function (RouteCollectorProxy $group) {
+        $group->get('/messages', [Frontend\Tools::class, 'getMessages']);
+        $group->get('/gravity', [Frontend\Tools::class, 'gravity']);
     });
 };

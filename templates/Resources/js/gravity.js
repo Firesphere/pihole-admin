@@ -17,7 +17,7 @@ function eventsource() {
         return;
     }
 
-    var source = new EventSource("scripts/pi-hole/php/gravity.sh.php");
+    var source = new EventSource("api/gravity/update");
 
     ta.html("");
     ta.show();

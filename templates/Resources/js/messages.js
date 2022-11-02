@@ -150,9 +150,9 @@ $(function () {
         : false;
     table = $("#messagesTable").DataTable({
         ajax: {
-            url: "api_db.php?messages" + (ignoreNonfatal ? "&ignore=DNSMASQ_WARN" : ""),
+            url: "api/messages" + (ignoreNonfatal ? "?ignore=DNSMASQ_WARN" : ""),
             data: {token: token},
-            type: "POST",
+            type: "GET",
             dataSrc: "messages",
         },
         order: [[0, "asc"]],
@@ -341,7 +341,7 @@ function delMsg(ids) {
     utils.showAlert("info", "", "Deleting messages: " + idstring, "...");
 
     $.ajax({
-        url: "scripts/pi-hole/php/message.php",
+        url: "api/messages",
         method: "post",
         dataType: "json",
         data: {action: "delete_message", id: JSON.stringify(ids), token: token},

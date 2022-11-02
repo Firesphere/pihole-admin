@@ -46,9 +46,11 @@ class PiHole
             // pihole is not available
             return [
                 'FTLnotrunning' => true,
-                'message'       => 'Did not restart Pi-hole, as it is not available on this system.'
+                'message'       => 'Did not restart Pi-hole, as it is not available on this system.',
+                'details'       => $output // Output the details
             ];
         }
+        $output = null; // Reset the output
         $command = sprintf('sudo pihole %s', $command);
         exec($command, $output, $returnstatus);
         if ($returnstatus !== 0) {
