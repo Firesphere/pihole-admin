@@ -26,14 +26,11 @@ class SQLiteDB
 
     private function getDBLocation(string $type)
     {
-        // Get possible non-standard location of FTL's database, if found
-        $FTLsettings = file_exists(PiHole::DEFAULT_FTLCONFFILE) ?
-            parse_ini_file(PiHole::DEFAULT_FTLCONFFILE) :
-            [];
+        $conf = new Config();
+        $config = $conf->get('db');
+        $ftlConfig = $conf->get('ftl');
 
-        $config = (new Config())->get('db');
-
-        return $FTLsettings[$type] ?? $config[$type];
+        return $ftlConfig[$type . 'DB'] ?? $config[$type];
     }
 
     public function __destruct()

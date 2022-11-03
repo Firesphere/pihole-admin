@@ -1,12 +1,13 @@
 .idea/
 .vscode/
-/setupVars.ini
+*.conf
 /coverage/
 /vendor/
 /logs/*
 /cache
 /public/cache/*.js
 /public/cache/*.css
+/config/settings.local.php
 !.gitkeep
 !/logs/README.md
 .phpunit.result.cache

@@ -22,7 +22,7 @@ class PiholeDB extends APIBase
 
     public function __construct()
     {
-        $this->db = new SQLiteDB('FTLDB', SQLITE3_OPEN_READWRITE);
+        $this->db = new SQLiteDB('FTL', SQLITE3_OPEN_READWRITE);
     }
 
 

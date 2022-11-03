@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Helper\Config;
 use RuntimeException;
 
 /**
@@ -10,33 +11,11 @@ use RuntimeException;
 class PiHole
 {
     /**
-     * @var string
-     */
-    public const DEFAULT_FTLCONFFILE = '/etc/pihole/pihole-FTL.conf';
-
-    /**
-     * @var array
-     */
-    protected static $piholeFTLConfig = [];
-
-    /**
-     * @param $piholeFTLConfFile
-     * @param $force
      * @return array|false
      */
-    public static function getConfig($piholeFTLConfFile = self::DEFAULT_FTLCONFFILE, $force = false)
+    public static function getConfig()
     {
-        if (!$force && count(self::$piholeFTLConfig)) {
-            return self::$piholeFTLConfig;
-        }
-
-        if (is_readable($piholeFTLConfFile)) {
-            self::$piholeFTLConfig = parse_ini_file($piholeFTLConfFile);
-        } else {
-            self::$piholeFTLConfig = [];
-        }
-
-        return self::$piholeFTLConfig;
+        return (new Config())->get('pihole');
     }
 
     public static function execute($command)

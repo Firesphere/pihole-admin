@@ -19,7 +19,7 @@ class Gravity extends APIBase
      */
     public static function gravity_last_update($raw = false)
     {
-        $db = new SQLiteDB('GRAVITYDB');
+        $db = new SQLiteDB('GRAVITY');
         $query = "SELECT value FROM info WHERE property = :property;";
         $result = $db->doQuery($query, [':property' => 'updated']);
         // Only fetch the first row. There shouldn't be any other anyway

@@ -2,6 +2,7 @@
 
 namespace App\API;
 
+use App\Helper\Config;
 use App\Helper\Helper;
 use App\Model\DNSRecord;
 use InvalidArgumentException;
@@ -14,15 +15,6 @@ use Psr\Http\Message\ServerRequestInterface;
 class DNSControl extends APIBase
 {
     /**
-     * Location of custom DNS records
-     */
-    private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
-    /**
-     * Location of custom CNAME records
-     */
-    private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
-
-    /**
      * @var array|DNSRecord[]
      */
     protected static array $existing_records = [];
@@ -33,11 +25,10 @@ class DNSControl extends APIBase
     public function __construct()
     {
         if (!count(static::$existing_records)) {
-            if (file_exists(static::CUSTOM_DNS_FILE)) {
-                $this->readEntries(static::CUSTOM_CNAME_FILE, 'CNAME');
-            }
-            if (file_exists(static::CUSTOM_DNS_FILE)) {
-                $this->readEntries(static::CUSTOM_DNS_FILE, 'IP');
+            $files = (new Config())->get('dns');
+            foreach ($files as $key => $file) {
+                [$type] = explode('_', $key);
+                $this->readEntries($file, $type);
             }
         }
     }
@@ -49,7 +40,7 @@ class DNSControl extends APIBase
     protected function readEntries($file, $type)
     {
         $handle = fopen($file, 'rb');
-        $explode = $type === 'IP' ? ' ' : ',';
+        $explode = $type === 'DNSLIST' ? ' ' : ',';
         while ($line = fgets($handle)) {
             $line = str_replace('cname=', '', trim($line));
             $explodedLine = explode($explode, $line);
@@ -113,7 +104,7 @@ class DNSControl extends APIBase
             return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target type']);
         }
 
-        $existingType = $type === 'CNAME' ? 'CNAME' : 'IP';
+        $existingType = $type === 'CNAME' ? 'CNAMELIST' : 'DNSLIST';
 
         foreach (static::$existing_records[$existingType] as $existing) {
             if ($existing->getName() === $params['domain'] &&
@@ -163,7 +154,7 @@ class DNSControl extends APIBase
         ) {
             throw new InvalidArgumentException('Invalid target');
         }
-        $argType = $args['type'] === 'DNS' ? 'IP' : 'CNAME';
+        $argType = $args['type'] === 'DNS' ? 'DNSLIST' : 'CNAMELIST';
         /** @var DNSRecord $existing */
         foreach (static::$existing_records[$argType] as $key => $existing) {
             if ($existing->getName() === $name &&
@@ -191,7 +182,7 @@ class DNSControl extends APIBase
     public function getAsJSON(ServerRequestInterface $request, ResponseInterface $response)
     {
         $params = $request->getQueryParams();
-        $type = strtoupper($params['type']) === 'DNS' ? 'IP' : 'CNAME';
+        $type = strtoupper($params['type']) === 'DNS' ? 'DNSLIST' : 'CNAMELIST';
         $list = static::getExistingRecords();
 
         if (!isset($list[$type])) {

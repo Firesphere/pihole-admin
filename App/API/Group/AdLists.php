@@ -23,8 +23,8 @@ class AdLists extends GroupPostHandler
      */
     public function __construct()
     {
-        $this->gravity = new SQLiteDB('GRAVITYDB', SQLITE3_OPEN_READWRITE);
-        $this->db = new SQLiteDB('FTLDB', SQLITE3_OPEN_READWRITE);
+        $this->gravity = new SQLiteDB('GRAVITY', SQLITE3_OPEN_READWRITE);
+        $this->db = new SQLiteDB('FTL', SQLITE3_OPEN_READWRITE);
     }
 
     /**

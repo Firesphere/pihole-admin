@@ -26,7 +26,7 @@ class User
 
     public function __construct()
     {
-        $this->db = new SQLiteDB(__DIR__ . '/Users.db');
+        $this->db = new SQLiteDB('USER', SQLITE3_OPEN_READWRITE);
     }
 
     public function setPassword($password)
@@ -43,7 +43,7 @@ class User
      */
     public function getUser(string $username)
     {
-        $db = new SQLiteDB('USERDB', SQLITE3_OPEN_READONLY);
+        $db = new SQLiteDB('USER', SQLITE3_OPEN_READONLY);
         $query = 'SELECT id, username, password FROM user WHERE username=:username';
         $params = [':username' => $username];
         $result = $db->doQuery($query, $params);
