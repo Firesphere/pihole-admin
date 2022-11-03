@@ -70,4 +70,12 @@ class Tools extends Frontend
 
         return $view->render($response, 'Pages/Tools/Debug.twig', $this->menuItems);
     }
+
+    public function getNetwork(RequestInterface $request, ResponseInterface $response)
+    {
+        $view = Twig::fromRequest($request);
+        $this->menuItems['Network'] = 'active';
+
+        return $view->render($response, 'Pages/Tools/Network.twig', $this->menuItems);
+    }
 }

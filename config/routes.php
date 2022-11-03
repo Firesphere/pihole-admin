@@ -32,6 +32,8 @@ return static function (App $app) {
         $group->get('topClients', [PiholeDB::class, 'getTopClients']);
         $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
         $group->get('topAds', [PiholeDB::class, 'getTopAds']);
+        $group->get('network', [PiholeDB::class, 'getNetwork']);
+        $group->post('network', [PiholeDB::class, 'deleteNetwork']);
         $group->post('groups', [GroupPostHandler::class, 'postHandler']);
 
         // Custom DNS features
@@ -76,5 +78,6 @@ return static function (App $app) {
         $group->get('/auditlog', [Frontend\Tools::class, 'getAuditLog']);
         $group->get('/taillog', [Frontend\Tools::class, 'getTailLog']);
         $group->get('/debug', [Frontend\Tools::class, 'debug']);
+        $group->get('/network', [Frontend\Tools::class, 'getNetwork']);
     });
 };
