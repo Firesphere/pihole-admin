@@ -443,16 +443,20 @@ class FTL extends APIBase
         }
 
         $offset = $params['offset'] ?? -1;
+        $lines = [];
         if ($offset > 0) {
             // Seeks on the file pointer where we want to continue reading is known
             fseek($file, $offset);
 
-            $lines = [];
             while (!feof($file)) {
                 $lines[] = Helper::formatLine(fgets($file));
             }
-
-            $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
+        } else {
+            ++$offset;
         }
+
+        fseek($file, -1, SEEK_END);
+
+        return $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
     }
 }
