@@ -11,12 +11,12 @@ var offset,
     scrolling = true;
 
 // Check every 200msec for fresh data
-var interval = 200;
+var interval = 500;
 
 // Function that asks the API for new data
 function reloadData() {
     clearTimeout(timer);
-    $.getJSON("scripts/pi-hole/php/tailLog.php?offset=" + offset, function (data) {
+    $.getJSON("api/log?" + window.logtype + "&offset=" + offset, function (data) {
         pre.append(data.lines);
 
         if (scrolling && offset !== data.offset) {
@@ -31,7 +31,7 @@ function reloadData() {
 
 $(function () {
     // Get offset at first loading of page
-    $.getJSON("scripts/pi-hole/php/tailLog.php", function (data) {
+    $.getJSON("api/log?" + window.logtype, function (data) {
         offset = data.offset;
     });
     pre = $("#output");

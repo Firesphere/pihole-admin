@@ -1,0 +1,21 @@
+{% extends 'Layout.twig' %}
+
+{% block content %}
+
+    <!-- Title -->
+    <div class="page-header">
+        <h1>Audit log (showing live data)</h1>
+    </div>
+
+    <div class="row">
+        {{ include('Partials/Queries.twig', {'Type': 'domain', 'Title': 'Allowed queries'}) }}
+        {{ include('Partials/Queries.twig', {'Type': 'ad', 'Title': 'blocked queries'}) }}
+    </div>
+    <!-- /.row -->
+{% endblock %}
+
+{% block pagescripts %}
+    {{ assets({files: [
+        'Resources/js/auditlog.js',
+    ]}) }}
+{% endblock %}

@@ -3,6 +3,7 @@
 namespace App\API;
 
 use App\API\Group\AdLists;
+use App\API\Group\Audit;
 use App\API\Group\Client;
 use App\API\Group\Domain;
 use App\API\Group\Group;
@@ -130,7 +131,15 @@ class GroupPostHandler extends APIBase
                     break;
             }
         }
-
+        if (strpos($postData['action'], 'audit') > 0) {
+            $handler = new Audit();
+            switch ($postData['action']) {
+                case 'add_adlist':
+                    $return = $handler->addAudit($postData);
+                    $reload = false;
+                    break;
+            }
+        }
 
         if ($reload) {
             $return['message'] = GlobalPiHole::execute('restartdns reload-lists');

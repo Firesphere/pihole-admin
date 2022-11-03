@@ -20,7 +20,7 @@ class SQLiteDB
     private static $dbs = [
         'GRAVITYDB' => '/var/www/html/gravity.db',
         'FTLDB'     => '/var/www/html/pihole-FTL.db',
-        'USERDB'    => '/var/www/html/users.db'
+        'USERDB'    => '/var/www/html/users.db',
     ];
     /**
      * @var SQLite3

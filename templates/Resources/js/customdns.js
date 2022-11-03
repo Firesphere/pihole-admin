@@ -15,11 +15,11 @@ $(function () {
 
     table = $("#customEntriesTable").DataTable({
         ajax: {
-            url: "api/customdns/getjson?type="+window.dnstype.toLowerCase(),
+            url: "api/customdns/getjson?type=" + window.dnstype.toLowerCase(),
             data: {token: token},
             type: "GET",
         },
-        columns: [{}, {type: window.dnstype+'-address'}, {orderable: false, searchable: false}],
+        columns: [{}, {type: window.dnstype + '-address'}, {orderable: false, searchable: false}],
         columnDefs: [
             {
                 targets: 2,
@@ -48,10 +48,10 @@ $(function () {
         stateSave: true,
         stateDuration: 0,
         stateSaveCallback: function (settings, data) {
-            utils.stateSaveCallback("Local"+window.dnstype+"Table", data);
+            utils.stateSaveCallback("Local" + window.dnstype + "Table", data);
         },
         stateLoadCallback: function () {
-            return utils.stateLoadCallback("Local"+window.dnstype+"Table");
+            return utils.stateLoadCallback("Local" + window.dnstype + "Table");
         },
         drawCallback: function () {
             $(".deleteCustom").on("click", deleteCustom);
@@ -71,7 +71,7 @@ function addCustom() {
     var target = utils.escapeHtml($("#target").val());
 
     utils.disableAll();
-    utils.showAlert("info", "", "Adding custom "+window.dnstype+" record...", "");
+    utils.showAlert("info", "", "Adding custom " + window.dnstype + " record...", "");
 
     $.ajax({
         url: "api/customdns/add",
@@ -84,7 +84,7 @@ function addCustom() {
                 utils.showAlert(
                     "success",
                     "far fa-check-circle",
-                    "Custom "+window.dnstype+" added",
+                    "Custom " + window.dnstype + " added",
                     origin + ": " + target
                 );
 
@@ -98,7 +98,7 @@ function addCustom() {
         },
         error: function () {
             utils.enableAll();
-            utils.showAlert("error", "fas fa-times", "Error while adding custom "+window.dnstype+" record", "");
+            utils.showAlert("error", "fas fa-times", "Error while adding custom " + window.dnstype + " record", "");
         },
     });
 }
@@ -108,7 +108,7 @@ function deleteCustom() {
     var origin = $(this).attr("data-origin");
 
     utils.disableAll();
-    utils.showAlert("info", "", "Deleting custom "+window.dnstype+" record...", "");
+    utils.showAlert("info", "", "Deleting custom " + window.dnstype + " record...", "");
 
     $.ajax({
         url: "api/customdns/delete",
@@ -121,7 +121,7 @@ function deleteCustom() {
                 utils.showAlert(
                     "success",
                     "far fa-check-circle",
-                    "Custom "+window.dnstype+" record deleted",
+                    "Custom " + window.dnstype + " record deleted",
                     origin + ": " + target
                 );
                 table.ajax.reload();
@@ -134,7 +134,7 @@ function deleteCustom() {
             utils.showAlert(
                 "error",
                 "fas fa-times",
-                "Error while deleting custom "+window.dnstype+" record", "");
+                "Error while deleting custom " + window.dnstype + " record", "");
             console.log(exception); // eslint-disable-line no-console
         },
     });

@@ -1,33 +1,33 @@
 {% extends "Layout.twig" %}
 
 {% block content %}
-<!-- Sourceing CSS colors from stylesheet to be used in JS code -->
-<span class="queries-permitted"></span>
-<span class="queries-blocked"></span>
-<span class="graphs-grid"></span>
-<span class="graphs-ticks"></span>
-<!-- Small boxes (Stat box) -->
+    <!-- Sourceing CSS colors from stylesheet to be used in JS code -->
+    <span class="queries-permitted"></span>
+    <span class="queries-blocked"></span>
+    <span class="graphs-grid"></span>
+    <span class="graphs-ticks"></span>
+    <!-- Small boxes (Stat box) -->
     {% for Template in includes %}
         {{ Template|raw }}
     {% endfor %}
 
 
-<div class="row">
-    {{ include('Partials/QueryTypes.twig') }}
-    {{ include('Partials/Upstream.twig') }}
-</div>
-<div class="row">
-    {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains', 'DomainClient': 'Domain'}) }}
-    {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains', 'DomainClient': 'Domain'}) }}
-</div>
-<div class="row">
-    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)', 'DomainClient': 'Client'}) }}
-    {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)', 'DomainClient': 'Client'}) }}
-</div>
+    <div class="row">
+        {{ include('Partials/QueryTypes.twig') }}
+        {{ include('Partials/Upstream.twig') }}
+    </div>
+    <div class="row">
+        {{ include('Partials/TopItems.twig', {'divId': 'domain-frequency', 'Title': 'Top Permitted Domains', 'DomainClient': 'Domain'}) }}
+        {{ include('Partials/TopItems.twig', {'divId': 'ad-frequency', 'Title': 'Top Blocked Domains', 'DomainClient': 'Domain'}) }}
+    </div>
+    <div class="row">
+        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency', 'Title': 'Top Clients (Total)', 'DomainClient': 'Client'}) }}
+        {{ include('Partials/TopItems.twig', {'divId': 'client-frequency-blocked', 'Title': 'Top Clients (Blocked only)', 'DomainClient': 'Client'}) }}
+    </div>
 {% endblock %}
 
 {% block pagescripts %}
-{{ assets({files: [
-    'Resources/js/index.js'
-]}) }}
+    {{ assets({files: [
+        'Resources/js/index.js'
+    ]}) }}
 {% endblock %}

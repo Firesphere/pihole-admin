@@ -6,8 +6,6 @@ use SlimSession\Helper;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$config['displayErrorDetails'] = true;
-$config['addContentLengthHeader'] = false;
 $container = new Container();
 
 // Register globally to app
@@ -25,6 +23,7 @@ $twig = require __DIR__ . '/twig.php';
 (require __DIR__ . '/middleware.php')($app, $twig);
 
 require __DIR__ . '/modules.php';
+require __DIR__ . '/settings.php';
 // Register routes
 (require __DIR__ . '/routes.php')($app);
 

@@ -11,7 +11,7 @@
 var auditTimeout = null;
 
 function updateTopLists() {
-    $.getJSON("api.php?topItems=audit", function (data) {
+    $.getJSON("api/summary?topItems=audit", function (data) {
         if ("FTLnotrunning" in data) {
             return;
         }
@@ -26,7 +26,7 @@ function updateTopLists() {
             if (Object.prototype.hasOwnProperty.call(data.top_queries, domain)) {
                 // Sanitize domain
                 domain = utils.escapeHtml(domain);
-                url = '<a href="queries.php?domain=' + domain + '">' + domain + "</a>";
+                url = '<a href="queries?domain=' + domain + '">' + domain + "</a>";
                 domaintable.append(
                     "<tr><td>" +
                     url +
@@ -47,7 +47,7 @@ function updateTopLists() {
                 var printdomain = utils.escapeHtml(input[0]);
                 if (input.length > 1) {
                     url =
-                        '<a href="queries.php?domain=' +
+                        '<a href="queries?domain=' +
                         printdomain +
                         '">' +
                         printdomain +
@@ -62,7 +62,7 @@ function updateTopLists() {
                         "</td> </tr> "
                     );
                 } else {
-                    url = '<a href="queries.php?domain=' + printdomain + '">' + printdomain + "</a>";
+                    url = '<a href="queries?domain=' + printdomain + '">' + printdomain + "</a>";
                     adtable.append(
                         "<tr><td>" +
                         url +
@@ -93,7 +93,7 @@ function updateTopLists() {
 function add(domain, list) {
     var token = $("#token").text();
     $.ajax({
-        url: "scripts/pi-hole/php/groups.php",
+        url: "api/groups",
         method: "post",
         data: {
             domain: domain,
