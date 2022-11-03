@@ -16,11 +16,11 @@ class DNSControl extends APIBase
     /**
      * Location of custom DNS records
      */
-    private const CUSTOM_DNS_FILE = '/var/www/html/custom.list';
+    private const CUSTOM_DNS_FILE = '/etc/pihole/custom.list';
     /**
      * Location of custom CNAME records
      */
-    private const CUSTOM_CNAME_FILE = '/var/www/html/05-pihole-custom-cname.conf';
+    private const CUSTOM_CNAME_FILE = '/etc/dnsmasq.d/05-pihole-custom-cname.conf';
 
     /**
      * @var array|DNSRecord[]
