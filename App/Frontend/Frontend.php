@@ -2,6 +2,8 @@
 
 namespace App\Frontend;
 
+use App\Helper\Config;
+
 class Frontend
 {
     protected static $querytypes = [
@@ -30,7 +32,7 @@ class Frontend
 
     public function __construct()
     {
-        $this->setupVars = parse_ini_file(__DIR__ . '/../../setupVars.ini');
+        $this->setupVars = (new Config())->get('pihole');
     }
 
     /**
