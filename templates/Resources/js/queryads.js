@@ -39,7 +39,7 @@ function eventsource() {
     if (typeof EventSource !== "function") {
         $.ajax({
             method: "GET",
-            url: "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact + "&IE",
+            url: "api/gravity/search?domain=" + domain.toLowerCase() + "&" + exact + "&IE",
             async: false,
         }).done(function (data) {
             ta.show();
@@ -54,7 +54,7 @@ function eventsource() {
     }
 
     var source = new EventSource(
-        "scripts/pi-hole/php/queryads.php?domain=" + domain.toLowerCase() + "&" + exact
+        "api/gravity/search?domain=" + domain.toLowerCase() + "&" + exact
     );
 
     // Reset and show field

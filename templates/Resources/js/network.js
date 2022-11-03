@@ -10,7 +10,7 @@
 var tableApi;
 var token = $("#token").text();
 
-var API_STRING = "api_db.php?network";
+var API_STRING = "api/network";
 
 // How many IPs do we show at most per device?
 var MAXIPDISPLAY = 3;
@@ -67,7 +67,7 @@ function deleteNetworkEntry() {
     utils.disableAll();
     utils.showAlert("info", "", "Deleting network table entry with ID " + parseInt(id, 10), "...");
     $.ajax({
-        url: "scripts/pi-hole/php/network.php",
+        url: "api/network",
         method: "post",
         dataType: "json",
         data: {action: "delete_network_entry", id: id, token: token},
@@ -157,7 +157,7 @@ $(function () {
                 for (index = 0; index < maxiter; index++) {
                     name = data.name[index];
                     if (name.length === 0) continue;
-                    names.push('<a href="queries.php?client=' + name + '">' + name + "</a>");
+                    names.push('<a href="queries?client=' + name + '">' + name + "</a>");
                 }
 
                 if (data.name.length > MAXIPDISPLAY) {
@@ -191,7 +191,7 @@ $(function () {
             index = 0;
             for (index = 0; index < maxiter; index++) {
                 var ip = data.ip[index];
-                ips.push('<a href="queries.php?client=' + ip + '">' + ip + "</a>");
+                ips.push('<a href="queries?client=' + ip + '">' + ip + "</a>");
             }
 
             if (data.ip.length > MAXIPDISPLAY) {

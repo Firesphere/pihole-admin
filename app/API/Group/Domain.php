@@ -15,6 +15,7 @@ use SQLiteException;
 class Domain extends GroupPostHandler
 {
     /**
+     * @todo rename to Allow/Block list
      * @var array
      */
     protected static $listTypes = [

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
 /**
@@ -46,7 +48,7 @@ class PiHole
             // pihole is not available
             return [
                 'FTLnotrunning' => true,
-                'message'       => 'Did not restart Pi-hole, as it is not available on this system.',
+                'message'       => 'Pi-hole is not available on this system.',
                 'details'       => $output // Output the details
             ];
         }

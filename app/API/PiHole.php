@@ -3,6 +3,7 @@
 namespace App\API;
 
 use InvalidArgumentException;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -19,6 +20,30 @@ class PiHole
      * @var array|false
      */
     private $parsedVersions;
+
+
+    protected static $ANSIcolors = [
+        '[1;91m' => '<span class="log-red">',
+        '[1;32m' => '<span class="log-green">',
+        '[1;33m' => '<span class="log-yellow">',
+        '[1;34m' => '<span class="log-blue">',
+        '[1;35m' => '<span class="log-purple">',
+        '[1;36m' => '<span class="log-cyan">',
+
+        '[90m' => '<span class="log-gray">',
+        '[91m' => '<span class="log-red">',
+        '[32m' => '<span class="log-green">',
+        '[33m' => '<span class="log-yellow">',
+        '[94m' => '<span class="log-blue">',
+        '[95m' => '<span class="log-purple">',
+        '[96m' => '<span class="log-cyan">',
+
+        '[1m' => '<span class="text-bold">',
+        '[4m' => '<span class="text-underline">',
+
+        '[0m' => '</span>',
+    ];
+
 
     /**
      * Check if the Versions file is readable.
@@ -110,5 +135,56 @@ class PiHole
     public function getParsedVersions(): bool|array
     {
         return $this->parsedVersions;
+    }
+
+
+    public function debug(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getQueryParams();
+        ob_end_flush();
+        ini_set('output_buffering', '0');
+        ob_implicit_flush(true);
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+
+        // Execute "pihole" using Web option
+        $command = 'export TERM=dumb && sudo pihole -d -w';
+
+        // Add auto-upload option
+        if (isset($params['upload'])) {
+            $command .= ' -a';
+        }
+
+        // Execute database integrity_check
+        if (isset($params['dbcheck'])) {
+            $command .= ' -c';
+        }
+
+        $proc = popen($command, 'rb');
+
+        while (!feof($proc)) {
+            $this->formatDebugText(fread($proc, 4096), $params);
+        }
+    }
+
+    /**
+     * @param $dataText
+     * @param $params
+     * @return void
+     */
+    protected function formatDebugText($dataText, $params)
+    {
+        $keys = [];
+        foreach (static::$ANSIcolors as $key => $value) {
+            $keys[chr(27) . $key] = $value;
+        }
+        unset($key);
+        $data = strtr(htmlspecialchars($dataText), $keys);
+
+        if (!isset($params['IE'])) {
+            echo 'data: ' . implode("\ndata: ", explode("\n", $data)) . "\n\n";
+        } else {
+            echo $data;
+        }
     }
 }

@@ -23,6 +23,7 @@ return static function (App $app) {
         $group->get('overTimeData', [FTL::class, 'overTimeData']);
         $group->get('getQueryTypes', [FTL::class, 'getQueryTypes']);
         $group->get('upstream', [FTL::class, 'getUpstreams']);
+        $group->get('log', [FTL::class, 'tailLog']);
         $group->get('version', [PiHole::class, 'getVersion']);
         $group->get('getAllQueries', [Queries::class, 'getAll']);
         $group->get('getMinTimestamp', [PiholeDB::class, 'getMinTimestamp']);
@@ -31,7 +32,10 @@ return static function (App $app) {
         $group->get('topClients', [PiholeDB::class, 'getTopClients']);
         $group->get('topDomains', [PiholeDB::class, 'getTopDomains']);
         $group->get('topAds', [PiholeDB::class, 'getTopAds']);
+        $group->get('network', [PiholeDB::class, 'getNetwork']);
+        $group->post('network', [PiholeDB::class, 'deleteNetwork']);
         $group->post('groups', [GroupPostHandler::class, 'postHandler']);
+
         // Custom DNS features
         $group->group('customdns/', function (RouteCollectorProxy $dnsGroup) {
             $dnsGroup->post('add', [DNSControl::class, 'addRecord']);
@@ -40,9 +44,15 @@ return static function (App $app) {
             $dnsGroup->get('getjson', [DNSControl::class, 'getAsJSON']);
             $dnsGroup->get('deleteAll/{type}', [DNSControl::class, 'deleteAll']); //??
         });
+
         $group->post('messages', [PiholeDB::class, 'deleteMessages']);
         $group->get('messages', [PiholeDB::class, 'getMessages']);
-        $group->get('gravity/update', [Gravity::class, 'updateGravity']);
+
+        $group->group('gravity', function (RouteCollectorProxy $gravityGroup) {
+            $gravityGroup->get('/update', [Gravity::class, 'updateGravity']);
+            $gravityGroup->get('/search', [Gravity::class, 'searchGravity']);
+        });
+        $group->get('debug', [PiHole::class, 'debug']);
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);
     $app->get('/queries', [Frontend\Queries::class, 'index']);
@@ -64,5 +74,10 @@ return static function (App $app) {
     $app->group('/tools', function (RouteCollectorProxy $group) {
         $group->get('/messages', [Frontend\Tools::class, 'getMessages']);
         $group->get('/gravity', [Frontend\Tools::class, 'gravity']);
+        $group->get('/search', [Frontend\Tools::class, 'getAdlistSearch']);
+        $group->get('/auditlog', [Frontend\Tools::class, 'getAuditLog']);
+        $group->get('/taillog', [Frontend\Tools::class, 'getTailLog']);
+        $group->get('/debug', [Frontend\Tools::class, 'debug']);
+        $group->get('/network', [Frontend\Tools::class, 'getNetwork']);
     });
 };

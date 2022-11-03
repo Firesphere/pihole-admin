@@ -4,6 +4,7 @@ namespace App\API;
 
 use App\DB\SQLiteDB;
 use App\Frontend\Frontend;
+use App\PiHole as GlobalPiHole;
 use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -440,5 +441,46 @@ SELECT domain, count(domain)
         $domains = array_slice($domains, 0, 10);
 
         return $this->returnAsJSON($request, $response, ['top_domains' => $domains]);
+    }
+
+    public function getNetwork(RequestInterface $request, ResponseInterface $response)
+    {
+        $results = $this->db->doQuery('SELECT * FROM network');
+        $network = [];
+
+        while ($res = $results->fetchArray(SQLITE3_ASSOC)) {
+            $id = (int)$res['id'];
+
+            // Get IP addresses and host names for this device
+            $res['ip'] = [];
+            $res['name'] = [];
+            $network_addresses = $this->db->doQuery("SELECT ip,name FROM network_addresses WHERE network_id = :id ORDER BY lastSeen DESC", [':id' => $id]);
+            while ($network_address = $network_addresses->fetchArray(SQLITE3_ASSOC)) {
+                $res['ip'][] = $network_address['ip'];
+                if ($network_address['name'] !== null) {
+                    $res['name'][] = utf8_encode($network_address['name']);
+                } else {
+                    $res['name'][] = '';
+                }
+            }
+
+            // UTF-8 encode vendor
+            $res['macVendor'] = utf8_encode($res['macVendor']);
+            $network[] = $res;
+        }
+
+        return $this->returnAsJSON($request, $response, ['network' => $network]);
+    }
+
+    public function deleteNetwork(RequestInterface $request, ResponseInterface $response)
+    {
+        $return = ['success' => true];
+        $params = $request->getParsedBody();
+        $this->db->doQuery('DELETE FROM network_addresses WHERE network_id=:id', [':id' => $params['id']]);
+        $this->db->doQuery('DELETE FROM network WHERE id=:id', [':id' => $params['id']]);
+
+        $return['message'] = GlobalPiHole::execute('restartdns reload-lists');
+
+        return $this->returnAsJSON($request, $response, $return);
     }
 }

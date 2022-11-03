@@ -5,9 +5,9 @@
  *  This file is copyright under the latest version of the EUPL.
  *  Please see LICENSE file for your rights under this license. */
 
-var offset,
+var offset = 0,
     timer,
-    pre,
+    pre = $('#output'),
     scrolling = true;
 
 // Check every 200msec for fresh data
@@ -16,10 +16,10 @@ var interval = 200;
 // Function that asks the API for new data
 function reloadData() {
     clearTimeout(timer);
-    $.getJSON("scripts/pi-hole/php/tailLog.php?offset=" + offset, function (data) {
+    $.getJSON("api/log?" + window.logtype + "&offset=" + offset, function (data) {
         pre.append(data.lines);
 
-        if (scrolling && offset !== data.offset) {
+        if (scrolling) {
             pre.scrollTop(pre[0].scrollHeight);
         }
 
@@ -31,10 +31,9 @@ function reloadData() {
 
 $(function () {
     // Get offset at first loading of page
-    $.getJSON("scripts/pi-hole/php/tailLog.php", function (data) {
+    $.getJSON("api/log?" + window.logtype, function (data) {
         offset = data.offset;
     });
-    pre = $("#output");
     // Trigger function that looks for new data
     reloadData();
 });

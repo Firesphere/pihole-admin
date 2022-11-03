@@ -114,4 +114,19 @@ class Helper
 
         return $result;
     }
+
+    public static function formatLine($line)
+    {
+        $txt = preg_replace('/ dnsmasq\\[[0-9]*\\]/', '', htmlspecialchars($line));
+
+        if (strpos($line, 'blacklisted') || strpos($line, 'gravity blocked')) {
+            $txt = '<b class="log-red">' . $txt . '</b>';
+        } elseif (strpos($line, 'query[A') || strpos($line, 'query[DHCP')) {
+            $txt = '<b>' . $txt . '</b>';
+        } else {
+            $txt = '<span class="text-muted">' . $txt . '</span>';
+        }
+
+        return $txt;
+    }
 }
