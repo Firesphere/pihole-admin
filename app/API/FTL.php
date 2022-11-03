@@ -452,7 +452,7 @@ class FTL extends APIBase
                 $lines[] = Helper::formatLine(fgets($file));
             }
 
-            exit(json_encode(['offset' => ftell($file), 'lines' => $lines], JSON_THROW_ON_ERROR));
+            $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
         }
     }
 }
