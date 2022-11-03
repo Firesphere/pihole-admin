@@ -447,6 +447,7 @@ class FTL extends APIBase
         if ($offset > 0) {
             // Seeks on the file pointer where we want to continue reading is known
             fseek($file, $offset);
+            $ftell = ftell($file);
 
             while (!feof($file)) {
                 $data = trim(fgets($file));
@@ -454,11 +455,13 @@ class FTL extends APIBase
                     $lines[] = Helper::formatLine(fgets($file));
                 }
             }
-            return $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
+        } else {
+            fseek($file, $offset, SEEK_END);
+            $ftell = ftell($file)+1;
         }
 
-        fseek($file, $offset, SEEK_END);
 
-        return $this->returnAsJSON($request, $response, ['offset' => ftell($file)+1]);
+
+        return $this->returnAsJSON($request, $response, ['offset' => $ftell, 'lines' => $lines]);
     }
 }
