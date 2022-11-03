@@ -7,7 +7,7 @@
 
 var offset = 0,
     timer,
-    pre = document.getElementById('output'),
+    pre = $('#output'),
     scrolling = true;
 
 // Check every 200msec for fresh data
@@ -20,7 +20,7 @@ function reloadData() {
         pre.append(data.lines);
 
         if (scrolling) {
-            pre.scrollTop(pre.scrollHeight);
+            pre.scrollTop(pre[0].scrollHeight);
         }
 
         offset = data.offset;
