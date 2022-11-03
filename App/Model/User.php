@@ -6,24 +6,54 @@ use App\DB\SQLiteDB;
 
 class User
 {
-    private static $table = 'users';
+    /**
+     * @var SQLiteDB
+     */
+    private $db;
 
-    private $user;
+    /**
+     * @var int
+     */
+    protected $id = 0;
+    /**
+     * @var string
+     */
+    protected $username;
+    /**
+     * @var string
+     */
+    private $password;
+
+    public function __construct()
+    {
+        $this->db = new SQLiteDB(__DIR__ . '/Users.db');
+    }
+
+    public function setPassword($password)
+    {
+        $this->db->doQuery(
+            "UPDATE users SET password = :password",
+            [':password' => password_hash($password, PASSWORD_DEFAULT)]
+        );
+    }
 
     /**
      * @param string $username
-     * @return mixed
+     * @return self
      */
     public function getUser(string $username)
     {
         $db = new SQLiteDB('USERDB', SQLITE3_OPEN_READONLY);
-        $query = 'SELECT id, password FROM user WHERE username=:username';
+        $query = 'SELECT id, username, password FROM user WHERE username=:username';
         $params = [':username' => $username];
         $result = $db->doQuery($query, $params);
 
-        $this->user = $result->fetchArray();
+        $arrayData = $result->fetchArray();
+        $this->id = $arrayData['id'];
+        $this->username = $arrayData['username'];
+        $this->password = $arrayData['password'];
 
-        return $this->user['id'];
+        return $this;
     }
 
     public function createUser()
@@ -32,14 +62,33 @@ class User
 
     /**
      * @param $id
-     * @param $plaintextPassword
+     * @param $enteredPassword
      * @return bool
      */
-    public function validateUser($id, $plaintextPassword)
+    public function validatePassword($enteredPassword)
     {
-        $password = $this->hashPassword($plaintextPassword);
+        $password = password_hash($enteredPassword, PASSWORD_DEFAULT);
 
-        return hash_equals($password, $this->user['password']);
+        return password_verify($password, $this->password);
+    }
+
+    public function byId($id)
+    {
+        if ($_SESSION['user'] === $id) {
+            $dbUser = $this->db->doQuery('SELECT id, username FROM user WHERE id = :id', [':id' => $id])->fetchArray();
+            $this->username = $dbUser['username'];
+            $this->id = $dbUser['id'];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     private function hashPassword($password)

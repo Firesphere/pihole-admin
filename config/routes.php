@@ -14,6 +14,7 @@ use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
 
 return static function (App $app) {
+    $app->any('/login', [Frontend\Login::class, 'index']);
     $app->group('/api/', function (RouteCollectorProxy $group) {
         $group->get('status', [PiholeDB::class, 'status']);
         $group->get('summary', [FTL::class, 'summary']);

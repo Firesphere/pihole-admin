@@ -1,12 +1,14 @@
 <?php
 
-// Error reporting
-error_reporting(0);
-ini_set('display_errors', '0');
-ini_set('display_startup_errors', '0');
-
 // Timezone
 date_default_timezone_set('Pacific/Auckland');
 
-return [];
+return [
+    'production' => false,
+    'db' => [
+        'GRAVITYDB' => '/etc/pihole/gravity.db',
+        'FTLDB'     => '/etc/pihole/pihole-FTL.db',
+        'USERDB'    => '/etc/pihole/users.db',
+    ]
+];
 

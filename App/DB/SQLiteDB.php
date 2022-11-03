@@ -2,6 +2,7 @@
 
 namespace App\DB;
 
+use App\Helper\Config;
 use App\PiHole;
 use SQLite3;
 use SQLite3Result;
@@ -13,15 +14,6 @@ class SQLiteDB
     public const LISTTYPE_REGEX_WHITELIST = 2;
     public const LISTTYPE_REGEX_BLACKLIST = 3;
 
-    /**
-     * Locations of the different DBs
-     * @var string[]
-     */
-    private static $dbs = [
-        'GRAVITYDB' => '/etc/pihole/gravity.db',
-        'FTLDB'     => '/etc/pihole/pihole-FTL.db',
-        'USERDB'    => '/etc/pihole/users.db',
-    ];
     /**
      * @var SQLite3
      */
@@ -39,7 +31,9 @@ class SQLiteDB
             parse_ini_file(PiHole::DEFAULT_FTLCONFFILE) :
             [];
 
-        return $FTLsettings[$type] ?? static::$dbs[$type];
+        $config = (new Config())->get('db');
+
+        return $FTLsettings[$type] ?? $config[$type];
     }
 
     public function __destruct()
