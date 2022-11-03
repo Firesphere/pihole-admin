@@ -465,7 +465,7 @@ SELECT domain, count(domain)
             }
 
             // UTF-8 encode vendor
-            $res['macVendor'] = utf8_encode($res['macVendor']);
+            $res['macVendor'] = utf8_encode((string)$res['macVendor']);
             $network[] = $res;
         }
 

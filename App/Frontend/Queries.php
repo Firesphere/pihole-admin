@@ -16,7 +16,7 @@ class Queries extends Frontend
         $this->getShowingString($params);
 
 
-        return $view->render($response, 'Pages/Queries.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Queries.twig', ['MenuItems' => $this->menuItems]);
     }
 
     /**

@@ -17,33 +17,34 @@ class Tools extends Frontend
     public function getMessages(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        $this->menuItems['Message'] = 'active';
+        $view->getEnvironment()->getGlobals();
+        $this->menuItems['Pi-hole diagnosis'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/Messages.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/Messages.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function gravity(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        $this->menuItems['Gravity'] = 'active';
+        $this->menuItems['Update Gravity'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/Gravity.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/Gravity.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getAdlistSearch(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        $this->menuItems['AdlistSearch'] = 'active';
+        $this->menuItems['Search Adlists'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/AdlistSearch.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/AdlistSearch.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getAuditLog(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        $this->menuItems['AuditLog'] = 'active';
+        $this->menuItems['Audit Log'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/AuditLog.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/AuditLog.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getTailLog(RequestInterface $request, ResponseInterface $response)
@@ -52,23 +53,23 @@ class Tools extends Frontend
         $params = $request->getQueryParams();
         $this->menuItems['Log'] = 'Pihole.log';
         $this->menuItems['Logtype'] = '';
-        $this->menuItems['Taillog'] = 'active';
+        $this->menuItems['Tail pihole.log'] = 'active';
         if (isset($params['FTL'])) {
             $this->menuItems['Log'] = 'FTL.log';
             $this->menuItems['Logtype'] = 'FTL';
-            $this->menuItems['TailFTL'] = 'active';
+            $this->menuItems['Tail FTL.log'] = 'active';
             $this->menuItems['Taillog'] = '';
         }
 
-        return $view->render($response, 'Pages/Tools/TailLog.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/TailLog.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function debug(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);
-        $this->menuItems['Debug'] = 'active';
+        $this->menuItems['Generate debug log'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/Debug.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/Debug.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getNetwork(RequestInterface $request, ResponseInterface $response)
@@ -76,6 +77,6 @@ class Tools extends Frontend
         $view = Twig::fromRequest($request);
         $this->menuItems['Network'] = 'active';
 
-        return $view->render($response, 'Pages/Tools/Network.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Tools/Network.twig', ['MenuItems' => $this->menuItems]);
     }
 }

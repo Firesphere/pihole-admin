@@ -5,7 +5,7 @@
     <div class="col-md-12">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs" role="tablist">
-                {% for Tab in Tabs %}
+                {% for Tab in MenuItems.Tabs %}
                     {% include('Partials/Settings/Tab.twig') %}
                 {% endfor %}
             </ul>

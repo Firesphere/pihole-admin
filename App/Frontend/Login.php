@@ -10,6 +10,6 @@ class Login extends Frontend
 {
     public function index(RequestInterface $request, ResponseInterface $response)
     {
-        return Twig::fromRequest($request)->render($response, 'Login.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Login.twig', ['MenuItems' => $this->menuItems]);
     }
 }

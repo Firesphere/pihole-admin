@@ -23,6 +23,6 @@ class Dashboard extends Frontend
         }
 
 
-        return $twig->render($response, 'Pages/Index.twig', $this->menuItems);
+        return $twig->render($response, 'Pages/Index.twig', ['MenuItems' => $this->menuItems]);
     }
 }

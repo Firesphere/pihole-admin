@@ -2,7 +2,7 @@
 <!-- Home Page -->
 {% for Item in Items %}
     <li {% if Item.ID %}id="{{ Item.ID }}"{% endif %}
-        class="menu-{{ Key|lower }} {% if Item.Children %}treeview{% endif %} {{ Item.Active }}"
+        class="menu-{{ Key|lower }} {% if Item.Children %}treeview{% endif %} {% if Item.Title in MenuItems|keys %}{{ MenuItems[Item.Title] }}{% endif %}"
             {% if Item.StatusLT %}style="{% if PiHoleStatus <= 0 %}display: none;{% else %}display: list-item;{% endif %}"{% endif %}
             {% if Item.StatusGT %}style="{% if PiHoleStatus >= 1 %}display: none;{% else %}display: list-item;{% endif %}"{% endif %}
     >
@@ -20,7 +20,7 @@
         {% if Item.Children %}
             <ul class="treeview-menu">
                 {% for Child in Item.Children %}
-                    <li class="{{ Child.Active }}">
+                    <li class="{% if Child.Title in MenuItems|keys %}{{ MenuItems[Child.Title] }}{% endif %}">
                         <a {% if Item.ID %}id="{{ Item.ID }}"{% endif %}
                            href="{{ Child.URL }}" {% if Child.Modal %}data-toggle="{{ Child.Modal }}" data-target="#{{ Child.TargetModal }}"{% endif %}>
                             {% if Child.Icon %}<i class="fa fa-fw menu-icon {{ Child.Icon }}"></i>

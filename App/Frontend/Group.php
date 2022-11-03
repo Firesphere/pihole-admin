@@ -12,27 +12,27 @@ class Group extends Frontend
     {
         $this->menuItems['Groups'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Groups.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Groups.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getClients(RequestInterface $request, ResponseInterface $response)
     {
         $this->menuItems['Clients'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Clients.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Clients.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getDomains(RequestInterface $request, ResponseInterface $response)
     {
         $this->menuItems['Domains'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Domains.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Groups/Domains.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getList(RequestInterface $request, ResponseInterface $response)
     {
-        $this->menuItems['List'] = 'active';
+        $this->menuItems['Adlists'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Groups/List.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Groups/List.twig', ['MenuItems' => $this->menuItems]);
     }
 }

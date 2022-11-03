@@ -11,20 +11,20 @@ class DNS extends Frontend
     public function __construct()
     {
         parent::__construct();
-        $this->menuItems['DNS'] = 'active menu-open';
+        $this->menuItems['Local DNS'] = 'active menu-open';
     }
 
     public function getDNSRecords(RequestInterface $request, ResponseInterface $response)
     {
-        $this->menuItems['DNSRecords'] = 'active';
+        $this->menuItems['DNS Records'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/DNS/Records.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/DNS/Records.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getCNAMERecords(RequestInterface $request, ResponseInterface $response)
     {
-        $this->menuItems['CNAMERecords'] = 'active';
+        $this->menuItems['CNAME Records'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/DNS/CNAME.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/DNS/CNAME.twig', ['MenuItems' => $this->menuItems]);
     }
 }

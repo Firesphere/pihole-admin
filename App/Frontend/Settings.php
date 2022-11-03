@@ -56,6 +56,6 @@ class Settings extends Frontend
         $view = Twig::fromRequest($request);
         $this->menuItems['Settings'] = 'active';
 
-        return $view->render($response, 'Pages/Settings.twig', $this->menuItems);
+        return $view->render($response, 'Pages/Settings.twig', ['MenuItems' => $this->menuItems]);
     }
 }

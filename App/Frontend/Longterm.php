@@ -11,27 +11,27 @@ class Longterm extends Frontend
     public function __construct()
     {
         parent::__construct();
-        $this->menuItems['Longterm'] = 'active menu-open';
+        $this->menuItems['Long-term Data'] = 'active menu-open';
     }
 
     public function getGraph(RequestInterface $request, ResponseInterface $response, $args)
     {
-        $this->menuItems['LongtermGraph'] = 'active';
+        $this->menuItems['Graphics'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Graph.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Graph.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getQueries(RequestInterface $request, ResponseInterface $response, $args)
     {
-        $this->menuItems['LongtermQueryLog'] = 'active';
+        $this->menuItems['Query Log'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Queries.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/Queries.twig', ['MenuItems' => $this->menuItems]);
     }
 
     public function getList(RequestInterface $request, ResponseInterface $response, $args)
     {
-        $this->menuItems['LongtermList'] = 'active';
+        $this->menuItems['Top Lists'] = 'active';
 
-        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/List.twig', $this->menuItems);
+        return Twig::fromRequest($request)->render($response, 'Pages/Longterm/List.twig', ['MenuItems' => $this->menuItems]);
     }
 }
