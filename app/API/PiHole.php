@@ -16,12 +16,6 @@ class PiHole
         'ftlUrl'    => 'https://github.com/pi-hole/FTL/releases',
         'dockerUrl' => 'https://github.com/pi-hole/docker-pi-hole/releases',
     ];
-    /**
-     * @var array|false
-     */
-    private $parsedVersions;
-
-
     protected static $ANSIcolors = [
         '[1;91m' => '<span class="log-red">',
         '[1;32m' => '<span class="log-green">',
@@ -43,7 +37,10 @@ class PiHole
 
         '[0m' => '</span>',
     ];
-
+    /**
+     * @var array|false
+     */
+    private $parsedVersions;
 
     /**
      * Check if the Versions file is readable.

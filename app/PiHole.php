@@ -2,8 +2,6 @@
 
 namespace App;
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use RuntimeException;
 
 /**

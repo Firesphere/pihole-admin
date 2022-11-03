@@ -1,0 +1,27 @@
+{% extends 'Layout.twig' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for Tab in Tabs %}
+                    {% include('Partials/Settings/Tab.twig') %}
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                <!-- ######################################################### System admin ######################################################### -->
+                {% include('Partials/Settings/System.twig') %}
+                <!-- ######################################################### DHCP ######################################################### -->
+            </div>
+        </div>
+    </div>
+</div>
+    {% endblock %}
+
+    {% block pagescripts %}
+    {{ assets({files: [
+        'Resources/vendor/jquery.confirm.min.js',
+        'Resources/js/settings.js',
+    ]}) }}
+{% endblock %}

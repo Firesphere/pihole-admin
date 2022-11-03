@@ -10,11 +10,6 @@ class TotalQueries extends Module implements ModuleInterface
 {
     public $sort = 2;
 
-    public function getTemplate(): string
-    {
-        return 'TotalQueries.twig';
-    }
-
     /**
      * @throws RuntimeError
      * @throws SyntaxError
@@ -23,6 +18,12 @@ class TotalQueries extends Module implements ModuleInterface
     public function renderTemplate($twigEnvironment): string
     {
         $path = sprintf('%s/%s', $this->getBaseFolder('Dashboard'), $this->getTemplate());
+
         return $twigEnvironment->render($path);
+    }
+
+    public function getTemplate(): string
+    {
+        return 'TotalQueries.twig';
     }
 }

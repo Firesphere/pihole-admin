@@ -4,9 +4,8 @@ namespace App\Frontend\Modules;
 
 class Module
 {
-    public $sort = 0;
-
     protected static $modules = [];
+    public $sort = 0;
 
     public static function registerModule($className)
     {
@@ -45,6 +44,7 @@ class Module
             $class[] = new $module();
         }
         usort($class, [self::class, 'getSortOrder']);
+
         return $class;
     }
 }

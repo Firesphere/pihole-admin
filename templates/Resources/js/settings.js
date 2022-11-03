@@ -200,7 +200,7 @@ $("#DHCPchk").click(function () {
 });
 
 function loadCacheInfo() {
-    $.getJSON("api.php?getCacheInfo", function (data) {
+    $.getJSON("api/settings/getCacheInfo", function (data) {
         if ("FTLnotrunning" in data) {
             return;
         }

@@ -8,6 +8,7 @@ use App\API\GroupPostHandler;
 use App\API\PiHole;
 use App\API\PiholeDB;
 use App\API\Queries;
+use App\API\Settings;
 use App\Frontend;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -53,6 +54,9 @@ return static function (App $app) {
             $gravityGroup->get('/search', [Gravity::class, 'searchGravity']);
         });
         $group->get('debug', [PiHole::class, 'debug']);
+        $group->group('settings', function (RouteCollectorProxy $settingsGroup) {
+            $settingsGroup->get('/getCacheInfo', [Settings::class, 'getCacheInfo']);
+        });
     });
     $app->get('/', [Frontend\Dashboard::class, 'index']);
     $app->get('/queries', [Frontend\Queries::class, 'index']);
@@ -80,4 +84,6 @@ return static function (App $app) {
         $group->get('/debug', [Frontend\Tools::class, 'debug']);
         $group->get('/network', [Frontend\Tools::class, 'getNetwork']);
     });
+
+    $app->get('/settings', [Frontend\Settings::class, 'index']);
 };

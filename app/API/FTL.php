@@ -359,6 +359,49 @@ class FTL extends APIBase
         return $this->returnAsJSON($request, $response, ['forward_destinations' => $forward_dest]);
     }
 
+    public function tailLog(RequestInterface $request, ResponseInterface $response)
+    {
+        $params = $request->getQueryParams();
+
+        if (isset($params['FTL'])) {
+            $file = fopen('/var/log/pihole/FTL.log', 'rb');
+        } else {
+            $file = fopen('/var/log/pihole/pihole.log', 'rb');
+        }
+
+        if (!$file) {
+            return $this->returnAsJSON(
+                $request,
+                $response,
+                [
+                    'offset' => 0,
+                    'lines'  => ["Failed to open log file. Check permissions!\n"]
+                ]
+            );
+        }
+
+        $offset = $params['offset'] ?? -1;
+        $lines = [];
+        if ($offset > 0) {
+            // Seeks on the file pointer where we want to continue reading is known
+            fseek($file, $offset);
+            $ftell = ftell($file);
+
+            while (!feof($file)) {
+                $data = trim(fgets($file));
+                if (!empty($data)) {
+                    $lines[] = Helper::formatLine(fgets($file));
+                }
+            }
+        } else {
+            fseek($file, $offset, SEEK_END);
+            $ftell = ftell($file) + 1;
+        }
+
+
+        return $this->returnAsJSON($request, $response, ['offset' => $ftell, 'lines' => $lines]);
+    }
+
     /**
      * Stub for semantics
      * @param $API
@@ -419,49 +462,5 @@ class FTL extends APIBase
     protected function topClients($API, $method, $limit = 0)
     {
         return $this->getQuerySourceLists($API, $method, $limit);
-    }
-
-    public function tailLog(RequestInterface $request, ResponseInterface $response)
-    {
-        $params = $request->getQueryParams();
-
-        if (isset($params['FTL'])) {
-            $file = fopen('/var/log/pihole/FTL.log', 'rb');
-        } else {
-            $file = fopen('/var/log/pihole/pihole.log', 'rb');
-        }
-
-        if (!$file) {
-            return $this->returnAsJSON(
-                $request,
-                $response,
-                [
-                    'offset'  => 0,
-                    'lines' => ["Failed to open log file. Check permissions!\n"]
-                ]
-            );
-        }
-
-        $offset = $params['offset'] ?? -1;
-        $lines = [];
-        if ($offset > 0) {
-            // Seeks on the file pointer where we want to continue reading is known
-            fseek($file, $offset);
-            $ftell = ftell($file);
-
-            while (!feof($file)) {
-                $data = trim(fgets($file));
-                if (!empty($data)) {
-                    $lines[] = Helper::formatLine(fgets($file));
-                }
-            }
-        } else {
-            fseek($file, $offset, SEEK_END);
-            $ftell = ftell($file)+1;
-        }
-
-
-
-        return $this->returnAsJSON($request, $response, ['offset' => $ftell, 'lines' => $lines]);
     }
 }

@@ -10,11 +10,6 @@ class ClientActivity extends Module implements ModuleInterface
 {
     public $sort = 3;
 
-    public function getTemplate(): string
-    {
-        return 'ClientActivity.twig';
-    }
-
     /**
      * @throws RuntimeError
      * @throws SyntaxError
@@ -23,6 +18,12 @@ class ClientActivity extends Module implements ModuleInterface
     public function renderTemplate($twigEnvironment): string
     {
         $path = sprintf('%s/%s', $this->getBaseFolder('Dashboard'), $this->getTemplate());
+
         return $twigEnvironment->render($path);
+    }
+
+    public function getTemplate(): string
+    {
+        return 'ClientActivity.twig';
     }
 }
