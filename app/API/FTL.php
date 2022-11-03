@@ -449,14 +449,16 @@ class FTL extends APIBase
             fseek($file, $offset);
 
             while (!feof($file)) {
-                $lines[] = Helper::formatLine(fgets($file));
+                $data = trim(fgets($file));
+                if (!empty($data)) {
+                    $lines[] = Helper::formatLine(fgets($file));
+                }
             }
-        } else {
-            ++$offset;
+            return $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
         }
 
-        fseek($file, -1, SEEK_END);
+        fseek($file, $offset, SEEK_END);
 
-        return $this->returnAsJSON($request, $response, ['offset' => ftell($file), 'lines' => $lines]);
+        return $this->returnAsJSON($request, $response, ['offset' => ftell($file)+1]);
     }
 }

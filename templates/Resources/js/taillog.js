@@ -11,7 +11,7 @@ var offset = 0,
     scrolling = true;
 
 // Check every 200msec for fresh data
-var interval = 500;
+var interval = 200;
 
 // Function that asks the API for new data
 function reloadData() {
