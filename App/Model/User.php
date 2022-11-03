@@ -43,15 +43,13 @@ class User
      */
     public function getUser(string $username)
     {
-        $db = new SQLiteDB('USER', SQLITE3_OPEN_READONLY);
         $query = 'SELECT id, username, password FROM user WHERE username=:username';
         $params = [':username' => $username];
-        $result = $db->doQuery($query, $params);
+        $result = $this->db->doQuery($query, $params)->fetchArray();
 
-        $arrayData = $result->fetchArray();
-        $this->id = $arrayData['id'];
-        $this->username = $arrayData['username'];
-        $this->password = $arrayData['password'];
+        $this->id = $result['id'];
+        $this->username = $result['username'];
+        $this->password = $result['password'];
 
         return $this;
     }
