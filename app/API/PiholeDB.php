@@ -469,7 +469,7 @@ SELECT domain, count(domain)
             $network[] = $res;
         }
 
-        $this->returnAsJSON($request, $response, ['network' => $network]);
+        return $this->returnAsJSON($request, $response, ['network' => $network]);
     }
 
     public function deleteNetwork(RequestInterface $request, ResponseInterface $response)
