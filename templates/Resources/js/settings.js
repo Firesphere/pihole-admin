@@ -211,17 +211,18 @@ function loadCacheInfo() {
 
         // Highlight early cache removals when present
         var cachelivefreed = parseInt(data.cacheinfo["cache-live-freed"], 10);
-        $("#cache-live-freed").text(cachelivefreed);
+        var clf = $("#cache-live-freed");
+        clf.text(cachelivefreed);
         if (cachelivefreed > 0) {
-            $("#cache-live-freed").parent("tr").children("th").children("span").addClass("lookatme");
-            $("#cache-live-freed").parent("tr").children("td").addClass("lookatme");
-            $("#cache-live-freed")
+            clf.parent("tr").children("th").children("span").addClass("lookatme");
+            clf.parent("tr").children("td").addClass("lookatme");
+            clf
                 .parent("tr")
                 .children("td")
                 .attr("lookatme-text", cachelivefreed.toString());
         } else {
-            $("#cache-live-freed").parent("tr").children("th").children("span").removeClass("lookatme");
-            $("#cache-live-freed").parent("tr").children("td").removeClass("lookatme");
+            clf.parent("tr").children("th").children("span").removeClass("lookatme");
+            clf.parent("tr").children("td").removeClass("lookatme");
         }
 
         // Update cache info every 10 seconds

@@ -3,7 +3,7 @@
 namespace App\Frontend;
 
 use App\Frontend\Modules\Module;
-use app\Frontend\Modules\ModuleInterface;
+use App\Frontend\Modules\ModuleInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;

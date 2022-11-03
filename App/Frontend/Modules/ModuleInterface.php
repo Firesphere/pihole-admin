@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Frontend\Modules;
+namespace App\Frontend\Modules;
 
 use Twig\Environment;
 
