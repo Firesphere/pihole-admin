@@ -7,7 +7,7 @@
 
 var offset = 0,
     timer,
-    pre,
+    pre = document.getElementById('output'),
     scrolling = true;
 
 // Check every 200msec for fresh data
@@ -19,8 +19,8 @@ function reloadData() {
     $.getJSON("api/log?" + window.logtype + "&offset=" + offset, function (data) {
         pre.append(data.lines);
 
-        if (scrolling && offset !== data.offset) {
-            pre.scrollTop(pre[0].scrollHeight);
+        if (scrolling) {
+            pre.scrollTop(pre.scrollHeight);
         }
 
         offset = data.offset;
@@ -34,7 +34,6 @@ $(function () {
     $.getJSON("api/log?" + window.logtype, function (data) {
         offset = data.offset;
     });
-    pre = $("#output");
     // Trigger function that looks for new data
     reloadData();
 });
