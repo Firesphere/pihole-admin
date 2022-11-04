@@ -13,35 +13,37 @@
         <h4><i class="icon fa fa-info"></i> Info</h4>
         {{ Success|raw }}
     </div>
-    {% elseif Error %}
+{% elseif Error %}
     <div id="alError" class="alert alert-danger alert-dismissible fade in" role="alert">
         <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
         </button>
         <h4><i class="icon fa fa-ban"></i> Error</h4>
         {{ Error|raw }}
     </div>
-    {% endif %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="nav-tabs-custom">
-            <ul class="nav nav-tabs" role="tablist">
-                {% for Tab in MenuItems.Tabs %}
-                    {% include('Partials/Settings/Tab.twig') %}
-                {% endfor %}
-            </ul>
-            <div class="tab-content">
-                <!-- ######################################################### System admin ######################################################### -->
-                {% include('Partials/Settings/System.twig') %}
-                <!-- ######################################################### DHCP ######################################################### -->
+{% endif %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs" role="tablist">
+                    {% for Tab in MenuItems.Tabs %}
+                        {% include('Partials/Settings/Tab.twig') %}
+                    {% endfor %}
+                </ul>
+                <div class="tab-content">
+                    {% for Tab in MenuItems.Tabs %}
+                        <div id="{{ Tab.Slug }}" class="tab-pane fade {{ Tab.Classes }}">
+                            {{  Tab.Template|raw  }}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
-</div>
-    {% endblock %}
+{% endblock %}
 
     {% block pagescripts %}
-    {{ assets({files: [
-        'Resources/vendor/jquery.confirm.min.js',
-        'Resources/js/settings.js',
-    ]}) }}
-{% endblock %}
+        {{ assets({files: [
+            'Resources/vendor/jquery.confirm.min.js',
+            'Resources/js/settings.js',
+        ]}) }}
+    {% endblock %}

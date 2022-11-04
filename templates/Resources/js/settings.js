@@ -358,7 +358,7 @@ $(function () {
 // Change "?tab=" parameter in URL for save and reload
 $(".nav-tabs a").on("shown.bs.tab", function (e) {
     var tab = e.target.hash.substring(1);
-    window.history.pushState("", "", "?tab=" + tab);
+    window.history.pushState("", "", "settings?tab=" + tab);
     window.scrollTo(0, 0);
 });
 
