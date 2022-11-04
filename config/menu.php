@@ -63,11 +63,12 @@ $menu = [
     ],
     'DNS Control'      => [
         [
-            'Title'    => 'Disable Blocking',
-            'URL'      => '#',
-            'Icon'     => 'fa-stop',
-            'StatusLT' => true,
-            'ID'       => 'pihole-disable',
+            'Title'     => 'Disable Blocking',
+            'URL'       => '#',
+            'Icon'      => 'fa-stop',
+            'StatusLT'  => true,
+            'ID'        => 'pihole-disable',
+            'ExtraSpan' => 'flip-status-disable',
             'Children' => [
                 'Indefinitely' => [
                     'URL'   => '#',
