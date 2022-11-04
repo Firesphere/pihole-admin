@@ -22,43 +22,43 @@ $menu = [
             'URL'      => '#',
             'Children' => [
                 'Graphics' => [
-                    'Title'  => 'Graphics',
-                    'URL'    => 'longterm/graph',
-                    'Icon'   => 'fa-chart-bar'
+                    'Title' => 'Graphics',
+                    'URL'   => 'longterm/graph',
+                    'Icon'  => 'fa-chart-bar'
                 ],
                 'QueryLog' => [
-                    'Title'  => 'Query Log',
-                    'Icon'   => 'fa-file-alt',
-                    'URL'    => 'longterm/queries',
+                    'Title' => 'Query Log',
+                    'Icon'  => 'fa-file-alt',
+                    'URL'   => 'longterm/queries',
                 ],
                 'TopList'  => [
-                    'Title'  => 'Top Lists',
-                    'Icon'   => 'fa-list',
-                    'URL'    => 'longterm/lists',
+                    'Title' => 'Top Lists',
+                    'Icon'  => 'fa-list',
+                    'URL'   => 'longterm/lists',
                 ],
             ],
         ],
     ],
     'Group Management' => [
         [
-            'Title'  => 'Groups',
-            'URL'    => 'groups',
-            'Icon'   => 'fa-user-friends',
+            'Title' => 'Groups',
+            'URL'   => 'groups',
+            'Icon'  => 'fa-user-friends',
         ],
         [
-            'Title'  => 'Clients',
-            'URL'    => 'groups/clients',
-            'Icon'   => 'fa-laptop',
+            'Title' => 'Clients',
+            'URL'   => 'groups/clients',
+            'Icon'  => 'fa-laptop',
         ],
         [
-            'Title'  => 'Domains',
-            'URL'    => 'groups/domains',
-            'Icon'   => 'fa-list',
+            'Title' => 'Domains',
+            'URL'   => 'groups/domains',
+            'Icon'  => 'fa-list',
         ],
         [
-            'Title'  => 'Adlists',
-            'URL'    => 'groups/adlists',
-            'Icon'   => 'fa-shield-alt',
+            'Title' => 'Adlists',
+            'URL'   => 'groups/adlists',
+            'Icon'  => 'fa-shield-alt',
         ],
     ],
     'DNS Control'      => [
@@ -67,6 +67,7 @@ $menu = [
             'URL'      => '#',
             'Icon'     => 'fa-stop',
             'StatusLT' => true,
+            'ID'       => 'pihole-disable',
             'Children' => [
                 'Indefinitely' => [
                     'URL'   => '#',
@@ -117,14 +118,14 @@ $menu = [
             'Title'    => 'Local DNS',
             'Children' => [
                 'DNSRecords'   => [
-                    'URL'    => 'dns/dns',
-                    'Title'  => 'DNS Records',
-                    'Icon'   => 'fa-address-card',
+                    'URL'   => 'dns/dns',
+                    'Title' => 'DNS Records',
+                    'Icon'  => 'fa-address-card',
                 ],
                 'CNAMERecords' => [
-                    'URL'    => 'dns/cname',
-                    'Title'  => 'CNAME Records',
-                    'Icon'   => 'fa-location-arrow',
+                    'URL'   => 'dns/cname',
+                    'Title' => 'CNAME Records',
+                    'Icon'  => 'fa-location-arrow',
                 ],
             ]
         ]
@@ -145,19 +146,19 @@ $menu = [
                     'Icon'       => 'fa-file-medical-alt'
                 ],
                 'Gravity'  => [
-                    'Title'  => 'Update Gravity',
-                    'URL'    => 'tools/gravity',
-                    'Icon'   => 'fa-arrow-circle-down',
+                    'Title' => 'Update Gravity',
+                    'URL'   => 'tools/gravity',
+                    'Icon'  => 'fa-arrow-circle-down',
                 ],
                 'Adlists'  => [
-                    'Title'  => 'Search Adlists',
-                    'URL'    => 'tools/search',
-                    'Icon'   => 'fa-search',
+                    'Title' => 'Search Adlists',
+                    'URL'   => 'tools/search',
+                    'Icon'  => 'fa-search',
                 ],
                 'Audit'    => [
-                    'Title'  => 'Audit log',
-                    'URL'    => 'tools/auditlog',
-                    'Icon'   => 'fa-balance-scale',
+                    'Title' => 'Audit log',
+                    'URL'   => 'tools/auditlog',
+                    'Icon'  => 'fa-balance-scale',
                 ],
                 'Taillog'  => [
                     'Title'      => 'Tail pihole.log',
@@ -176,21 +177,21 @@ $menu = [
                             </svg>',
                 ],
                 'Debug'    => [
-                    'Title'  => 'Generate debug log',
-                    'URL'    => 'tools/debug',
-                    'Icon'   => 'fa-ambulance',
+                    'Title' => 'Generate debug log',
+                    'URL'   => 'tools/debug',
+                    'Icon'  => 'fa-ambulance',
                 ],
                 'Network'  => [
-                    'Title'  => 'Network',
-                    'URL'    => 'tools/network',
-                    'Icon'   => 'fa-network-wired',
+                    'Title' => 'Network',
+                    'URL'   => 'tools/network',
+                    'Icon'  => 'fa-network-wired',
                 ]
             ]
         ],
         'Settings' => [
-            'URL'    => 'settings',
-            'Icon'   => 'fa-cog',
-            'Title'  => 'Settings',
+            'URL'   => 'settings',
+            'Icon'  => 'fa-cog',
+            'Title' => 'Settings',
         ],
     ],
 ];
