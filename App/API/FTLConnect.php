@@ -6,7 +6,7 @@ use App\PiHole;
 
 class FTLConnect
 {
-    private const DEFAULT_FTL_IP = '192.168.178.45';
+    private const DEFAULT_FTL_IP = '127.0.0.1';
     private const DEFAULT_FTL_PORT = 4711;
 
     /**
