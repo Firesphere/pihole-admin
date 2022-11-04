@@ -13,27 +13,27 @@
                                 <tbody>
                                 <tr>
                                     <th scope="row">FTL version:</th>
-                                    <td>{{ FTLVersion }}</td>
+                                    <td>{{ System.FTLVersion }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Process identifier (PID):</th>
-                                    <td></td>
+                                    <td>{{ System.FTLPId }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Time FTL started:</th>
-                                    <td></td>
+                                    <td>{{ System.FTLStarted }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">User / Group:</th>
-                                    <td></td>
+                                    <td>{{ System.FTLUser }} / {{ System.FTLGroup }}</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Total CPU utilization:</th>
-                                    <td>%</td>
+                                    <td>{{ System.FTLCPU }}%</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">Memory utilization:</th>
-                                    <td>%</td>
+                                    <td>{{ System.FTLMEM }}%</td>
                                 </tr>
                                 <tr>
                                     <th scope="row">
@@ -77,21 +77,21 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="col-md-4">
-                            <?php if ($piHoleLogging) { ?>
+                            {% if Config.QUERY_LOGGING %}
                             <button type="button"
                                     class="btn btn-warning confirm-disablelogging-noflush btn-block">
                                 Disable query logging
                             </button>
-                            <?php } else { ?>
+                            {% else %}
                             <form role="form" method="post">
                                 <input type="hidden" name="action" value="Enable">
                                 <input type="hidden" name="field" value="Logging">
-                                <input type="hidden" name="token" value="<?php echo $token; ?>">
+                                <input type="hidden" name="token" value="todo-security-token-things">
                                 <button type="submit" class="btn btn-success btn-block">Enable query
                                     logging
                                 </button>
                             </form>
-                            <?php } ?>
+                            {% endif %}
                         </div>
                         <p class="hidden-md hidden-lg"></p>
                         <div class="col-md-4">
@@ -129,28 +129,28 @@
 
                     <form role="form" method="post" id="flushlogsform">
                         <input type="hidden" name="field" value="flushlogs">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                     <form role="form" method="post" id="flusharpform">
                         <input type="hidden" name="field" value="flusharp">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                     <form role="form" method="post" id="disablelogsform-noflush">
                         <input type="hidden" name="field" value="Logging">
                         <input type="hidden" name="action" value="Disable-noflush">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                     <form role="form" method="post" id="poweroffform">
                         <input type="hidden" name="field" value="poweroff">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                     <form role="form" method="post" id="rebootform">
                         <input type="hidden" name="field" value="reboot">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                     <form role="form" method="post" id="restartdnsform">
                         <input type="hidden" name="field" value="restartdns">
-                        <input type="hidden" name="token" value="<?php echo $token; ?>">
+                        <input type="hidden" name="token" value="todo-add-token">
                     </form>
                 </div>
             </div>

@@ -87,4 +87,5 @@ return static function (App $app) {
     });
 
     $app->get('/settings', [Frontend\Settings::class, 'index']);
+    $app->post('/settings', [Frontend\Settings::class, 'handlePost']);
 };

@@ -29,9 +29,11 @@ class Frontend
      */
     protected $setupVars = [];
     protected $menuItems = [];
+    protected $config;
 
     public function __construct()
     {
+        $this->config = new Config();
         $this->setupVars = (new Config())->get('pihole');
     }
 
