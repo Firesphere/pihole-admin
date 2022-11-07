@@ -3,6 +3,7 @@
 namespace App\Frontend\Settings;
 
 use App\Frontend\Settings;
+use App\Helper\Config;
 use App\Helper\Helper;
 use App\PiHole;
 
@@ -15,7 +16,7 @@ class DHCPHandler extends Settings
             $ip = trim($postData['AddIP']);
             $hostname = trim($postData['AddHostname']);
 
-            addStaticDHCPLease($mac, $ip, $hostname);
+            self::addStaticDHCPLease($mac, $ip, $hostname, $success, $error);
 
             return;
         }
@@ -84,6 +85,54 @@ class DHCPHandler extends Settings
         } else {
             PiHole::execute('-a disabledhcp');
             $success = 'The DHCP server has been deactivated';
+        }
+    }
+
+    private static function addStaticDHCPLease($mac, $ip, $hostname, &$success, &$error)
+    {
+        global $dhcp_static_leases;
+
+        $mac = strtoupper($mac);
+        if (!Helper::validIP($ip) && $ip !== '') {
+            $error .= 'IP address (' . htmlspecialchars($ip) . ') is invalid!<br>';
+        }
+
+        if (!Helper::validDomain($hostname) && $hostname !== '') {
+            $error .= 'Host name (' . htmlspecialchars($hostname) . ') is invalid!<br>';
+        }
+
+        if (empty($hostname) && empty($ip)) {
+            $error .= 'You can not omit both the IP address and the host name!<br>';
+        }
+
+        if (empty($hostname)) {
+            $hostname = 'nohost';
+        }
+
+        if (empty($ip)) {
+            $ip = 'noip';
+        }
+
+        // Test if this lease is already included
+        $dhcp_static_leases = (new Config())->getLeases();
+
+        foreach ($dhcp_static_leases as $lease) {
+            if ($lease['hwaddr'] === $mac) {
+                $error .= 'Static lease for MAC address (' . htmlspecialchars($mac) . ') already defined!<br>';
+            }
+            if ($ip !== 'noip' && $lease['IP'] === $ip) {
+                $error .= 'Static lease for IP address (' . htmlspecialchars($ip) . ') already defined!<br>';
+            }
+            if ($lease['host'] === $hostname) {
+                $error .= 'Static lease for hostname (' . htmlspecialchars($hostname) . ') already defined!<br>';
+            }
+        }
+
+        $cmd = sprintf('-a addstaticdhcp %s %s %s', $mac, $ip, $hostname);
+
+        $output = PiHole::execute($cmd);
+        if (empty($output)) {
+            $success .= 'A new static address has been added';
         }
     }
 }

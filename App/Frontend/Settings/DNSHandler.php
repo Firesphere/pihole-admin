@@ -3,11 +3,19 @@
 namespace App\Frontend\Settings;
 
 use App\Frontend\Settings;
+use App\Helper\Config;
 use App\Helper\Helper;
 use App\PiHole;
 
 class DNSHandler extends Settings
 {
+    /**
+     * @param $postData
+     * @param Config $config
+     * @param $success
+     * @param $error
+     * @return void
+     */
     public static function handleAction($postData, $config, &$success, &$error)
     {
         $DNSservers = [];

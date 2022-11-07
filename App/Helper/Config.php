@@ -61,4 +61,44 @@ class Config
 
         return $list;
     }
+
+    public function getLeases()
+    {
+        $dhcp_static_leases = [];
+        $dnsConf = $this->get('dns');
+
+        if (!file_exists($dnsConf['LEASES_CONF']) || !is_readable($dnsConf['LEASES_CONF'])) {
+            return false;
+        }
+
+        $dhcpstatic = @fopen($dnsConf['LEASES_CONF'], 'rb');
+        if (!is_resource($dhcpstatic)) {
+            return false;
+        }
+
+        while (!feof($dhcpstatic)) {
+            // Remove any possibly existing variable with this name
+            $mac = '';
+            $one = '';
+            $two = '';
+            sscanf(trim(fgets($dhcpstatic)), 'dhcp-host=%[^,],%[^,],%[^,]', $mac, $one, $two);
+            if ($mac !== '' && filter_var($mac, FILTER_VALIDATE_MAC)) {
+                if (Helper::validIP($one) && strlen($two) == 0) {
+                    // dhcp-host=mac,IP - no HOST
+                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => ''];
+                } elseif (strlen($two) == 0) {
+                    // dhcp-host=mac,hostname - no IP
+                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => '', 'host' => $one];
+                } else {
+                    // dhcp-host=mac,IP,hostname
+                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => $two];
+                }
+            } elseif (Helper::validIP($one) && Helper::validDomain($mac)) {
+                // dhcp-host=hostname,IP - no MAC
+                $dhcp_static_leases[] = ['hwaddr' => '', 'IP' => $one, 'host' => $mac];
+            }
+        }
+
+        return $dhcp_static_leases;
+    }
 }

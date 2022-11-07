@@ -17,13 +17,15 @@ $settings = [
     'dns'        => [
         'DNSLIST_CONF'   => '/etc/pihole/custom.list',
         'CNAMELIST_CONF' => '/etc/dnsmasq.d/05-pihole-custom-cname.conf',
+        'LEASES_CONF'    => '/etc/dnsmasq.d/04-pihole-static-dhcp.conf',
     ],
     'pihole'     => [],
     'ftl'        => []
 ];
 
 if (file_exists(__DIR__ . '/settings.local.php')) {
-    (require __DIR__ . '/settings.local.php');
+    $local = (require __DIR__ . '/settings.local.php');
+    $settings = array_merge($local, $settings);
 }
 
 if (file_exists($settings['conf']['PIHOLE_CONF'])) {

@@ -16,6 +16,9 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class Settings extends Frontend
 {
@@ -26,14 +29,9 @@ class Settings extends Frontend
 
     protected $settings = [];
 
-    public function __construct(ContainerInterface $container)
-    {
-        parent::__construct();
-        /** @var \SlimSession\Helper $session */
-        $this->session = $container->get('session');
-        $this->menuItems['Settings'] = 'active';
-
-        $this->menuItems['Tabs'] = [
+    protected $menuItems = [
+        'Settings' => 'active',
+        'Tabs'     => [
             'System'     => [
                 'Title' => 'System',
                 'Slug'  => 'sysadmin',
@@ -58,11 +56,26 @@ class Settings extends Frontend
                 'Title' => 'Teleporter',
                 'Slug'  => 'teleporter',
             ],
-        ];
+        ]
+    ];
+
+    /**
+     * @var CallAPI
+     */
+    private $api;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct();
+        /** @var \SlimSession\Helper $session */
+        $this->session = $container->get('session');
+        $this->api = new CallAPI();
+
         $piholeConfig = $this->config->get('pihole');
-        $api = new CallAPI();
-        $IPv4txt = $this->getIPv4txt($api);
+
+        $IPv4txt = $this->getIPv4txt();
         $FTLPid = Helper::pidOf('pihole-FTL');
+
         $this->settings = [
             'Success'         => $this->session->get('SETTINGS_SUCCESS'),
             'Error'           => $this->session->get('SETTINGS_ERROR'),
@@ -78,10 +91,19 @@ class Settings extends Frontend
                 'FTLMEM'     => FTLConnect::getFTLData($FTLPid, '%mem'),
                 'FTLRSS'     => Helper::formatByteUnits(1e3 * (float)FTLConnect::getFTLData($FTLPid, 'rss')),
             ],
+            'DHCPLeases'      => $this->config->getLeases(),
             'IPv4'            => $IPv4txt,
         ];
     }
 
+    /**
+     * @param RequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $get = $request->getQueryParams();
@@ -106,12 +128,11 @@ class Settings extends Frontend
     }
 
     /**
-     * @param CallAPI $api
      * @return mixed|string
      */
-    public function getIPv4txt(CallAPI $api): mixed
+    public function getIPv4txt(): mixed
     {
-        $gateway = $api->doCall('gateway');
+        $gateway = $this->api->doCall('gateway');
         $gatewayIP = ['ip' => '-1'];
         if (!isset($gateway['FTLnotrunning'])) {
             $gateway = explode(' ', $gateway[0]);
