@@ -200,4 +200,25 @@ class Helper
 
         return $validChars && $lengthCheck && $labelLengthCheck; // length of each label
     }
+
+    /**
+     * Convert a second thing in to a readable time
+     * @param $time
+     * @return string
+     */
+    public static function secondsToTime($time)
+    {
+        $seconds = round($time);
+        if ($seconds < 60) {
+            return sprintf('%ds', $seconds);
+        }
+        if ($seconds < 3600) {
+            return sprintf('%dm %ds', $seconds / 60, $seconds % 60);
+        }
+        if ($seconds < 86400) {
+            return sprintf('%dh %dm %ds', $seconds / 3600 % 24, $seconds / 60 % 60, $seconds % 60);
+        }
+
+        return sprintf('%dd %dh %dm %ds', $seconds / 86400, $seconds / 3600 % 24, $seconds / 60 % 60, $seconds % 60);
+    }
 }

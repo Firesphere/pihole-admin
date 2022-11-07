@@ -114,7 +114,7 @@ class DHCPHandler extends Settings
         }
 
         // Test if this lease is already included
-        $dhcp_static_leases = (new Config())->getLeases();
+        $dhcp_static_leases = (new Config())->getStaticLeases();
 
         foreach ($dhcp_static_leases as $lease) {
             if ($lease['hwaddr'] === $mac) {

@@ -36,13 +36,13 @@ class Settings extends Frontend
                 'Title' => 'System',
                 'Slug'  => 'sysadmin',
             ],
-            'DHCP'       => [
-                'Title' => 'DHCP',
-                'Slug'  => 'piholedhcp',
-            ],
             'DNS'        => [
                 'Title' => 'DNS',
                 'Slug'  => 'dns',
+            ],
+            'DHCP'       => [
+                'Title' => 'DHCP',
+                'Slug'  => 'piholedhcp',
             ],
             'API'        => [
                 'Title' => 'API/Web interface',
@@ -81,17 +81,8 @@ class Settings extends Frontend
             'Error'           => $this->session->get('SETTINGS_ERROR'),
             'Config'          => $piholeConfig,
             'PiHoleInterface' => $piholeConfig['PIHOLE_INTERFACE'] ?? 'unknown',
-            'System'          => [
-                'FTLPId'     => $FTLPid ?? 'FTL Not running',
-                'FTLVersion' => $FTLPid ? exec('/usr/bin/pihole-FTL version') : '',
-                'FTLStarted' => FTLConnect::getFTLData($FTLPid, 'lstart'),
-                'FTLUser'    => FTLConnect::getFTLData($FTLPid, 'euser'),
-                'FTLGroup'   => FTLConnect::getFTLData($FTLPid, 'egroup'),
-                'FTLCPU'     => FTLConnect::getFTLData($FTLPid, '%cpu'),
-                'FTLMEM'     => FTLConnect::getFTLData($FTLPid, '%mem'),
-                'FTLRSS'     => Helper::formatByteUnits(1e3 * (float)FTLConnect::getFTLData($FTLPid, 'rss')),
-            ],
-            'DHCPLeases'      => $this->config->getLeases(),
+            'System'          => $this->getSystemSettings($FTLPid),
+            'DHCP'            => $this->getDHCPSettings(),
             'IPv4'            => $IPv4txt,
         ];
     }
@@ -216,5 +207,41 @@ class Settings extends Frontend
 
         return $response->withHeader('Location', '/settings')
             ->withStatus(302);
+    }
+
+    /**
+     * @param int|bool|null $FTLPid
+     * @return array
+     */
+    public function getSystemSettings($FTLPid): array
+    {
+        return [
+            'PId'     => $FTLPid ?? 'FTL Not running',
+            'Version' => $FTLPid ? exec('/usr/bin/pihole-FTL version') : '',
+            'Started' => FTLConnect::getFTLData($FTLPid, 'lstart'),
+            'User'    => FTLConnect::getFTLData($FTLPid, 'euser'),
+            'Group'   => FTLConnect::getFTLData($FTLPid, 'egroup'),
+            'CPU'     => FTLConnect::getFTLData($FTLPid, '%cpu'),
+            'MEM'     => FTLConnect::getFTLData($FTLPid, '%mem'),
+            'RSS'     => Helper::formatByteUnits(1e3 * (float)FTLConnect::getFTLData($FTLPid, 'rss')),
+        ];
+    }
+
+    protected function getDHCPSettings()
+    {
+        $piholeConf = $this->config->get('pihole');
+
+        return [
+            'Active'        => (isset($piholeConf['DHCP_ACTIVE']) && $piholeConf['DHCP_ACTIVE'] === 1),
+            'Start'         => $piholeConf['DHCP_START'] ?? '',
+            'End'           => $piholeConf['DHCP_END'] ?? '',
+            'Router'        => $piholeConf['DHCP_ROUTER'] ?? '',
+            'Domain'        => $piholeConf['PIHOLE_DOMAIN'] ?? '',
+            'Lease'         => $piholeConf['DHCP_LEASETIME'] ?? 24,
+            'RapidCommit'   => $piholeConf['DHCP_rapid_commit'] ?? false,
+            'StaticLeases'  => $this->config->getStaticLeases(),
+            'DynamicLeases' => $this->config->getDynamicLeases(),
+            'IPv6'          => $piholeConf['DHCP_IPv6'] ?? false,
+        ];
     }
 }

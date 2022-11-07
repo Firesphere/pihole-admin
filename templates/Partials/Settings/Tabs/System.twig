@@ -11,33 +11,33 @@
                             <tbody>
                             <tr>
                                 <th scope="row">FTL version:</th>
-                                <td>{{ System.FTLVersion }}</td>
+                                <td>{{ System.Version }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Process identifier (PID):</th>
-                                <td>{{ System.FTLPId }}</td>
+                                <td>{{ System.PId }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Time FTL started:</th>
-                                <td>{{ System.FTLStarted }}</td>
+                                <td>{{ System.Started }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">User / Group:</th>
-                                <td>{{ System.FTLUser }} / {{ System.FTLGroup }}</td>
+                                <td>{{ System.User }} / {{ System.Group }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">Total CPU utilization:</th>
-                                <td>{{ System.FTLCPU }}%</td>
+                                <td>{{ System.CPU }}%</td>
                             </tr>
                             <tr>
                                 <th scope="row">Memory utilization:</th>
-                                <td>{{ System.FTLMEM }}%</td>
+                                <td>{{ System.MEM }}%</td>
                             </tr>
                             <tr>
                                 <th scope="row">
                                     <span title="Resident memory is the portion of memory occupied by a process that is held in main memory (RAM). The rest of the occupied memory exists in the swap space or file system.">Used memory:</span>
                                 </th>
-                                <td>{{ FTLRSS }}</td>
+                                <td>{{ System.RSS }}</td>
                             </tr>
                             <tr>
                                 <th scope="row">

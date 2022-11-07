@@ -62,7 +62,54 @@ class Config
         return $list;
     }
 
-    public function getLeases()
+    public function getDynamicLeases()
+    {
+        // Read leases file
+        $dhcp_leases = [];
+        $dhcpleases = @fopen('/etc/pihole/dhcp.leases', 'r');
+        if (!is_resource($dhcpleases)) {
+            return [];
+        }
+
+        while (!feof($dhcpleases)) {
+            [$time, $hwaddr, $ip, $host, $clid] = explode(' ', trim(fgets($dhcpleases)));
+            if ($clid) {
+                $time = (int)$time;
+                if ($time === 0) {
+                    $time = 'Infinite';
+                } elseif ($time <= 315360000) { // 10 years in seconds
+                    $time = Helper::secondsToTime($time);
+                } else { // Assume time stamp
+                    $time = Helper::secondsToTime($time - time());
+                }
+
+                $type = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ? 4 : 6;
+
+
+                $host = htmlentities($host);
+
+                if ($clid === '*') {
+                    $clid = '<i>unknown</i>';
+                }
+
+                $order = bin2hex(inet_pton($ip));
+
+                $dhcp_leases[] = [
+                    'time'   => $time,
+                    'hwaddr' => strtoupper($hwaddr),
+                    'IP'     => $ip,
+                    'host'   => $host,
+                    'clid'   => $clid,
+                    'type'   => $type,
+                    'order'  => $order
+                ];
+            }
+        }
+
+        return $dhcp_leases;
+    }
+
+    public function getStaticLeases()
     {
         $dhcp_static_leases = [];
         $dnsConf = $this->get('dns');
@@ -83,7 +130,7 @@ class Config
             $two = '';
             sscanf(trim(fgets($dhcpstatic)), 'dhcp-host=%[^,],%[^,],%[^,]', $mac, $one, $two);
             if ($mac !== '' && filter_var($mac, FILTER_VALIDATE_MAC)) {
-                if (Helper::validIP($one) && strlen($two) == 0) {
+                if (Helper::validIP($one) && $two === '') {
                     // dhcp-host=mac,IP - no HOST
                     $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => ''];
                 } elseif (strlen($two) == 0) {
