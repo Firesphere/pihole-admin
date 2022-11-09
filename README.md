@@ -16,24 +16,33 @@ You should now be ready to go.
 
 The goal is to rebuild/recreate the PiHole admin interface, but using Slim4 framework, to make it more extensible and configurable.
 
-Todos:
-- [ ] API*
-- [ ] Interface*
-- [x] DNS Record management*
+Todos matching Pi-hole:
+- [x] Dashboard
+- [x] Query log
+- [x] Long Term data
+- [x] Groups etc.
+- [x] Network
+- [x] Enable/Disable blocking
+- [x] DNS Record management
+- [x] Tooling
+- [ ] Settings
+  - [x] System
+  - [ ] DNS
+  - [x] DHCP
+  - [ ] API/Web interface
+  - [ ] Privacy
+  - [ ] Teleporter
+
+Todos - Additional
 - [ ] User management
-- [ ] Preferences
-- [x] Enable/disable features/PiHole
-- [ ] Update from interface
-- [ ] Manage DHCP/DNS
-- [ ] Import/export
-- [x] Javascript calls updates
-- [x] Group and system management
-- [x] Adlist management
-- [ ] Logging outputs
-- [x] Network list
+  - [ ] User permissions
+  - [ ] Link devices to users
+- [ ] Exclude domains from stats
+- [ ] Dashboard modules management
+  - Optional additional Dashboard modules
+  - [ ] Speedtest
+ 
 
-
-* Partially done, e.g. some calls or options exist but need frontend implementations
 
 # Adding modules
 
@@ -44,7 +53,7 @@ Register it
 
 Set the sort property to wherever you want it sorted
 
-Override the folder and template location to where you want it.
+Add the folder and template location to where you want it.
 
 You should be set to go and your module should be included now.
 
