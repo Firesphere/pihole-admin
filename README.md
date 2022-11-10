@@ -27,7 +27,7 @@ Todos matching Pi-hole:
 - [x] Tooling
 - [ ] Settings
   - [x] System
-  - [ ] DNS
+  - [x] DNS
   - [x] DHCP
   - [ ] API/Web interface
   - [ ] Privacy
