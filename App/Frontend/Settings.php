@@ -83,6 +83,7 @@ class Settings extends Frontend
             'PiHoleInterface' => $piholeConfig['PIHOLE_INTERFACE'] ?? 'unknown',
             'System'          => $this->getSystemSettings($FTLPid),
             'DHCP'            => $this->getDHCPSettings(),
+            'DNS'             => $this->getDNSSettings(),
             'IPv4'            => $IPv4txt,
         ];
     }
@@ -146,20 +147,20 @@ class Settings extends Frontend
             // Set DNS server
             case 'DNS':
                 DNSHandler::handleAction($postData, $this->config, $success, $error);
-                break;
                 // Set query logging
+                // no break
             case 'Logging':
                 LoggingHandler::handleAction($postData, $this->session, $success, $error);
-                break;
                 // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
+                // no break
             case 'API':
                 APIHandler::handleAction($postData, $success, $error);
-                break;
                 // Config Web UI
+                // no break
             case 'webUI':
                 WebUIHandler::handleAction($postData, $success, $error);
-                break;
                 // Power off the system
+                // no break
             case 'poweroff':
                 PiHole::execute('-a poweroff');
                 $success = 'The system will poweroff in 5 seconds...';
@@ -194,7 +195,7 @@ class Settings extends Frontend
                     $error = implode('<br>', $output);
                 }
                 if ($error === '') {
-                    $success .= 'The network table has been flushed';
+                    $success = 'The network table has been flushed';
                 }
                 break;
             default:
@@ -243,5 +244,87 @@ class Settings extends Frontend
             'DynamicLeases' => $this->config->getDynamicLeases(),
             'IPv6'          => $piholeConf['DHCP_IPv6'] ?? false,
         ];
+    }
+
+    protected function getDNSSettings()
+    {
+        $piholeConf = $this->config->get('pihole');
+
+        $presetServers = $this->config->getDNSServerList();
+        $activeServers = $this->getActiveDNSServers($presetServers);
+        $ftlConf = $this->config->get('ftl');
+        $ratelimit = 1000;
+        $ratelimitinterval = 60;
+        if (isset($ftlConf['RATE_LIMIT'])) {
+            [$ratelimit, $ratelimitinterval] = explode('/', $ftlConf['RATE_LIMIT']);
+        }
+
+        return [
+            'Servers'           => $presetServers,
+            'ActiveServers'     => $activeServers[0],
+            'CustomServers'     => $activeServers[1],
+            'DNSMasq'           => $this->getDNSMasq($piholeConf),
+            'Interface'         => $piholeConf['PIHOLE_INTERFACE'],
+            'RequireFQDN'       => $piholeConf['DNS_FQDN_REQUIRED'] ?? false,
+            'BogusPriv'         => $piholeConf['DNS_BOGUS_PRIV'] ?? false,
+            'DNSSec'            => $piholeConf['DNSSEC'] ?? false,
+            'Ratelimit'         => $ratelimit,
+            'Ratelimitinterval' => $ratelimitinterval,
+            'RevServer'         => isset($piholeConf['REV_SERVER']),
+            'RevServerCIDR'     => $piholeConf['REV_SERVER_CIDR'] ?? '',
+            'RevServerTarget'   => $piholeConf['REV_SERVER_TARGET'] ?? '',
+            'RevServerDomain'   => $piholeConf['REV_SERVER_DOMAIN'] ?? ''
+        ];
+    }
+
+    private function getActiveDNSServers($presetServers)
+    {
+        $servers = $this->config->get('pihole');
+        $preset = [];
+        $custom = [];
+
+        foreach ($servers as $key => $value) {
+            if (str_starts_with($key, 'PIHOLE_DNS_')) {
+                if ($this->isPreset($value, $presetServers)) {
+                    $preset[] = $value;
+                } else {
+                    if (filter_var($value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                        $custom[4][] = $value;
+                    } else {
+                        $custom[6][] = $value;
+                    }
+                }
+            }
+        }
+
+        return [$preset, $custom];
+    }
+
+    private function isPreset($value, $presetServers)
+    {
+        foreach ($presetServers as $provider => $server) {
+            if (in_array($value, array_values($server))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getDNSMasq($conf)
+    {
+        $return = 'single';
+        $options = [
+            'single',
+            'bind',
+            'all',
+        ];
+        if (in_array($conf['DNSMASQ_LISTENING'], $options)) {
+            $return = $conf['DNSMASQ_LISTENING'];
+        } elseif (isset($conf['DNSMASQ_LISTENING'])) {
+            $return = 'local';
+        }
+
+        return $return;
     }
 }

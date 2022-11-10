@@ -15,12 +15,15 @@ $settings = [
         'FTL_CONF'    => '/etc/pihole/pihole-FTL.conf',
     ],
     'dns'        => [
-        'DNSLIST_CONF'   => '/etc/pihole/custom.list',
-        'CNAMELIST_CONF' => '/etc/dnsmasq.d/05-pihole-custom-cname.conf',
-        'LEASES_CONF'    => '/etc/dnsmasq.d/04-pihole-static-dhcp.conf',
+        'DNSLIST_CONF'        => '/etc/pihole/custom.list',
+        'CNAMELIST_CONF'      => '/etc/dnsmasq.d/05-pihole-custom-cname.conf',
+        'STATIC_LEASES_CONF'  => '/etc/dnsmasq.d/04-pihole-static-dhcp.conf',
+        'DYNAMIC_LEASES_CONF' => '/etc/pihole/dhcp.leases',
+        'SERVERS_CONF'        => '/etc/pihole/dns-servers.conf',
     ],
-    'pihole'     => [],
-    'ftl'        => []
+
+    'pihole' => [],
+    'ftl'    => []
 ];
 
 if (file_exists(__DIR__ . '/settings.local.php')) {

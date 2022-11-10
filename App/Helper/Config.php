@@ -43,7 +43,7 @@ class Config
             3 => 'v6_1',
             4 => 'v6_2'
         ];
-        $handle = @fopen('/etc/pihole/dns-servers.conf', 'rb');
+        $handle = @fopen($this->data['dns']['SERVERS_CONF'], 'rb');
         if ($handle) {
             while ($line = fgets($handle)) {
                 $line = explode(';', rtrim($line));
@@ -66,13 +66,13 @@ class Config
     {
         // Read leases file
         $dhcp_leases = [];
-        $dhcpleases = @fopen('/etc/pihole/dhcp.leases', 'r');
+        $dhcpleases = @fopen($this->data['dns']['DYNAMIC_LEASES_CONF'], 'rb');
         if (!is_resource($dhcpleases)) {
             return [];
         }
 
-        while (!feof($dhcpleases)) {
-            [$time, $hwaddr, $ip, $host, $clid] = explode(' ', trim(fgets($dhcpleases)));
+        while ($dhcplease = fgets($dhcpleases)) {
+            [$time, $hwaddr, $ip, $host, $clid] = explode(' ', trim($dhcplease));
             if ($clid) {
                 $time = (int)$time;
                 if ($time === 0) {
@@ -114,11 +114,11 @@ class Config
         $dhcp_static_leases = [];
         $dnsConf = $this->get('dns');
 
-        if (!file_exists($dnsConf['LEASES_CONF']) || !is_readable($dnsConf['LEASES_CONF'])) {
+        if (!file_exists($dnsConf['STATIC_LEASES_CONF']) || !is_readable($dnsConf['STATIC_LEASES_CONF'])) {
             return false;
         }
 
-        $dhcpstatic = @fopen($dnsConf['LEASES_CONF'], 'rb');
+        $dhcpstatic = @fopen($dnsConf['STATIC_LEASES_CONF'], 'rb');
         if (!is_resource($dhcpstatic)) {
             return false;
         }
