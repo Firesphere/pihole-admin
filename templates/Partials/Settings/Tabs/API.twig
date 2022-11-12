@@ -1,0 +1,223 @@
+<div class="row">
+    <div class="col-md-6">
+        <form role="form" method="post">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">API settings</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Top Lists</h4>
+                            <p>Exclude the following domains from being shown in</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6">
+                            <div class="form-group">
+                                <label>Top Domains / Top Advertisers</label>
+                                {{ include('Partials/TextArea.twig', {'Content': ExcludedDomains, 'Name': 'domains', 'Placeholder': 'Enter one domain per line'}) }}
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6">
+                            <div class="form-group">
+                                <label>Top Clients</label>
+                                {{ include('Partials/TextArea.twig', {'Content': ExcludedClients, 'Name': 'clients', 'Placeholder': 'Enter one IP address or host name per line'}) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Query Log</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div>
+                                <input type="checkbox" name="querylog-permitted"
+                                       id="querylog-permitted"
+                                       {% if QueryLog == 'permittedonly' or QueryLog == 'all' %}checked{% endif %}>
+                                <label for="querylog-permitted"><strong>Show permitted domain
+                                        entries {{ QueryLog }}</strong></label>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div>
+                                <input type="checkbox" name="querylog-blocked"
+                                       id="querylog-blocked"
+                                       {% if QueryLog == 'blockedonly' or QueryLog == 'all' %}checked{% endif %}>
+                                <label for="querylog-blocked"><strong>Show blocked domain entries</strong></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer clearfix">
+                    <input type="hidden" name="field" value="API">
+                    <input type="hidden" name="token" value="{{ APIToken }}">
+                    <button type="button" class="btn btn-primary api-token">Show API token</button>
+                    <button type="submit" class="btn btn-primary pull-right">Save</button>
+                </div>
+            </div>
+        </form>
+        <div class="modal fade" id="apiTokenModal" role="dialog" data-keyboard="false"
+             tabindex="-1" data-backdrop="static" aria-labelledby="apiTokenModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="apiTokenModalHeaderLabel">API Token</h4>
+                    </div>
+                    <div class="modal-body">
+                        <pre><iframe id="apiTokenIframe" name="apiToken_iframe"
+                                     src="scripts/pi-hole/php/api_token.php"></iframe></pre>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <form role="form" method="post">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Web interface settings</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>Interface appearance</h4>
+                            {% for Theme in Themes %}
+                                <div><input type="radio" name="webtheme" value="{{ Theme.key }}"
+                                            id="webtheme_{{ Theme.key }}"
+                                            {% if Theme.key == ActiveTheme %}checked{% endif %}>
+                                    <label for="webtheme_{{ Theme.key }}"><strong>{{ Theme.label }}</strong></label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div>
+                                <input type="checkbox" name="boxedlayout" id="boxedlayout"
+                                       value="yes" {% if Boxed %}checked{% endif %}>
+                                <label for="boxedlayout"><strong>Use boxed layout (for large screens)</strong></label>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="field" value="webUI">
+                    <input type="hidden" name="token" value="<?php echo $token; ?>">
+                </div>
+                <div class="box-footer clearfix">
+                    <button type="submit" class="btn btn-primary pull-right">Save</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-warning">
+            <div class="box-header with-border">
+                <h3 class="box-title">Per-browser settings (auto saved)</h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Checkbox and radio buttons</p>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="iCheckStyle">
+                            <option>default</option>
+                            <option>primary</option>
+                            <option>success</option>
+                            <option>info</option>
+                            <option>warning</option>
+                            <option>danger</option>
+                            <option>turquoise</option>
+                            <option>emerland</option>
+                            <option>peterriver</option>
+                            <option>amethyst</option>
+                            <option>wetasphalt</option>
+                            <option>greensea</option>
+                            <option>nephritis</option>
+                            <option>belizehole</option>
+                            <option>wisteria</option>
+                            <option>midnightblue</option>
+                            <option>sunflower</option>
+                            <option>carrot</option>
+                            <option>alizarin</option>
+                            <option>clouds</option>
+                            <option>concrete</option>
+                            <option>orange</option>
+                            <option>pumpkin</option>
+                            <option>pomegranate</option>
+                            <option>silver</option>
+                            <option>asbestos</option>
+                            <option>material-red</option>
+                            <option>material-pink</option>
+                            <option>material-purple</option>
+                            <option>material-deeppurple</option>
+                            <option>material-indigo</option>
+                            <option>material-blue</option>
+                            <option>material-lightblue</option>
+                            <option>material-cyan</option>
+                            <option>material-teal</option>
+                            <option>material-green</option>
+                            <option>material-lightgreen</option>
+                            <option>material-lime</option>
+                            <option>material-yellow</option>
+                            <option>material-amber</option>
+                            <option>material-orange</option>
+                            <option>material-deeporange</option>
+                            <option>material-brown</option>
+                            <option>material-grey</option>
+                            <option>material-bluegrey</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>CPU Temperature Unit</p>
+                    </div>
+                    <div class="col-md-6">
+                        <select id="tempunit-selector">
+                            <option value="C">Celsius</option>
+                            <option value="K">Kelvin</option>
+                            <option value="F">Fahrenheit</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            <input type="checkbox" name="bargraphs" id="bargraphs" value="yes">
+                            <label for="bargraphs"><strong>Use new Bar charts on dashboard</strong></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            <input type="checkbox" name="colorfulQueryLog" id="colorfulQueryLog" value="no">
+                            <label for="colorfulQueryLog"><strong>Colorful Query Log</strong></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div>
+                            <input type="checkbox" name="hideNonfatalDnsmasqWarnings" id="hideNonfatalDnsmasqWarnings"
+                                   value="no">
+                            <label for="hideNonfatalDnsmasqWarnings"><strong>Hide non-fatal <code>dnsmasq</code>
+                                    warnings
+                                    (warnings listed
+                                    <a target="_blank" href="https://docs.pi-hole.net/ftldns/dnsmasq_warn">here</a>
+                                    )
+                                </strong>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -17,14 +17,14 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for Key, Value in DNS.Servers %}
+                                {% for Key, Value in Servers %}
                                     <tr>
                                         {% if Value.v4_1 %}
                                             <td title="{{ Value.v4_1 }}">
                                                 <div><input type="checkbox" name="DNSserver{{ Value.v4_1 }}"
                                                             id="DNS4server{{ Value.v4_1 }}"
                                                             value="true"
-                                                            {% if Value.v4_1 in DNS.ActiveServers %}checked{% endif %}><label
+                                                            {% if Value.v4_1 in ActiveServers %}checked{% endif %}><label
                                                             for="DNS4server{{ Value.v4_1 }}"></label></div>
                                             </td>
                                         {% else %}
@@ -35,7 +35,7 @@
                                                 <div><input type="checkbox" name="DNSserver{{ Value.v4_2 }}"
                                                             id="DNS4server{{ Value.v4_2 }}"
                                                             value="true"
-                                                            {% if Value.v4_2 in DNS.ActiveServers %}checked{% endif %}><label
+                                                            {% if Value.v4_2 in ActiveServers %}checked{% endif %}><label
                                                             for="DNS4server{{ Value.v4_2 }}"></label></div>
                                             </td>
                                         {% else %}
@@ -46,7 +46,7 @@
                                                 <div><input type="checkbox" name="DNSserver{{ Value.v6_1 }}"
                                                             id="DNS6server{{ Value.v6_1 }}"
                                                             value="true"
-                                                            {% if Value.v6_1 in DNS.ActiveServers %}checked{% endif %}><label
+                                                            {% if Value.v6_1 in ActiveServers %}checked{% endif %}><label
                                                             for="DNS6server{{ Value.v6_1 }}"></label></div>
                                             </td>
                                         {% else %}
@@ -57,7 +57,7 @@
                                                 <div><input type="checkbox" name="DNSserver{{ Value.v6_2 }}"
                                                             id="DNS6server{{ Value.v6_2 }}"
                                                             value="true"
-                                                            {% if Value.v6_2 in DNS.ActiveServers %}checked{% endif %}><label
+                                                            {% if Value.v6_2 in ActiveServers %}checked{% endif %}><label
                                                             for="DNS6server{{ Value.v6_2 }}"></label></div>
                                             </td>
                                         {% else %}
@@ -91,13 +91,13 @@
                                 <div class="col-md-1">
                                     <div>
                                         <input type="checkbox" name="custom1" id="custom1"
-                                               value="Customv4" {% if DNS.CustomServers.4.1 %}checked{% endif %}>
+                                               value="Customv4" {% if CustomServers.4.1 %}checked{% endif %}>
                                         <label for="custom1"></label></div>
                                 </div>
                                 <div class="col-md-11">
                                     <input type="text" name="custom1val" class="form-control" autocomplete="off"
                                            spellcheck="false" autocapitalize="none" autocorrect="off"
-                                           value="{{ DNS.CustomServers.4.1 }}">
+                                           value="{{ CustomServers.4.1 }}">
                                 </div>
                             </div>
                         </div>
@@ -107,13 +107,13 @@
                                 <div class="col-md-1">
                                     <div>
                                         <input type="checkbox" name="custom1" id="custom1"
-                                               value="Customv4" {% if DNS.CustomServers.4.2 %}checked{% endif %}>
+                                               value="Customv4" {% if CustomServers.4.2 %}checked{% endif %}>
                                         <label for="custom1"></label></div>
                                 </div>
                                 <div class="col-md-11">
                                     <input type="text" name="custom1val" class="form-control" autocomplete="off"
                                            spellcheck="false" autocapitalize="none" autocorrect="off"
-                                           value="{{ DNS.CustomServers.4.2 }}">
+                                           value="{{ CustomServers.4.2 }}">
                                 </div>
                             </div>
                         </div>
@@ -125,13 +125,13 @@
                                 <div class="col-md-1">
                                     <div>
                                         <input type="checkbox" name="custom1" id="custom1"
-                                               value="Customv6" {% if DNS.CustomServers.6.1 %}checked{% endif %}>
+                                               value="Customv6" {% if CustomServers.6.1 %}checked{% endif %}>
                                         <label for="custom1"></label></div>
                                 </div>
                                 <div class="col-md-11">
                                     <input type="text" name="custom1val" class="form-control" autocomplete="off"
                                            spellcheck="false" autocapitalize="none" autocorrect="off"
-                                           value="{{ DNS.CustomServers.6.1 }}">
+                                           value="{{ CustomServers.6.1 }}">
                                 </div>
                             </div>
                         </div>
@@ -141,13 +141,13 @@
                                 <div class="col-md-1">
                                     <div>
                                         <input type="checkbox" name="custom1" id="custom1"
-                                               value="Customv6" {% if DNS.CustomServers.6.2 %}checked{% endif %}>
+                                               value="Customv6" {% if CustomServers.6.2 %}checked{% endif %}>
                                         <label for="custom1"></label></div>
                                 </div>
                                 <div class="col-md-11">
                                     <input type="text" name="custom1val" class="form-control" autocomplete="off"
                                            spellcheck="false" autocapitalize="none" autocorrect="off"
-                                           value="{{ DNS.CustomServers.6.2 }}">
+                                           value="{{ CustomServers.6.2 }}">
                                 </div>
                             </div>
                         </div>
@@ -168,7 +168,7 @@
                                     <h4>Recommended setting</h4>
                                     <div>
                                         <input type="radio" name="DNSinterface" id="DNSinterface1" value="local"
-                                               {% if DNS.DNSMasq == 'local' %}checked{% endif %}>
+                                               {% if DNSMasq == 'local' %}checked{% endif %}>
                                         <label for="DNSinterface1"><strong>Allow only local requests</strong><br>Allows
                                             only queries from devices that are at most one hop away (local
                                             devices)</label>
@@ -178,19 +178,19 @@
                                     <h4>Potentially dangerous options</h4>Make sure your Pi-hole is properly firewalled!
                                     <div>
                                         <input type="radio" name="DNSinterface" id="DNSinterface2" value="single"
-                                               {% if DNS.DNSMasq == 'single' %}checked{% endif %}>
+                                               {% if DNSMasq == 'single' %}checked{% endif %}>
                                         <label for="DNSinterface2"><strong>Respond only on
-                                                interface {{ DNS.Interface }}</strong></label>
+                                                interface {{ Interface }}</strong></label>
                                     </div>
                                     <div>
                                         <input type="radio" name="DNSinterface" id="DNSinterface3" value="bind"
-                                               {% if DNS.DNSMasq == 'bind' %}checked{% endif %}>
+                                               {% if DNSMasq == 'bind' %}checked{% endif %}>
                                         <label for="DNSinterface3"><strong>Bind only to
-                                                interface {{ DNS.Interface }}</strong></label>
+                                                interface {{ Interface }}</strong></label>
                                     </div>
                                     <div>
                                         <input type="radio" name="DNSinterface" id="DNSinterface4" value="all"
-                                               {% if DNS.DNSMasq == 'all' %}checked{% endif %}>
+                                               {% if DNSMasq == 'all' %}checked{% endif %}>
                                         <label for="DNSinterface4"><strong>Permit all origins</strong></label>
                                     </div>
                                     <p>These options are dangerous on devices
@@ -221,7 +221,7 @@
                         <div class="col-lg-12">
                             <div>
                                 <input type="checkbox" name="DNSrequiresFQDN" id="DNSrequiresFQDN"
-                                       title="domain-needed" {% if DNS.RequireFQDN %}checked{% endif %}>
+                                       title="domain-needed" {% if RequireFQDN %}checked{% endif %}>
                                 <label for="DNSrequiresFQDN"><strong>Never forward non-FQDN <code>A</code> and <code>AAAA</code>
                                         queries</strong></label>
                                 <p>When there is a Pi-hole domain set and this box is
@@ -234,7 +234,7 @@
                             </div>
                             <div>
                                 <input type="checkbox" name="DNSbogusPriv" id="DNSbogusPriv"
-                                       title="bogus-priv" {% if DNS.BogusPriv %}checked{% endif %}>
+                                       title="bogus-priv" {% if BogusPriv %}checked{% endif %}>
                                 <label for="DNSbogusPriv"><strong>Never forward reverse lookups for private IP
                                         ranges</strong></label>
                                 <p>All reverse lookups for private IP ranges (i.e., <code>192.168.0.x/24</code>, etc.)
@@ -263,10 +263,10 @@
                             <h4><a id="ratelimit"></a>Rate-limiting</h4>
                             <p>Block clients making more than
                                 <input type="number" name="rate_limit_count"
-                                       value="{{ DNS.Ratelimit }}" min="0"
+                                       value="{{ Ratelimit }}" min="0"
                                        step="10" style="width: 5em;"> queries within
                                 <input type="number" name="rate_limit_interval"
-                                       value="{{ DNS.Ratelimitinterval }}" min="0" step="10"
+                                       value="{{ Ratelimitinterval }}" min="0" step="10"
                                        style="width: 4em;"> seconds.</p>
                             <p>When a client makes too many queries in too short time, it
                                 gets rate-limited. Rate-limited queries are answered with a

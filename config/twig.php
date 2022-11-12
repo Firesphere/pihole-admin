@@ -42,5 +42,5 @@ $twigEnv = $twig->getEnvironment();
 foreach ($globals as $key => $value) {
     $twigEnv->addGlobal($key, $value);
 }
-
+$twigEnv->addGlobal('Theme', (new \App\Helper\Config())->get('pihole')['WEBTHEME'] ?? 'default-auto');
 return $twig;

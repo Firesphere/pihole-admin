@@ -29,9 +29,10 @@ Todos matching Pi-hole:
   - [x] System
   - [x] DNS
   - [x] DHCP
-  - [ ] API/Web interface
+  - [x] API/Web interface
   - [ ] Privacy
   - [ ] Teleporter
+- Login/security
 
 Todos - Additional
 - [ ] User management

@@ -14,11 +14,8 @@ class WebUIHandler extends Settings
         } else {
             PiHole::execute('-a layout traditional');
         }
-        if (isset($postData['webtheme'])) {
-            global $available_themes;
-            if (array_key_exists($postData['webtheme'], $available_themes)) {
-                PiHole::execute(sprintf('-a theme %s', $postData['webtheme']));
-            }
+        if (isset($postData['webtheme']) && array_key_exists($postData['webtheme'], Settings::$themes)) {
+            PiHole::execute(sprintf('-a theme %s', $postData['webtheme']));
         }
         $success .= 'The webUI settings have been updated';
     }

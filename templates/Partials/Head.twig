@@ -37,8 +37,26 @@
         'Resources/style/pi-hole.css',
     ]}) }}
     {#    // Theme selection #}
-    {{ assets({files: [
-        'Resources/style/themes/lcars.css',
-    ]}) }}
+    {% if Theme == 'lcars' %}
+        {{ assets({files: [
+            'Resources/style/themes/lcars.css',
+        ]}) }}
+    {% elseif Theme == 'default-auto' %}
+        {{ assets({files: [
+            'Resources/style/themes/default-auto.css',
+        ]}) }}
+    {% elseif Theme == 'default-light' %}
+        {{ assets({files: [
+            'Resources/style/themes/default-light.css',
+        ]}) }}
+    {% elseif Theme == 'default-dark' %}
+        {{ assets({files: [
+            'Resources/style/themes/default-dark.css',
+        ]}) }}
+    {% elseif Theme == 'default-darker' %}
+        {{ assets({files: [
+            'Resources/style/themes/default-darker.css',
+        ]}) }}
+    {% endif %}
     <noscript>{{ assets({files: ['Resources/vendor/js-warn.css']}) }}</noscript>
 </head>

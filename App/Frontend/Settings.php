@@ -59,6 +59,35 @@ class Settings extends Frontend
         ]
     ];
 
+    public static $themes = [
+        'default-light'  => [
+            'label' => 'Pi-hole default theme (light, default)',
+            false,
+            'key'   => 'default-light'
+        ],
+        'default-dark'   => [
+            'label' => 'Pi-hole midnight theme (dark)',
+            true,
+            'key'   => 'default-dark'
+        ],
+        'default-darker' => [
+            'label' => 'Pi-hole deep-midnight theme (dark)',
+            true,
+            'key'   => 'default-darker'
+        ],
+        // Option to have the theme go with the device dark mode setting, always set the background to black to avoid flashing
+        'default-auto'   => [
+            'label' => 'Pi-hole auto theme (light/dark)',
+            true,
+            'key'   => 'default-auto'
+        ],
+        'lcars'          => [
+            'label' => 'Star Trek LCARS theme (dark)',
+            true,
+            'key'   => 'lcars'
+        ],
+    ];
+
     /**
      * @var CallAPI
      */
@@ -85,6 +114,9 @@ class Settings extends Frontend
             'DHCP'            => $this->getDHCPSettings(),
             'DNS'             => $this->getDNSSettings(),
             'IPv4'            => $IPv4txt,
+            'API'             => $this->getAPISettings(),
+            'Privacy'         => [],
+            'Teleporter'      => []
         ];
     }
 
@@ -110,7 +142,7 @@ class Settings extends Frontend
                 $value['Expanded'] = true;
             }
             $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
-            $value['Template'] = $view->getEnvironment()->render($template, $this->settings);
+            $value['Template'] = $view->getEnvironment()->render($template, $this->settings[$key]);
         }
         unset($value);
         $this->settings['MenuItems'] = $this->menuItems;
@@ -147,20 +179,20 @@ class Settings extends Frontend
             // Set DNS server
             case 'DNS':
                 DNSHandler::handleAction($postData, $this->config, $success, $error);
+                break;
                 // Set query logging
-                // no break
             case 'Logging':
                 LoggingHandler::handleAction($postData, $this->session, $success, $error);
+                break;
                 // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
-                // no break
             case 'API':
                 APIHandler::handleAction($postData, $success, $error);
+                break;
                 // Config Web UI
-                // no break
             case 'webUI':
                 WebUIHandler::handleAction($postData, $success, $error);
+                break;
                 // Power off the system
-                // no break
             case 'poweroff':
                 PiHole::execute('-a poweroff');
                 $success = 'The system will poweroff in 5 seconds...';
@@ -201,6 +233,7 @@ class Settings extends Frontend
             default:
                 // Option not found
                 $error = 'Invalid option';
+                break;
         }
 
         $this->session->set('SETTINGS_SUCCESS', $success);
@@ -274,6 +307,23 @@ class Settings extends Frontend
             'RevServerCIDR'     => $piholeConf['REV_SERVER_CIDR'] ?? '',
             'RevServerTarget'   => $piholeConf['REV_SERVER_TARGET'] ?? '',
             'RevServerDomain'   => $piholeConf['REV_SERVER_DOMAIN'] ?? ''
+        ];
+    }
+
+    public function getAPISettings()
+    {
+        $config = $this->config->get('pihole');
+        $activeTheme = $config['WEBTHEME'] ?? '';
+        $activeTheme = isset(static::$themes[$activeTheme]) ? $activeTheme : 'default-auto';
+
+        return [
+            'ExcludedDomains' => isset($config['API_EXCLUDE_DOMAINS']) ? explode(',', $config['API_EXCLUDE_DOMAINS']) : [],
+            'ExcludedClients' => isset($config['API_EXCLUDE_CLIENTS']) ? explode(',', $config['API_EXCLUDE_CLIENTS']) : [],
+            'QueryLog'        => $config['API_QUERY_LOG_SHOW'] ?? 'all',
+            'APIToken'        => $this->session->get('token'),
+            'Themes'          => static::$themes,
+            'ActiveTheme'     => $activeTheme,
+            'Boxed'           => isset($config['WEBUIBOXEDLAYOUT']) && $config['WEBUIBOXEDLAYOUT'] === 'boxed'
         ];
     }
 

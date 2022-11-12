@@ -10,7 +10,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div><input type="checkbox" name="active" id="DHCPchk"
-                                        {% if DHCP.Active %}checked{% endif %}>
+                                        {% if Active %}checked{% endif %}>
                                 <label for="DHCPchk">
                                     <strong>DHCP server enabled</strong>
                                 </label>
@@ -18,7 +18,7 @@
                             <br>
                             <p id="dhcpnotice"
                                lookatme-text="Make sure your router's DHCP server is disabled when using the Pi-hole DHCP server!"
-                               {% if DHCP.Active %}hidden{% endif %}>
+                               {% if Active %}hidden{% endif %}>
                                 Make sure your router's DHCP server is disabled when using the Pi-hole DHCP server!
                             </p>
                         </div>
@@ -33,8 +33,8 @@
                                     <label for="from" class="input-group-addon">From</label>
                                     <input type="text" class="form-control DHCPgroup" name="from"
                                            autocomplete="off" spellcheck="false" autocapitalize="none"
-                                           autocorrect="off" value="{{ DHCP.Start }}"
-                                           {% if not DHCP.Active %}disabled{% endif %}>
+                                           autocorrect="off" value="{{ Start }}"
+                                           {% if not Active %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -44,8 +44,8 @@
                                     <label for="to" class="input-group-addon">To</label>
                                     <input type="text" class="form-control DHCPgroup" name="to"
                                            autocomplete="off" spellcheck="false" autocapitalize="none"
-                                           autocorrect="off" value="{{ DHCP.End }}"
-                                           {% if not DHCP.Active %}disabled{% endif %}>
+                                           autocorrect="off" value="{{ End }}"
+                                           {% if not Active %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -58,8 +58,8 @@
                                     <label for="router" class="input-group-addon">Router</label>
                                     <input type="text" class="form-control DHCPgroup" name="router"
                                            autocomplete="off" spellcheck="false" autocapitalize="none"
-                                           autocorrect="off" value="{{ DHCP.Router }}"
-                                           {% if not DHCP.Active %}disabled{% endif %}>
+                                           autocorrect="off" value="{{ Router }}"
+                                           {% if not Active %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -81,8 +81,8 @@
                                 <div class="input-group">
                                     <label for="domain" class="input-group-addon">Domain</label>
                                     <input type="text" class="form-control DHCPgroup" name="domain"
-                                           value="{{ DHCP.Domain }}"
-                                           {% if not DHCP.Active %}disabled{% endif %}>
+                                           value="{{ Domain }}"
+                                           {% if not Active %}disabled{% endif %}>
                                 </div>
                             </div>
                         </div>
@@ -95,8 +95,8 @@
                                     <label for="leasetime" class="input-group-addon">Lease time in hours</label>
                                     <input type="number" class="form-control DHCPgroup"
                                            name="leasetime"
-                                           id="leasetime" value="{% if DHCP.Active %}{{ DHCP.Lease }}{% endif %}"
-                                           data-mask {% if not DHCP.Active %}disabled{% endif %}>
+                                           id="leasetime" value="{% if Active %}{{ Lease }}{% endif %}"
+                                           data-mask {% if not Active %}disabled{% endif %}>
                                 </div>
                             </div>
                             <p>Hint: 0 = infinite, 24 = one day, 168 = one week, 744 = one month, 8760 = one year</p>
@@ -106,13 +106,13 @@
                         <div class="col-md-12">
                             <div><input type="checkbox" name="DHCP_rapid_commit" id="DHCP_rapid_commit"
                                         class="DHCPgroup" {{ DHCPRapidCommit }}
-                                        {% if not DHCP.Active %}disabled{% endif %}>
+                                        {% if not Active %}disabled{% endif %}>
                                 &nbsp;<label for="DHCP_rapid_commit"><strong>Enable DHCPv4 rapid commit (fast address assignment)</strong></label>
                             </div>
                             <div>
                                 <input type="checkbox" name="useIPv6" id="useIPv6" class="DHCPgroup"
-                                       {% if DHCP.IPv6 %}checked{% endif %}
-                                        {% if not DHCP.Active %}disabled{% endif %}>
+                                       {% if IPv6 %}checked{% endif %}
+                                        {% if not Active %}disabled{% endif %}>
                                 &nbsp;<label for="useIPv6"><strong>Enable IPv6 support (SLAAC + RA)</strong></label>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for Lease in DHCP.DynamicLeases %}
+                                {% for Lease in DynamicLeases %}
                                 <tr data-placement="auto" data-container="body" data-toggle="tooltip"
                                     title="Lease type: IPv{{ type }}<br/>
                                     Remaining lease time: {{ time }}<br/>
@@ -188,7 +188,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for Lease in DHCP.StaticLeases %}
+                                {% for Lease in StaticLeases %}
                                 <tr>
                                     <td>{{ hwaddr }}</td>
                                     <td data-order="{{ order }}">{{ ip }}</td>

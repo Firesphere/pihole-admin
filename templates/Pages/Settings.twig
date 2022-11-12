@@ -6,21 +6,24 @@
             max-width: none;
             white-space: nowrap;
         }
-    </style>    {% if Success %}
-    <div id="alInfo" class="alert alert-info alert-dismissible fade in" role="alert">
-        <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-        </button>
-        <h4><i class="icon fa fa-info"></i> Info</h4>
-        {{ Success|raw }}
-    </div>
-{% elseif Error %}
-    <div id="alError" class="alert alert-danger alert-dismissible fade in" role="alert">
-        <button type="button" class="close" data-hide="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-        </button>
-        <h4><i class="icon fa fa-ban"></i> Error</h4>
-        {{ Error|raw }}
-    </div>
-{% endif %}
+    </style>
+    {% if Success %}
+        <div id="alInfo" class="alert alert-info alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-hide="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+            </button>
+            <h4><i class="icon fa fa-info"></i> Info</h4>
+            {{ Success|raw }}
+        </div>
+    {% elseif Error %}
+        <div id="alError" class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-hide="alert" aria-label="Close"><span
+                        aria-hidden="true">&times;</span>
+            </button>
+            <h4><i class="icon fa fa-ban"></i> Error</h4>
+            {{ Error|raw }}
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-md-12">
             <div class="nav-tabs-custom">
@@ -32,7 +35,7 @@
                 <div class="tab-content">
                     {% for Tab in MenuItems.Tabs %}
                         <div id="{{ Tab.Slug }}" class="tab-pane fade {{ Tab.Classes }}">
-                            {{  Tab.Template|raw  }}
+                            {{ Tab.Template|raw }}
                         </div>
                     {% endfor %}
                 </div>
