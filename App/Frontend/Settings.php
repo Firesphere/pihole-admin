@@ -115,8 +115,8 @@ class Settings extends Frontend
             'DNS'             => $this->getDNSSettings(),
             'IPv4'            => $IPv4txt,
             'API'             => $this->getAPISettings(),
-            'Privacy'         => [],
-            'Teleporter'      => []
+            'Privacy'         => $this->getPrivacySettings(),
+            'Teleporter'      => ['HasPHAR' => extension_loaded('Phar')],
         ];
     }
 
@@ -310,7 +310,7 @@ class Settings extends Frontend
         ];
     }
 
-    public function getAPISettings()
+    protected function getAPISettings()
     {
         $config = $this->config->get('pihole');
         $activeTheme = $config['WEBTHEME'] ?? '';
@@ -324,6 +324,38 @@ class Settings extends Frontend
             'Themes'          => static::$themes,
             'ActiveTheme'     => $activeTheme,
             'Boxed'           => isset($config['WEBUIBOXEDLAYOUT']) && $config['WEBUIBOXEDLAYOUT'] === 'boxed'
+        ];
+    }
+
+    protected function getPrivacySettings()
+    {
+        $config = $this->config->get('pihole');
+        $privacyLevel = (int)($config['PRIVACYLEVEL'] ?? 0);
+        return [
+            'PrivacyLevels' => [
+                0 => [
+                    'Label' => 'Show everything and record everything',
+                    'Selected' => $privacyLevel === 0,
+                    'Note' => 'Gives maximum amount of statistics',
+                ],
+                1 => [
+                    'Selected' => $privacyLevel === 1,
+                    'Label' => 'Hide domains: Display and store all domains as "hidden"',
+                    'Note' => 'This disables the Top Permitted Domains and Top Blocked Domains tables on the dashboard'
+                ],
+                2 => [
+                    'Selected' => $privacyLevel === 2,
+                    'Label' => 'Hide domains and clients: Display and store all domains as "hidden" and all clients as "0.0.0.0"',
+                    'Note' => 'This disables all tables on the dashboard'
+                ],
+                3 => [
+                    'Selected' => $privacyLevel === 3,
+                    'Label' => 'Anonymous mode: This disables basically everything except the live anonymous statistics',
+                    'Note' => 'No history is saved at all to the database, and nothing is shown in the query log. Also, there are no top item lists.'
+                ]
+            ],
+            'PrivacyLevel' => $privacyLevel,
+            'QueryLogging' => $config['QUERY_LOGGING'] ?? true,
         ];
     }
 

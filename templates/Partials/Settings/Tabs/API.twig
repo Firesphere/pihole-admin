@@ -16,13 +16,13 @@
                         <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6">
                             <div class="form-group">
                                 <label>Top Domains / Top Advertisers</label>
-                                {{ include('Partials/TextArea.twig', {'Content': ExcludedDomains, 'Name': 'domains', 'Placeholder': 'Enter one domain per line'}) }}
+                                {{ include('Partials/Settings/Tabs/TabPartials/TextArea.twig', {'Content': ExcludedDomains, 'Name': 'domains', 'Placeholder': 'Enter one domain per line'}) }}
                             </div>
                         </div>
                         <div class="col-xs-12 col-sm-6 col-md-12 col-lg-6">
                             <div class="form-group">
                                 <label>Top Clients</label>
-                                {{ include('Partials/TextArea.twig', {'Content': ExcludedClients, 'Name': 'clients', 'Placeholder': 'Enter one IP address or host name per line'}) }}
+                                {{ include('Partials/Settings/Tabs/TabPartials/TextArea.twig', {'Content': ExcludedClients, 'Name': 'clients', 'Placeholder': 'Enter one IP address or host name per line'}) }}
                             </div>
                         </div>
                     </div>

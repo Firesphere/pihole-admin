@@ -30,7 +30,7 @@ Todos matching Pi-hole:
   - [x] DNS
   - [x] DHCP
   - [x] API/Web interface
-  - [ ] Privacy
+  - [x] Privacy
   - [ ] Teleporter
 - Login/security
 
