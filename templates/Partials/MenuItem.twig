@@ -1,0 +1,36 @@
+<li class="header text-uppercase">{{ Key }}</li>
+<!-- Home Page -->
+{% for Item in Items %}
+    <li {% if Item.ID %}id="{{ Item.ID }}"{% endif %}
+        class="menu-{{ Key|lower }} {% if Item.Children %}treeview{% endif %} {% if Item.Title in MenuItems|keys %}{{ MenuItems[Item.Title] }}{% endif %}"
+            {% if Item.StatusLT %}style="{% if PiHoleStatus <= 0 %}display: none;{% else %}display: list-item;{% endif %}"{% endif %}
+            {% if Item.StatusGT %}style="{% if PiHoleStatus >= 1 %}display: none;{% else %}display: list-item;{% endif %}"{% endif %}
+    >
+        <a href="{{ Item.URL }}">
+            <i class="fa fa-fw menu-icon {{ Item.Icon }}"></i>&nbsp;<span
+                    {% if Item.SpanLabel %}id="{{ Item.SpanLabel }}"{% endif %}>{{ Item.Title }}
+                {% if Item.ExtraSpan %}<span id="{{ Item.ExtraSpan }}" class="{{ Item.ExtraClass }}"></span>{% endif %}
+            </span>
+            {% if Item.Children %}
+                <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+            {% endif %}
+        </a>
+        {% if Item.Children %}
+            <ul class="treeview-menu">
+                {% for Child in Item.Children %}
+                    <li class="{% if Child.Title in MenuItems|keys %}{{ MenuItems[Child.Title] }}{% endif %}">
+                        <a {% if Child.ID %}id="{{ Child.ID }}"{% endif %}
+                           href="{{ Child.URL }}" {% if Child.Modal %}data-toggle="{{ Child.Modal }}" data-target="#{{ Child.TargetModal }}"{% endif %}>
+                            {% if Child.Icon %}<i class="fa fa-fw menu-icon {{ Child.Icon }}"></i>
+                            {% elseif Child.InlineIcon %}{{ Child.InlineIcon|raw }}
+                            {% endif %}&nbsp;{{ Child.Title }}
+                            {% if Child.ExtraSpan %}<span id="{{ Child.ExtraSpan }}" class="{{ Child.ExtraClass }}"></span>{% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endfor %}

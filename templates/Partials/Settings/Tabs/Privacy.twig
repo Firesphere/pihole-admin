@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="col-md-12">
+        <form role="form" method="post">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Privacy settings</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h4>DNS resolver privacy level</h4>
+                            <p>Specify if DNS queries should be anonymized, available options are:</p>
+                            {% for Key,Data in PrivacyLevels %}
+                                <div>
+                                    {{ include('Partials/Settings/Tabs/TabPartials/PrivacyCheckbox.twig', {'Key': Key, 'Data': Data}) }}
+                                </div>
+                            {% endfor %}
+                            <p>The privacy level may be increased at any time without having to restart the DNS
+                                resolver. However, note that the DNS resolver needs to be restarted when lowering the
+                                privacy level. This restarting is automatically done when saving.</p>
+                            {% if QueryLogging and PrivacyLevel > 0 %}
+                                <p class="lookatme"
+                                   lookatme-text="Warning: Pi-hole's query logging is activated. Although the dashboard will hide the requested details, all queries are still fully logged to the pihole.log file.">
+                                    Warning: Pi-hole's query logging is activated. Although the dashboard will hide the
+                                    requested details, all queries are still fully logged to the pihole.log file.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="box-footer clearfix">
+                    <input type="hidden" name="field" value="privacyLevel">
+                    <input type="hidden" name="token" value="{{ APIToken }}">
+                    <button type="submit" class="btn btn-primary pull-right">Apply</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

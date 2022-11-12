@@ -4,8 +4,8 @@
 
     <!-- Title -->
     <div class="page-header">
-        <h1>Output the last lines of the {{ Log }} file</h1>
-        <small>Live view of the {{ Log }}</small>
+        <h1>Output the last lines of the {{ MenuItems.Log }} file</h1>
+        <small>Live view of the {{ MenuItems.Log }}</small>
     </div>
     <div>
         <input type="checkbox" checked id="chk1">
@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block pagescripts %}
-    <script type="text/javascript">window.logtype = "{{ Logtype }}"</script>
+    <script type="text/javascript">window.logtype = "{{ MenuItems.Logtype }}"</script>
 
     {{ assets({files: [
         'Resources/js/taillog.js',

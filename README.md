@@ -27,11 +27,12 @@ Todos matching Pi-hole:
 - [x] Tooling
 - [ ] Settings
   - [x] System
-  - [ ] DNS
+  - [x] DNS
   - [x] DHCP
-  - [ ] API/Web interface
-  - [ ] Privacy
+  - [x] API/Web interface
+  - [x] Privacy
   - [ ] Teleporter
+- Login/security
 
 Todos - Additional
 - [ ] User management

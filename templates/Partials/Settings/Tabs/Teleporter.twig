@@ -1,0 +1,166 @@
+<div class="row">
+    {% if HasPHAR %}
+        <form role="form" method="post" id="takeoutform"
+              action="settings"
+              target="teleporter_iframe" enctype="multipart/form-data">
+            <input type="hidden" name="token" value="{{ APIToken }}">
+            <div class="col-lg-6 col-md-12">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Backup</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <p>Backup your Pi-hole configuration (settings &amp; lists) as a downloadable
+                                    archive</p>
+                                <button type="submit" class="btn btn-default">Backup</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Restore</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label>Restore...</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div>
+                                    <input type="checkbox" name="whitelist" id="tele_whitelist" value="true" checked>
+                                    <label for="tele_whitelist">Whitelist (exact)</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="regex_whitelist" id="tele_regex_whitelist" value="true"
+                                           checked>
+                                    <label for="tele_regex_whitelist">Whitelist (regex/wildcard)</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="blacklist" id="tele_blacklist" value="true" checked>
+                                    <label for="tele_blacklist">Blacklist (exact)</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="regexlist" id="tele_regexlist" value="true" checked>
+                                    <label for="tele_regexlist">Blacklist (regex/wildcard)</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="adlist" id="tele_adlist" value="true" checked>
+                                    <label for="tele_adlist">Adlists</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div>
+                                    <input type="checkbox" name="client" id="tele_client" value="true" checked>
+                                    <label for="tele_client">Client</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="group" id="tele_group" value="true" checked>
+                                    <label for="tele_group">Group</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="auditlog" id="tele_auditlog" value="true" checked>
+                                    <label for="tele_auditlog">Audit log</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="staticdhcpleases" id="tele_staticdhcpleases"
+                                           value="true"
+                                           checked>
+                                    <label for="tele_staticdhcpleases">Static DHCP Leases</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="localdnsrecords" id="tele_localdnsrecords" value="true"
+                                           checked>
+                                    <label for="tele_localdnsrecords">Local DNS Records</label>
+                                </div>
+                                <div>
+                                    <input type="checkbox" name="localcnamerecords" id="tele_localcnamerecords"
+                                           value="true"
+                                           checked>
+                                    <label for="tele_localcnamerecords">Local CNAME Records</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <label for="zip_file">File input</label>
+                                <div class="input-group">
+                                                    <span class="input-group-btn">
+                                                        <span class="btn btn-default btn-file" tabindex="0">Browse...
+                                                            <input type="file" name="zip_file" id="zip_file"
+                                                                   accept="application/gzip" tabindex="-1">
+                                                        </span>
+                                                    </span>
+                                    <input type="text" id="zip_filename" class="form-control"
+                                           placeholder="no file selected" readonly="readonly" tabindex="-1">
+                                </div>
+                                <p class="help-block">Upload only Pi-hole backup files.</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div>
+                                    <input type="checkbox" name="flushtables" id="tele_flushtables" value="true"
+                                           checked>
+                                    <label for="tele_flushtables">Clear existing data</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-footer clearfix">
+                        <button type="submit" class="btn btn-default" name="action"
+                                value="in" data-toggle="modal" data-target="#teleporterModal">Restore
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="modal fade" id="teleporterModal" role="dialog" data-keyboard="false"
+             tabindex="-1" data-backdrop="static" aria-labelledby="teleporterModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="exampleModalLabel">Teleporter Import</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label class="control-label">Output:</label>
+                        <div class="box no-margin no-border no-shadow">
+                                            <pre class="no-margin no-padding"><iframe
+                                                        class="col-xs-12 no-border no-padding"
+                                                        name="teleporter_iframe" height="100"
+                                                        tabindex="-1"></iframe></pre>
+                            <div class="overlay">
+                                <i class="fa fa-spinner fa-pulse"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-default hidden">
+                            <i class="fas fa-sync"></i> Reload page
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="col-lg-12">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Teleporter</h3>
+                </div>
+                <div class="box-body">
+                    <p>The PHP extension <code>Phar</code> is not loaded. Please ensure it is installed and loaded if
+                        you
+                        want to use the Pi-hole teleporter.</p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>

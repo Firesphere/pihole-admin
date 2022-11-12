@@ -36,10 +36,11 @@ $globals = [
     'MemUse'        => number_format($mem, 4),
     'CPUCount'      => $cpu,
     'Temperature'   => $temp,
+    'Menu'          => (require __DIR__ . '/menu.php')
 ];
 $twigEnv = $twig->getEnvironment();
 foreach ($globals as $key => $value) {
     $twigEnv->addGlobal($key, $value);
 }
-
+$twigEnv->addGlobal('Theme', (new \App\Helper\Config())->get('pihole')['WEBTHEME'] ?? 'default-auto');
 return $twig;
