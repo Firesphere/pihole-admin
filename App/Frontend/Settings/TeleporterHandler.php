@@ -9,6 +9,8 @@ use PharData;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use RecursiveIteratorIterator;
+use Slim\Psr7\UploadedFile;
 
 class TeleporterHandler extends Settings
 {
@@ -16,6 +18,18 @@ class TeleporterHandler extends Settings
      * @var SQLiteDB
      */
     protected $gravity;
+
+    /**
+     * @var array
+     */
+    protected $flushedTables = [];
+
+    protected static $valid_mimetypes = [
+        'application/gzip',
+        'application/tar',
+        'application/x-compressed',
+        'application/x-gzip'
+    ];
 
     public function __construct(ContainerInterface $container)
     {
@@ -26,8 +40,11 @@ class TeleporterHandler extends Settings
     public function teleport(RequestInterface $request, ResponseInterface $response)
     {
         $data = $request->getParsedBody();
-        if (!isset($data['in'])) {
+        if (!isset($data['action'])) {
             $this->export($data);
+        } else {
+            $files = $request->getUploadedFiles();
+            $this->import($data, $files);
         }
     }
 
@@ -100,20 +117,158 @@ class TeleporterHandler extends Settings
         exit;
     }
 
-    public function import($postData, $config, &$success, &$error)
+    /**
+     * @param $postData
+     * @param array|UploadedFile[] $files
+     * @return string|void
+     */
+    public function import($postData, $files)
     {
+        $file = $files['zip_file'];
+        $filename = $file->getClientFilename();
+        $source = $file->getFilePath();
+        $mimeType = $file->getClientMediaType();
+
+        // verify the file mime type
+
+        $mime_valid = in_array($mimeType, self::$valid_mimetypes);
+
+        // verify the file extension (Looking for ".tar.gz" at the end of the file name)
+        $ext = array_slice(explode('.', $filename), -2, 2);
+        $ext_valid = strtolower($ext[0]) === 'tar' && strtolower($ext[1]) === 'gz';
+
+        if (!$ext_valid || !$mime_valid) {
+            $error = sprintf(
+                'The file you are trying to upload is not a .tar.gz file (filename: %s, type: %s). Please try again',
+                htmlentities($filename),
+                htmlentities($mimeType)
+            );
+            exit($error);
+        }
+
+        $fullFilePath = sys_get_temp_dir() . '/' . $filename;
+
+        if (!move_uploaded_file($source, $fullFilePath)) {
+            exit('Failed moving ' . htmlentities($source) . ' to ' . htmlentities($fullFilePath));
+        }
+
+        $archive = new PharData($fullFilePath);
+
+        $importedsomething = false;
+        $fullpiholerestart = false;
+        $reloadsettingspage = false;
+
+        foreach (new RecursiveIteratorIterator($archive) as $file) {
+            $fileName = $file->getFilename();
+            $fileParts = explode('.', $filename);
+            $fileType = end($fileParts);
+            if ($fileType === 'json') {
+                $fileContents = $this->getJSONContent($file);
+                // Do the JSON thing
+                switch ($filename) {
+                    case 'blacklist.exact.json':
+                }
+            }
+
+            switch ($fileName) {
+                case 'blacklist.txt':
+                    $lines = explode("\n", $file->getContent());
+                    $dataSet = array_filter($lines);
+                    $path = $file->getRealPath();
+                    $count = $this->importTable($dataSet, $path);
+                    break;
+            }
+        }
+
+        return '';
     }
 
     /**
-     * @param $table
-     * @param $type
+     * Replacing archive_insert_into_table
+     * @param $dataSet
+     * @param $path
+     * @return int|void
+     */
+    protected function importTable($dataSet, $path)
+    {
+        // Return early if we cannot extract the lines in the file
+        if (is_null($dataSet) || empty($dataSet)) {
+            return 0;
+        }
+
+        $comment = 'Imported from ' . $path;
+    }
+
+    /**
+     * Replacing archive_restore_table
+     * @param array $dataSet
+     * @param string $table
+     * @param bool $flush
+     * @return int
+     */
+    protected function restoreTable($dataSet, $table, $flush = false)
+    {
+        $field = false;
+        $listTypes = ImportQueryHelper::$listTypes;
+        $queryList = ImportQueryHelper::$queryParts;
+        if (isset($listTypes[$table])) {
+            $table = $listTypes[$table]['table'];
+            // If the field "domain" is too long later on, we need to skip the dataset
+            $queryList[$table]['type'] = $listTypes[$table]['type'];
+            $field = 'domain';
+        }
+
+        if ($flush && !in_array($table, $this->flushedTables)) {
+            $masterSelect = 'SELECT name FROM sqlite_master WHERE type=:tabletype AND name=:tablename';
+            $result = $this->gravity->doQuery($masterSelect, [':tabletype' => 'table', ':tablename' => $table]);
+            $tableExists = $result->fetchArray();
+            if ($tableExists) {
+                $this->gravity->doQuery(sprintf('DELETE FROM "%s";', $table));
+                $this->flushedTables[] = $table;
+            }
+        }
+
+        $query = sprintf(
+            'INSERT OR IGNORE INTO "%s" %s VALUES %s;',
+            $table,
+            $queryList[$table]['fields'],
+            $queryList[$table]['values'],
+        );
+
+        $rowCount = 0;
+        foreach ($dataSet as $row) {
+            // Limit max length for a domain entry to 253 chars
+            if ($field !== false && strlen($row[$field]) > 253) {
+                continue;
+            }
+
+            $queryParams = [];
+            foreach ($row as $key => $value) {
+                $queryParams[':' . $key] = $value;
+            }
+            // Make sure it's set properly _after_ the data is put in the array.
+            // And of course, if it's needed.
+            if ($queryList[$table]['type'] >= 0) {
+                $queryParams[':type'] = $queryList[$table]['type'];
+            }
+            $this->gravity->doQuery($query, $queryParams);
+
+            ++$rowCount;
+        }
+
+        return $rowCount;
+    }
+
+    /**
+     * @param string $table
+     * @param int $type
      * @return false|string
      * @throws \JsonException
      */
-    protected function exportTable($table, $type = -1)
+    protected function exportTable($table, int $type = -1)
     {
         $queryStr = 'SELECT * FROM "%s"';
-        if ($type > -1) {
+        if ($type >= 0) {
             $queryStr .= sprintf(" WHERE type = '%s'", $type);
         }
         $query = sprintf($queryStr, $table);
@@ -146,5 +301,26 @@ class TeleporterHandler extends Settings
         }
 
         return '';
+    }
+
+    /**
+     * @param $file
+     * @return false|array
+     * @throws \JsonException
+     */
+    private function getJSONContent($file)
+    {
+        $json = file_get_contents($file);
+        // Return early if we cannot extract the JSON string
+        if (is_null($json)) {
+            return false;
+        }
+
+        $contents = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        // Return early if we cannot decode the JSON string
+        if (is_null($contents)) {
+            return false;
+        }
+        return $contents;
     }
 }

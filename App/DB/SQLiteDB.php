@@ -38,6 +38,29 @@ class SQLiteDB
         $this->db->close();
     }
 
+    private function getDBType($value)
+    {
+        $type = gettype($value);
+        switch ($type) {
+            case 'integer':
+                $sqltype = SQLITE3_INTEGER;
+                break;
+            case 'string':
+                $sqltype = SQLITE3_TEXT;
+                break;
+            case 'NULL':
+                $sqltype = SQLITE3_NULL;
+                break;
+            case 'double':
+                $sqltype = SQLITE3_FLOAT;
+                break;
+            default:
+                $sqltype = 'UNK';
+        }
+
+        return $sqltype;
+    }
+
     /**
      * Execute a query, as prepared statement if parameters are passed.
      * Otherwise, it's executed and returned directly
@@ -51,10 +74,14 @@ class SQLiteDB
         if (count($params)) {
             $prepared = $this->db->prepare($query);
             foreach ($params as $key => $value) {
-                $prepared->bindValue($key, $value);
+                $type = $this->getDBType($value);
+                $prepared->bindValue($key, $value, $type);
             }
 
-            return $prepared->execute();
+            $return = $prepared->execute();
+            $prepared->close();
+
+            return $return;
         }
 
         return $this->db->query($query);
