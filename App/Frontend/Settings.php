@@ -192,47 +192,47 @@ class Settings extends Frontend
             case 'DNS':
                 DNSHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-            // Set query logging
+                // Set query logging
             case 'Logging':
                 LoggingHandler::handleAction($postData, $this->session, $success, $error);
                 break;
-            // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
+                // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
             case 'API':
                 APIHandler::handleAction($postData, $success, $error);
                 break;
-            // Config Web UI
+                // Config Web UI
             case 'webUI':
                 WebUIHandler::handleAction($postData, $success, $error);
                 break;
-            // Power off the system
+                // Power off the system
             case 'poweroff':
                 PiHole::execute('-a poweroff');
                 $success = 'The system will poweroff in 5 seconds...';
                 break;
-            // Reboot the system
+                // Reboot the system
             case 'reboot':
                 PiHole::execute('-a reboot');
                 $success = 'The system will reboot in 5 seconds...';
                 break;
-            // restart Pihole-FTL
+                // restart Pihole-FTL
             case 'restartdns':
                 PiHole::execute('-a restartdns');
                 $success = 'The DNS server has been restarted';
                 break;
-            // Flush the logs
+                // Flush the logs
             case 'flushlogs':
                 PiHole::execute('-f');
                 $success = 'The Pi-hole log file has been flushed';
                 break;
-            // Set DHCP
+                // Set DHCP
             case 'DHCP':
                 DHCPHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-            // set Privacy level
+                // set Privacy level
             case 'privacyLevel':
                 PrivacyHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-            // Flush network table
+                // Flush network table
             case 'flusharp':
                 $output = PiHole::execute('arpflush quiet');
                 if (is_array($output)) {
