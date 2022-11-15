@@ -61,7 +61,8 @@ class DNSControl extends APIBase
             $data = new DNSRecord([
                 'name'   => $explodedLine[1],
                 'target' => $explodedLine[0],
-                'type'   => $recordType
+                'type'   => $recordType,
+                'domains' => array_slice($explodedLine, 0, -1)
             ]);
             static::$existing_records[$type][] = $data;
         }
@@ -95,7 +96,7 @@ class DNSControl extends APIBase
                 return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
             }
 
-            if ($domain === $params['target']) {
+            if (strtolower($domain) === strtolower($params['target'])) {
                 return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Domain and target cannot be the same']);
             }
             // IPv6 type checking
