@@ -565,20 +565,21 @@ class QRCode
     {
         $style = "border-style:none;border-collapse:collapse;margin:0px;padding:0px;";
 
-        print("<table style='$style'>");
+        $returnStr = "<table style='%s'>%s</table>";
 
+        $tr = '';
+        $trStr = "<tr style='%s'>%s</tr>";
         for ($r = 0; $r < $this->getModuleCount(); $r++) {
-            print("<tr style='$style'>");
-
+            $td = '';
             for ($c = 0; $c < $this->getModuleCount(); $c++) {
                 $color = $this->isDark($r, $c) ? "#000000" : "#ffffff";
-                print("<td style='$style;width:$size;height:$size;background-color:$color'></td>");
+                $td .= sprintf("<td style='%s;width:%s;height:%s;background-color:%s'></td>", $style, $size, $size, $color);
             }
 
-            print("</tr>");
+            $tr .= sprintf($trStr, $style, $td);
         }
 
-        print("</table>");
+        return sprintf($returnStr, $style, $tr);
     }
 
     public function printSVG($size = 2)
@@ -586,15 +587,23 @@ class QRCode
         $size = (int)$size;
         $width = $this->getModuleCount() * $size;
         $height = $width;
-        $return = ('<svg width="' . $width . '" height="' . $height . '" viewBox="0 0 ' . $width . ' ' . $height . '" xmlns="http://www.w3.org/2000/svg">');
-
+        $returnStr = '<svg width="%s" height="%s" viewBox="0 0 %s %s" xmlns="http://www.w3.org/2000/svg">%s</svg>';
+        $rectStr = '<rect x="%s" y="%s" width="%s" height="%s" fill="%s" shape-rendering="crispEdges"/>';
+        $rect = '';
         for ($r = 0; $r < $this->getModuleCount(); $r++) {
             for ($c = 0; $c < $this->getModuleCount(); $c++) {
                 $color = $this->isDark($r, $c) ? "#000000" : "#ffffff";
-                $return .= ('<rect x="' . ($c * $size) . '" y="' . ($r * $size) . '" width="' . $size . '" height="' . $size . '" fill="' . $color . '" shape-rendering="crispEdges"/>');
+                $rect .= sprintf(
+                    $rectStr,
+                    ($c * $size),
+                    ($r * $size),
+                    $size,
+                    $size,
+                    $color
+                );
             }
         }
 
-        return $return . "</svg>";
+        return sprintf($returnStr, $width, $height, $width, $height, $rect);
     }
 }

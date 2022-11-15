@@ -18,6 +18,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -139,24 +140,8 @@ class Settings extends Frontend
         $this->session->delete('SETTINGS_SUCCESS');
         $this->session->delete('SETTINGS_ERROR');
         $environment = $view->getEnvironment();
-        foreach ($this->menuItems['Tabs'] as $key => &$value) {
-            if ($value['Slug'] === $activeTab) {
-                $value['Classes'] = 'active in ';
-                $value['Expanded'] = true;
-            }
-            if ($value['Slug'] === 'api') { // QR Token modal
-                QRMath::init();
-                $qrCode = QRCode::getMinimumQRCode($this->session->get('token'), QR_ERROR_CORRECT_LEVEL_Q);
-                $qr = [
-                    'APIQRCode' => $qrCode->printSVG(10),
-                    'APIToken'  => $this->session->get('token')
-                ];
-                $this->settings['API']['QRFrame'] = $environment->render('Partials/Settings/APIToken.twig', $qr);
-            }
-            $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
-            $value['Template'] = $environment->render($template, $this->settings[$key]);
-        }
-        unset($value);
+        $this->renderPartials($activeTab, $environment);
+
         $this->settings['MenuItems'] = $this->menuItems;
 
 
@@ -421,5 +406,35 @@ class Settings extends Frontend
         }
 
         return $return;
+    }
+
+    /**
+     * @param mixed $activeTab
+     * @param Environment $environment
+     * @return array|mixed
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    protected function renderPartials(mixed $activeTab, Environment $environment)
+    {
+        foreach ($this->menuItems['Tabs'] as $key => &$value) {
+            if ($value['Slug'] === $activeTab) {
+                $value['Classes'] = 'active in ';
+                $value['Expanded'] = true;
+            }
+            if ($value['Slug'] === 'api') { // QR Token modal
+                QRMath::init();
+                $qrCode = QRCode::getMinimumQRCode($this->session->get('token'), QR_ERROR_CORRECT_LEVEL_Q);
+                $qr = [
+                    'APIQRCode' => $qrCode->printSVG(10),
+                    'APIToken'  => $this->session->get('token')
+                ];
+                $rendered = $environment->render('Partials/Settings/APIToken.twig', $qr);
+                $this->settings['API']['QRFrame'] = $rendered;
+            }
+            $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
+            $value['Template'] = $environment->render($template, $this->settings[$key]);
+        }
     }
 }
