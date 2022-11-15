@@ -238,7 +238,7 @@ class TeleporterHandler extends Settings
         $rowCount = 0;
         foreach ($dataSet as $row) {
             // Limit max length for a domain entry to 253 chars
-            if ($field !== false && strlen($row[$field]) > 253) {
+            if ($field !== false && strlen((string)$row[$field]) > 253) {
                 continue;
             }
 

@@ -28,10 +28,11 @@ $(function () {
 
     // set Teleporter iframe's font, enable Modal's button(s), ...
     $('iframe[name="teleporter_iframe"]').on("load", function () {
+        var pre = $(pre);
         var font = {
-            "font-family": $("pre").css("font-family"),
-            "font-size": $("pre").css("font-size"),
-            color: $("pre").css("color"),
+            "font-family": pre.css("font-family"),
+            "font-size": pre.css("font-size"),
+            color: pre.css("color"),
         };
         var contents = $(this).contents();
         contents.find("body").css(font);

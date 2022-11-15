@@ -279,7 +279,7 @@ class QRUtil
 
     public static function isAlphaNum($s)
     {
-        $length = strlen($s);
+        $length = strlen((string)$s);
         for ($i = 0; $i < $length; $i++) {
             $c = ord($s[$i]);
             if (!(self::toCharCode('0') <= $c && $c <= self::toCharCode('9'))
@@ -300,7 +300,7 @@ class QRUtil
 
     public static function isNumber($s)
     {
-        $length = strlen($s);
+        $length = strlen((string)$s);
         for ($i = 0; $i < $length; $i++) {
             $c = ord($s[$i]);
             if (!(self::toCharCode('0') <= $c && $c <= self::toCharCode('9'))) {
@@ -317,7 +317,7 @@ class QRUtil
 
         $i = 0;
 
-        while ($i + 1 < strlen($data)) {
+        while ($i + 1 < strlen((string)$data)) {
             $c = ((0xff & ord($data[$i])) << 8) | (0xff & ord($data[$i + 1]));
 
             if (!(0x8140 <= $c && $c <= 0x9FFC) && !(0xE040 <= $c && $c <= 0xEBBF)) {
@@ -327,7 +327,7 @@ class QRUtil
             $i += 2;
         }
 
-        return $i >= strlen($data);
+        return $i >= strlen((string)$data);
     }
 
     public static function getBCHTypeInfo($data)

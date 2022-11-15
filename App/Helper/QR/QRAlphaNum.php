@@ -14,13 +14,13 @@ class QRAlphaNum extends QRData
         $i = 0;
         $c = $this->getData();
 
-        while ($i + 1 < strlen($c)) {
+        while ($i + 1 < strlen((string)$c)) {
             $buffer->put(QRAlphaNum::getCode(ord($c[$i])) * 45
                 + QRAlphaNum::getCode(ord($c[$i + 1])), 11);
             $i += 2;
         }
 
-        if ($i < strlen($c)) {
+        if ($i < strlen((string)$c)) {
             $buffer->put(QRAlphaNum::getCode(ord($c[$i])), 6);
         }
     }

@@ -15,18 +15,19 @@ class QRNumber extends QRData
 
         $i = 0;
 
-        while ($i + 2 < strlen($data)) {
-            $num = QRNumber::parseInt(substr($data, $i, 3));
+        $length = strlen((string)$data);
+        while ($i + 2 < $length) {
+            $num = self::parseInt(substr($data, $i, 3));
             $buffer->put($num, 10);
             $i += 3;
         }
 
-        if ($i < strlen($data)) {
-            if (strlen($data) - $i == 1) {
-                $num = QRNumber::parseInt(substr($data, $i, $i + 1));
+        if ($i < $length) {
+            if (strlen((string)$data) - $i == 1) {
+                $num = self::parseInt(substr($data, $i, $i + 1));
                 $buffer->put($num, 4);
-            } elseif (strlen($data) - $i == 2) {
-                $num = QRNumber::parseInt(substr($data, $i, $i + 2));
+            } elseif ((string)strlen((string)$data) - $i == 2) {
+                $num = self::parseInt(substr($data, $i, $i + 2));
                 $buffer->put($num, 7);
             }
         }
@@ -35,7 +36,7 @@ class QRNumber extends QRData
     public static function parseInt($s)
     {
         $num = 0;
-        for ($i = 0; $i < strlen($s); $i++) {
+        for ($i = 0; $i < strlen((string)$s); $i++) {
             $num = $num * 10 + QRNumber::parseIntAt(ord($s[$i]));
         }
 

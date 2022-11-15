@@ -9,7 +9,7 @@ class QRMath
 
     public static function init()
     {
-        self::$QR_MATH_EXP_TABLE = QRMath::createNumArray(256);
+        self::$QR_MATH_EXP_TABLE = self::createNumArray(256);
 
         for ($i = 0; $i < 8; $i++) {
             self::$QR_MATH_EXP_TABLE[$i] = 1 << $i;
@@ -58,6 +58,6 @@ class QRMath
             $n -= 255;
         }
 
-        return self::$QR_MATH_EXP_TABLE[$n];
+        return self::$QR_MATH_EXP_TABLE[$n] ?? '';
     }
 }

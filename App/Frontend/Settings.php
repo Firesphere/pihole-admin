@@ -11,6 +11,8 @@ use App\Frontend\Settings\LoggingHandler;
 use App\Frontend\Settings\PrivacyHandler;
 use App\Frontend\Settings\WebUIHandler;
 use App\Helper\Helper;
+use App\Helper\QR\QRMath;
+use App\Helper\QRCode;
 use App\PiHole;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
@@ -136,13 +138,23 @@ class Settings extends Frontend
 
         $this->session->delete('SETTINGS_SUCCESS');
         $this->session->delete('SETTINGS_ERROR');
+        $environment = $view->getEnvironment();
         foreach ($this->menuItems['Tabs'] as $key => &$value) {
             if ($value['Slug'] === $activeTab) {
                 $value['Classes'] = 'active in ';
                 $value['Expanded'] = true;
             }
+            if ($value['Slug'] === 'api') { // QR Token modal
+                QRMath::init();
+                $qrCode = QRCode::getMinimumQRCode($this->session->get('token'), QR_ERROR_CORRECT_LEVEL_Q);
+                $qr = [
+                    'APIQRCode' => $qrCode->printSVG(10),
+                    'APIToken'  => $this->session->get('token')
+                ];
+                $this->settings['API']['QRFrame'] = $environment->render('Partials/Settings/APIToken.twig', $qr);
+            }
             $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
-            $value['Template'] = $view->getEnvironment()->render($template, $this->settings[$key]);
+            $value['Template'] = $environment->render($template, $this->settings[$key]);
         }
         unset($value);
         $this->settings['MenuItems'] = $this->menuItems;
@@ -180,47 +192,47 @@ class Settings extends Frontend
             case 'DNS':
                 DNSHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-                // Set query logging
+            // Set query logging
             case 'Logging':
                 LoggingHandler::handleAction($postData, $this->session, $success, $error);
                 break;
-                // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
+            // Set domains to be excluded from being shown in Top Domains (or Ads) and Top Clients
             case 'API':
                 APIHandler::handleAction($postData, $success, $error);
                 break;
-                // Config Web UI
+            // Config Web UI
             case 'webUI':
                 WebUIHandler::handleAction($postData, $success, $error);
                 break;
-                // Power off the system
+            // Power off the system
             case 'poweroff':
                 PiHole::execute('-a poweroff');
                 $success = 'The system will poweroff in 5 seconds...';
                 break;
-                // Reboot the system
+            // Reboot the system
             case 'reboot':
                 PiHole::execute('-a reboot');
                 $success = 'The system will reboot in 5 seconds...';
                 break;
-                // restart Pihole-FTL
+            // restart Pihole-FTL
             case 'restartdns':
                 PiHole::execute('-a restartdns');
                 $success = 'The DNS server has been restarted';
                 break;
-                // Flush the logs
+            // Flush the logs
             case 'flushlogs':
                 PiHole::execute('-f');
                 $success = 'The Pi-hole log file has been flushed';
                 break;
-                // Set DHCP
+            // Set DHCP
             case 'DHCP':
                 DHCPHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-                // set Privacy level
+            // set Privacy level
             case 'privacyLevel':
                 PrivacyHandler::handleAction($postData, $this->config, $success, $error);
                 break;
-                // Flush network table
+            // Flush network table
             case 'flusharp':
                 $output = PiHole::execute('arpflush quiet');
                 if (is_array($output)) {
@@ -331,31 +343,32 @@ class Settings extends Frontend
     {
         $config = $this->config->get('pihole');
         $privacyLevel = (int)($config['PRIVACYLEVEL'] ?? 0);
+
         return [
             'PrivacyLevels' => [
                 0 => [
-                    'Label' => 'Show everything and record everything',
+                    'Label'    => 'Show everything and record everything',
                     'Selected' => $privacyLevel === 0,
-                    'Note' => 'Gives maximum amount of statistics',
+                    'Note'     => 'Gives maximum amount of statistics',
                 ],
                 1 => [
                     'Selected' => $privacyLevel === 1,
-                    'Label' => 'Hide domains: Display and store all domains as "hidden"',
-                    'Note' => 'This disables the Top Permitted Domains and Top Blocked Domains tables on the dashboard'
+                    'Label'    => 'Hide domains: Display and store all domains as "hidden"',
+                    'Note'     => 'This disables the Top Permitted Domains and Top Blocked Domains tables on the dashboard'
                 ],
                 2 => [
                     'Selected' => $privacyLevel === 2,
-                    'Label' => 'Hide domains and clients: Display and store all domains as "hidden" and all clients as "0.0.0.0"',
-                    'Note' => 'This disables all tables on the dashboard'
+                    'Label'    => 'Hide domains and clients: Display and store all domains as "hidden" and all clients as "0.0.0.0"',
+                    'Note'     => 'This disables all tables on the dashboard'
                 ],
                 3 => [
                     'Selected' => $privacyLevel === 3,
-                    'Label' => 'Anonymous mode: This disables basically everything except the live anonymous statistics',
-                    'Note' => 'No history is saved at all to the database, and nothing is shown in the query log. Also, there are no top item lists.'
+                    'Label'    => 'Anonymous mode: This disables basically everything except the live anonymous statistics',
+                    'Note'     => 'No history is saved at all to the database, and nothing is shown in the query log. Also, there are no top item lists.'
                 ]
             ],
-            'PrivacyLevel' => $privacyLevel,
-            'QueryLogging' => $config['QUERY_LOGGING'] ?? true,
+            'PrivacyLevel'  => $privacyLevel,
+            'QueryLogging'  => $config['QUERY_LOGGING'] ?? true,
         ];
     }
 

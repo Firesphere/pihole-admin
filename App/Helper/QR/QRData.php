@@ -24,7 +24,7 @@ abstract class QRData
      */
     public function getLength()
     {
-        return strlen($this->getData());
+        return strlen((string)$this->getData());
     }
 
     public function getData()

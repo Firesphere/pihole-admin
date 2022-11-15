@@ -68,8 +68,9 @@
                     </div>
                     <div class="modal-body">
                         {# @todo implement the API token and QR properly #}
-                        <pre><iframe id="apiTokenIframe" name="apiToken_iframe"
-                                     src="scripts/pi-hole/php/api_token.php"></iframe></pre>
+                        <div class="onmyown">
+                        {{ QRFrame|raw }}
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>

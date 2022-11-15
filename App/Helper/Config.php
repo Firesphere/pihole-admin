@@ -114,7 +114,7 @@ class Config
                 if (Helper::validIP($one) && $two === '') {
                     // dhcp-host=mac,IP - no HOST
                     $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => ''];
-                } elseif (strlen($two) == 0) {
+                } elseif (strlen((string)$two) == 0) {
                     // dhcp-host=mac,hostname - no IP
                     $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => '', 'host' => $one];
                 } else {

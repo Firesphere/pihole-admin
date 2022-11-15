@@ -1,0 +1,22 @@
+<style>
+    .qrcode {
+        background: #fff;
+        text-align: center;
+        margin: 10px 0 1em;
+    }
+
+    .qrcode svg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .token {
+        font-size: 14px;
+        word-break: break-word;
+    }
+</style>
+<div class="qrcode">
+    {{ APIQRCode|raw }}
+    <p>Raw API Token:</p>
+    <code class="token">{{ APIToken }}</code>
+</div>

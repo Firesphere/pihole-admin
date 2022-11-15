@@ -12,7 +12,7 @@ class QR8BitByte extends QRData
     public function write(&$buffer)
     {
         $data = $this->getData();
-        $length = strlen($data);
+        $length = strlen((string)$data);
         for ($i = 0; $i < $length; $i++) {
             $buffer->put(ord($data[$i]), 8);
         }
