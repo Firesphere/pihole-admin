@@ -16,16 +16,13 @@
 //
 //---------------------------------------------------------------------
 
-//---------------------------------------------------------------
-// QRCode
-//---------------------------------------------------------------
-
 namespace App\Helper;
 
 use App\Helper\QR\QR8BitByte;
 use App\Helper\QR\QRAlphaNum;
 use App\Helper\QR\QRBitBuffer;
 use App\Helper\QR\QRKanji;
+use App\Helper\QR\QRRSBlock;
 
 class QRCode
 {
@@ -39,7 +36,7 @@ class QRCode
 
     protected $qrDataList;
 
-    public function __construct()
+    public function __construct($typeNumber = 1, $errorCorrectLevel = QR_ERROR_CORRECT_LEVEL_H, $qrDataList = [])
     {
         $this->typeNumber = 1;
         $this->errorCorrectLevel = QR_ERROR_CORRECT_LEVEL_H;
@@ -50,8 +47,7 @@ class QRCode
     {
         $mode = QR\QRUtil::getMode($data);
 
-        $qr = new QRCode();
-        $qr->setErrorCorrectLevel($errorCorrectLevel);
+        $qr = new self(1, $errorCorrectLevel);
         $qr->addData($data, $mode);
 
         $qrData = $qr->getData(0);
@@ -166,8 +162,8 @@ class QRCode
                 }
 
                 $this->modules[$row + $r][$col + $c] =
-                    (0 <= $r && $r <= 6 && ($c == 0 || $c == 6))
-                    || (0 <= $c && $c <= 6 && ($r == 0 || $r == 6))
+                    (0 <= $r && $r <= 6 && ($c === 0 || $c === 6))
+                    || (0 <= $c && $c <= 6 && ($r === 0 || $r === 6))
                     || (2 <= $r && $r <= 4 && 2 <= $c && $c <= 4);
             }
         }
@@ -176,12 +172,11 @@ class QRCode
     public function setupPositionAdjustPattern()
     {
         $pos = QR\QRUtil::getPatternPosition($this->typeNumber);
-        $count = count($pos);
 
-        for ($i = 0; $i < $count; $i++) {
-            for ($j = 0; $j < $count; $j++) {
-                $row = $pos[$i];
-                $col = $pos[$j];
+        foreach ($pos as $iValue) {
+            foreach ($pos as $jValue) {
+                $row = $iValue;
+                $col = $jValue;
 
                 if ($this->modules[$row][$col] !== null) {
                     continue;
@@ -190,7 +185,7 @@ class QRCode
                 for ($r = -2; $r <= 2; $r++) {
                     for ($c = -2; $c <= 2; $c++) {
                         $this->modules[$row + $r][$col + $c] =
-                            $r == -2 || $r == 2 || $c == -2 || $c == 2 || ($r == 0 && $c == 0);
+                            $r === -2 || $r === 2 || $c === -2 || $c === 2 || ($r === 0 && $c === 0);
                     }
                 }
             }
@@ -204,8 +199,8 @@ class QRCode
                 continue;
             }
 
-            $this->modules[$i][6] = ($i % 2 == 0);
-            $this->modules[6][$i] = ($i % 2 == 0);
+            $this->modules[$i][6] = ($i % 2 === 0);
+            $this->modules[6][$i] = ($i % 2 === 0);
         }
     }
 
@@ -215,7 +210,7 @@ class QRCode
         $bits = QR\QRUtil::getBCHTypeInfo($data);
 
         for ($i = 0; $i < 15; $i++) {
-            $mod = (!$test && (($bits >> $i) & 1) == 1);
+            $mod = (!$test && (($bits >> $i) & 1) === 1);
 
             if ($i < 6) {
                 $this->modules[$i][8] = $mod;
@@ -245,7 +240,7 @@ class QRCode
         $bits = QR\QRUtil::getBCHTypeNumber($this->typeNumber);
 
         for ($i = 0; $i < 18; $i++) {
-            $mod = (!$test && (($bits >> $i) & 1) == 1);
+            $mod = (!$test && (($bits >> $i) & 1) === 1);
             $this->modules[(int)floor($i / 3)][$i % 3 + $this->moduleCount - 8 - 3] = $mod;
             $this->modules[$i % 3 + $this->moduleCount - 8 - 3][floor($i / 3)] = $mod;
         }
@@ -256,19 +251,17 @@ class QRCode
         $rsBlocks = QR\QRRSBlock::getRSBlocks($typeNumber, $errorCorrectLevel);
 
         $buffer = new QRBitBuffer();
-        $count = count($dataArray);
-        for ($i = 0; $i < $count; $i++) {
+        foreach ($dataArray as $iValue) {
             /** @protected \QRData $data */
-            $data = $dataArray[$i];
+            $data = $iValue;
             $buffer->put($data->getMode(), 4);
             $buffer->put($data->getLength(), $data->getLengthInBits($typeNumber));
             $data->write($buffer);
         }
 
         $totalDataCount = 0;
-        $rsCount = count($rsBlocks);
-        for ($i = 0; $i < $rsCount; $i++) {
-            $totalDataCount += $rsBlocks[$i]->getDataCount();
+        foreach ($rsBlocks as $iValue) {
+            $totalDataCount += $iValue->getDataCount();
         }
 
         if ($buffer->getLengthInBits() > $totalDataCount * 8) {
@@ -285,7 +278,7 @@ class QRCode
         }
 
         // padding
-        while ($buffer->getLengthInBits() % 8 != 0) {
+        while ($buffer->getLengthInBits() % 8 !== 0) {
             $buffer->putBit(false);
         }
 
@@ -311,8 +304,8 @@ class QRCode
     }
 
     /**
-     * @param \QRBitBuffer $buffer
-     * @param \QRRSBlock[] $rsBlocks
+     * @param QRBitBuffer $buffer
+     * @param QRRSBlock[] $rsBlocks
      *
      * @return array
      */
@@ -335,8 +328,7 @@ class QRCode
             $maxEcCount = max($maxEcCount, $ecCount);
 
             $dcdata[$r] = $this->createNullArray($dcCount);
-            $dcDataCount = count($dcdata[$r]);
-            for ($i = 0; $i < $dcDataCount; $i++) {
+            foreach ($dcdata[$r] as $i => $iValue) {
                 $bdata = $buffer->getBuffer();
                 $dcdata[$r][$i] = 0xff & $bdata[$i + $offset];
             }
@@ -348,16 +340,15 @@ class QRCode
             $modPoly = $rawPoly->mod($rsPoly);
             $ecdata[$r] = $this->createNullArray($rsPoly->getLength() - 1);
 
-            $ecDataCount = count($ecdata[$r]);
-            for ($i = 0; $i < $ecDataCount; $i++) {
+            foreach ($ecdata[$r] as $i => $iValue) {
                 $modIndex = $i + $modPoly->getLength() - count($ecdata[$r]);
                 $ecdata[$r][$i] = ($modIndex >= 0) ? $modPoly->get($modIndex) : 0;
             }
         }
 
         $totalCodeCount = 0;
-        for ($i = 0; $i < $rsBlockCount; $i++) {
-            $totalCodeCount += $rsBlocks[$i]->getTotalCount();
+        foreach ($rsBlocks as $rsBlock) {
+            $totalCodeCount += $rsBlock->getTotalCount();
         }
 
         $data = $this->createNullArray($totalCodeCount);
@@ -391,7 +382,7 @@ class QRCode
         $byteIndex = 0;
 
         for ($col = $this->moduleCount - 1; $col > 0; $col -= 2) {
-            if ($col == 6) {
+            if ($col === 6) {
                 $col--;
             }
 
@@ -401,7 +392,7 @@ class QRCode
                         $dark = false;
 
                         if ($byteIndex < count($data)) {
-                            $dark = ((($data[$byteIndex] >> $bitIndex) & 1) == 1);
+                            $dark = ((($data[$byteIndex] >> $bitIndex) & 1) === 1);
                         }
 
                         if (QR\QRUtil::getMask($maskPattern, $row, $col - $c)) {
@@ -411,7 +402,7 @@ class QRCode
                         $this->modules[$row][$col - $c] = $dark;
                         $bitIndex--;
 
-                        if ($bitIndex == -1) {
+                        if ($bitIndex === -1) {
                             $byteIndex++;
                             $bitIndex = 7;
                         }
@@ -439,7 +430,7 @@ class QRCode
 
             $lostPoint = QR\QRUtil::getLostPoint($this);
 
-            if ($i == 0 || $minLostPoint > $lostPoint) {
+            if ($i === 0 || $minLostPoint > $lostPoint) {
                 $minLostPoint = $lostPoint;
                 $pattern = $i;
             }
@@ -541,11 +532,11 @@ class QRCode
 
     public function hex2rgb($hex = 0x0)
     {
-        return array(
+        return [
             'r' => floor($hex / 65536),
             'g' => floor($hex / 256) % 256,
             'b' => $hex % 256
-        );
+        ];
     }
 
     // added $fg (foreground), $bg (background), and $bgtrans (use transparent bg) parameters
@@ -554,11 +545,7 @@ class QRCode
 
     public function isDark($row, $col)
     {
-        if ($this->modules[$row][$col] !== null) {
-            return $this->modules[$row][$col];
-        }
-
-        return false;
+        return $this->modules[$row][$col] ?? false;
     }
 
     public function printHTML($size = "2px")

@@ -172,11 +172,11 @@ class QRUtil
                     }
 
                     for ($c = -1; $c <= 1; $c++) {
-                        if (($col + $c < 0 || $moduleCount <= $col + $c) || ($r == 0 && $c == 0)) {
+                        if (($col + $c < 0 || $moduleCount <= $col + $c) || ($r === 0 && $c === 0)) {
                             continue;
                         }
 
-                        if ($dark == $qrCode->isDark($row + $r, $col + $c)) {
+                        if ($dark === $qrCode->isDark($row + $r, $col + $c)) {
                             $sameCount++;
                         }
                     }
@@ -205,7 +205,7 @@ class QRUtil
                 if ($qrCode->isDark($row + 1, $col + 1)) {
                     $count++;
                 }
-                if ($count == 0 || $count == 4) {
+                if ($count === 0 || $count === 4) {
                     $lostPoint += 3;
                 }
             }
@@ -284,7 +284,7 @@ class QRUtil
             $c = ord($s[$i]);
             if (!(self::toCharCode('0') <= $c && $c <= self::toCharCode('9'))
                 && !(self::toCharCode('A') <= $c && $c <= self::toCharCode('Z'))
-                && strpos(" $%*+-./:", $s[$i]) === false
+                && !str_contains(" $%*+-./:", $s[$i])
             ) {
                 return false;
             }
@@ -333,8 +333,8 @@ class QRUtil
     public static function getBCHTypeInfo($data)
     {
         $d = $data << 10;
-        while (QRUtil::getBCHDigit($d) - QRUtil::getBCHDigit(QR_G15) >= 0) {
-            $d ^= (QR_G15 << (QRUtil::getBCHDigit($d) - QRUtil::getBCHDigit(QR_G15)));
+        while (self::getBCHDigit($d) - self::getBCHDigit(QR_G15) >= 0) {
+            $d ^= (QR_G15 << (self::getBCHDigit($d) - self::getBCHDigit(QR_G15)));
         }
 
         return (($data << 10) | $d) ^ QR_G15_MASK;
@@ -344,7 +344,7 @@ class QRUtil
     {
         $digit = 0;
 
-        while ($data != 0) {
+        while ($data !== 0) {
             $digit++;
             $data >>= 1;
         }
@@ -355,8 +355,8 @@ class QRUtil
     public static function getBCHTypeNumber($data)
     {
         $d = $data << 12;
-        while (QRUtil::getBCHDigit($d) - QRUtil::getBCHDigit(QR_G18) >= 0) {
-            $d ^= (QR_G18 << (QRUtil::getBCHDigit($d) - QRUtil::getBCHDigit(QR_G18)));
+        while (self::getBCHDigit($d) - self::getBCHDigit(QR_G18) >= 0) {
+            $d ^= (QR_G18 << (self::getBCHDigit($d) - self::getBCHDigit(QR_G18)));
         }
 
         return ($data << 12) | $d;

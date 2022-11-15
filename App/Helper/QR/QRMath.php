@@ -22,7 +22,7 @@ class QRMath
                 ^ self::$QR_MATH_EXP_TABLE[$i - 8];
         }
 
-        self::$QR_MATH_LOG_TABLE = QRMath::createNumArray(256);
+        self::$QR_MATH_LOG_TABLE = self::createNumArray(256);
 
         for ($i = 0; $i < 255; $i++) {
             self::$QR_MATH_LOG_TABLE[self::$QR_MATH_EXP_TABLE[$i]] = $i;

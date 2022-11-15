@@ -10,7 +10,7 @@ class QRPolynomial
     {
         $offset = 0;
 
-        while ($offset < count($num) && $num[$offset] == 0) {
+        while ($offset < count($num) && $num[$offset] === 0) {
             $offset++;
         }
 
@@ -107,8 +107,6 @@ class QRPolynomial
             $num[$i] ^= QRMath::gexp(QRMath::glog($e->get($i)) + $ratio);
         }
 
-        $newPolynomial = new QRPolynomial($num);
-
-        return $newPolynomial->mod($e);
+        return (new self($num))->mod($e);
     }
 }

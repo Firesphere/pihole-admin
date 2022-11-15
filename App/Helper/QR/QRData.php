@@ -33,7 +33,7 @@ abstract class QRData
     }
 
     /**
-     * @param \QRBitBuffer $buffer
+     * @param QRBitBuffer $buffer
      */
     abstract public function write(&$buffer);
 
@@ -48,7 +48,6 @@ abstract class QRData
                 case QR_MODE_ALPHA_NUM:
                     return 9;
                 case QR_MODE_8BIT_BYTE:
-                    return 8;
                 case QR_MODE_KANJI:
                     return 8;
                 default:

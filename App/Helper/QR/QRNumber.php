@@ -23,10 +23,10 @@ class QRNumber extends QRData
         }
 
         if ($i < $length) {
-            if (strlen((string)$data) - $i == 1) {
+            if (strlen((string)$data) - $i === 1) {
                 $num = self::parseInt(substr($data, $i, $i + 1));
                 $buffer->put($num, 4);
-            } elseif ((string)strlen((string)$data) - $i == 2) {
+            } elseif (strlen((string)$data) - $i === 2) {
                 $num = self::parseInt(substr($data, $i, $i + 2));
                 $buffer->put($num, 7);
             }
@@ -36,8 +36,9 @@ class QRNumber extends QRData
     public static function parseInt($s)
     {
         $num = 0;
-        for ($i = 0; $i < strlen((string)$s); $i++) {
-            $num = $num * 10 + QRNumber::parseIntAt(ord($s[$i]));
+        $length = strlen((string)$s);
+        for ($i = 0; $i < $length; $i++) {
+            $num = $num * 10 + self::parseIntAt(ord($s[$i]));
         }
 
         return $num;
