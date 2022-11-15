@@ -39,35 +39,37 @@ class DNSControl extends APIBase
      */
     protected function readEntries($file, $type)
     {
-        $handle = fopen($file, 'rb');
-        $explode = $type === 'DNSLIST' ? ' ' : ',';
-        while ($line = fgets($handle)) {
-            $line = str_replace('cname=', '', trim($line));
-            $explodedLine = explode($explode, $line);
+        if (file_exists($file)) {
+            $handle = fopen($file, 'rb');
+            $explode = $type === 'DNSLIST' ? ' ' : ',';
+            while ($line = fgets($handle)) {
+                $line = str_replace('cname=', '', trim($line));
+                $explodedLine = explode($explode, $line);
 
-            if (count($explodedLine) <= 1) {
-                continue;
+                if (count($explodedLine) <= 1) {
+                    continue;
+                }
+
+                $recordType = $type === 'IP' ? 'A' : 'CNAME';
+
+                // A record but not an IPv4
+                if ($recordType === 'A' &&
+                    filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
+                ) {
+                    $recordType = 'AAAA';
+                }
+
+                $data = new DNSRecord([
+                    'name'    => $explodedLine[1],
+                    'target'  => $explodedLine[0],
+                    'type'    => $recordType,
+                    'domains' => array_slice($explodedLine, 0, -1)
+                ]);
+                static::$existing_records[$type][] = $data;
             }
 
-            $recordType = $type === 'IP' ? 'A' : 'CNAME';
-
-            // A record but not an IPv4
-            if ($recordType === 'A' &&
-                filter_var($explodedLine[1], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
-            ) {
-                $recordType = 'AAAA';
-            }
-
-            $data = new DNSRecord([
-                'name'   => $explodedLine[1],
-                'target' => $explodedLine[0],
-                'type'   => $recordType,
-                'domains' => array_slice($explodedLine, 0, -1)
-            ]);
-            static::$existing_records[$type][] = $data;
+            fclose($handle);
         }
-
-        fclose($handle);
     }
 
     /**

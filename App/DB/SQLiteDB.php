@@ -78,10 +78,7 @@ class SQLiteDB
                 $prepared->bindValue($key, $value, $type);
             }
 
-            $return = $prepared->execute();
-            $prepared->close();
-
-            return $return;
+            return $prepared->execute();
         }
 
         return $this->db->query($query);
