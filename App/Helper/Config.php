@@ -15,25 +15,6 @@ class Config
         $this->data = require __DIR__ . '/../../config/settings.php';
     }
 
-    public function get($key, $default = null)
-    {
-        $this->default = $default;
-
-        $segments = explode('.', $key);
-        $data = $this->data;
-
-        foreach ($segments as $segment) {
-            if (isset($data[$segment])) {
-                $data = $data[$segment];
-            } else {
-                $data = $this->default;
-                break;
-            }
-        }
-
-        return $data;
-    }
-
     public function getDNSServerList()
     {
         $list = [];
@@ -147,5 +128,24 @@ class Config
         }
 
         return $dhcp_static_leases;
+    }
+
+    public function get($key, $default = null)
+    {
+        $this->default = $default;
+
+        $segments = explode('.', $key);
+        $data = $this->data;
+
+        foreach ($segments as $segment) {
+            if (isset($data[$segment])) {
+                $data = $data[$segment];
+            } else {
+                $data = $this->default;
+                break;
+            }
+        }
+
+        return $data;
     }
 }

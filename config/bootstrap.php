@@ -28,5 +28,6 @@ require __DIR__ . '/modules.php';
 // Register routes
 (require __DIR__ . '/routes.php')($app);
 
+require __DIR__ . '/qr.php';
 // Get versions
 return $app;
