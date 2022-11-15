@@ -15,8 +15,9 @@
                 {{ include('Partials/DNS/Form.twig', {
                     'Title': 'Add a new CNAME record',
                     'Origin': 'Domain',
+                    'OriginPlaceholder': 'Domain or comma-separated list of domains',
                     'Target': 'Target Domain',
-                    'Placeholder': 'Associated Target Domain',
+                    'TargetPlaceholder': 'Associated Target Domain',
                     'fieldtype': 'url',
                 }) }}
                 <div class="box-footer clearfix">

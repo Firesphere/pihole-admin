@@ -80,55 +80,62 @@ class DNSControl extends APIBase
     public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
         $params = $request->getParsedBody();
-        // Validate domain and IP of target
-        if (!filter_var($params['domain'], FILTER_VALIDATE_DOMAIN) &&
-            !filter_var($params['domain'], FILTER_VALIDATE_IP)
-        ) {
-            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid domain name']);
-        }
-        if (
-            !filter_var($params['target'], FILTER_VALIDATE_DOMAIN) &&
-            !filter_var($params['target'], FILTER_VALIDATE_IP)
-        ) {
-            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
-        }
-
-        // IPv6 type checking
-        if (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-            $type = 'A';
-        } elseif (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-            $type = 'AAAA';
-        } elseif (filter_var($params['target'], FILTER_VALIDATE_DOMAIN)) {
-            $type = 'CNAME';
-        } else {
-            return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target type']);
-        }
-
-        $existingType = $type === 'CNAME' ? 'CNAMELIST' : 'DNSLIST';
-
-        foreach (static::$existing_records[$existingType] as $existing) {
-            if ($existing->getName() === $params['domain'] &&
-                $existing->getTarget() === $params['target'] &&
-                $existing->getType() === $type
+        $domains = array_map('trim', $params['domain']);
+        foreach ($domains as $domain) {
+            // Validate domain and IP of target
+            if (!filter_var($domain, FILTER_VALIDATE_DOMAIN) &&
+                !filter_var($domain, FILTER_VALIDATE_IP)
             ) {
-                return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Record already exists']);
+                return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid domain name']);
             }
+            if (
+                !filter_var($params['target'], FILTER_VALIDATE_DOMAIN) &&
+                !filter_var($params['target'], FILTER_VALIDATE_IP)
+            ) {
+                return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target']);
+            }
+
+            if ($domain === $params['target']) {
+                return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Domain and target cannot be the same']);
+            }
+            // IPv6 type checking
+            if (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $type = 'A';
+            } elseif (filter_var($params['target'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $type = 'AAAA';
+            } elseif (filter_var($params['target'], FILTER_VALIDATE_DOMAIN)) {
+                $type = 'CNAME';
+            } else {
+                return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Invalid target type']);
+            }
+
+            $existingType = $type === 'CNAME' ? 'CNAMELIST' : 'DNSLIST';
+
+            foreach (static::$existing_records[$existingType] as $existing) {
+                if ($existing->getName() === $domain &&
+                    $existing->getTarget() === $params['target'] &&
+                    $existing->getType() === $type
+                ) {
+                    return $this->returnAsJSON($request, $response, ['success' => false, 'message' => 'Record already exists']);
+                }
+            }
+            $record = new DNSRecord([
+                'type'   => $type,
+                'target' => $params['target'],
+                'name'   => $domain
+            ]);
+
+
+            $result = $record->save();
+            if (isset($result['FTLnotrunning'])) {
+                $result['success'] = false;
+
+                return $this->returnAsJSON($request, $response, $result);
+            }
+
+            static::$existing_records[] = $record;
         }
-        $record = new DNSRecord([
-            'type'   => $type,
-            'target' => $params['target'],
-            'name'   => $params['domain']
-        ]);
 
-
-        $result = $record->save();
-        if (isset($result['FTLnotrunning'])) {
-            $result['success'] = false;
-
-            return $this->returnAsJSON($request, $response, $result);
-        }
-
-        static::$existing_records[] = $record;
 
         return $this->returnAsJSON($request, $response, ['success' => true]);
     }
@@ -138,37 +145,41 @@ class DNSControl extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws \JsonException
      */
     public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response)
     {
         $args = $request->getParsedBody();
         $name = $args['domain'];
+        $domains = array_map('trim', explode(',', $name));
         $target = $args['target'];
-        // Validate domain and IP of the domain
-        if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
-            throw new InvalidArgumentException('Invalid domain name');
-        }
-        if (
-            (!filter_var($target, FILTER_VALIDATE_DOMAIN)) &&
-            (!filter_var($target, FILTER_VALIDATE_IP))
-        ) {
-            throw new InvalidArgumentException('Invalid target');
-        }
-        $argType = $args['type'] === 'DNS' ? 'DNSLIST' : 'CNAMELIST';
-        /** @var DNSRecord $existing */
-        foreach (static::$existing_records[$argType] as $key => $existing) {
-            if ($existing->getName() === $name &&
-                $existing->getTarget() === $target
-            ) {
-                $result = $existing->delete();
-                unset(static::$existing_records[$key]);
-                break;
+        foreach ($domains as $domain) {
+            // Validate domain and IP of the domain
+            if (!filter_var($name, FILTER_VALIDATE_DOMAIN)) {
+                throw new InvalidArgumentException('Invalid domain name');
             }
-        }
-        if (isset($result['FTLnotrunning'])) {
-            $result['success'] = false;
+            if (
+                (!filter_var($target, FILTER_VALIDATE_DOMAIN)) &&
+                (!filter_var($target, FILTER_VALIDATE_IP))
+            ) {
+                throw new InvalidArgumentException('Invalid target');
+            }
+            $argType = $args['type'] === 'DNS' ? 'DNSLIST' : 'CNAMELIST';
+            /** @var DNSRecord $existing */
+            foreach (static::$existing_records[$argType] as $key => $existing) {
+                if ($existing->getName() === $name &&
+                    $existing->getTarget() === $target
+                ) {
+                    $result = $existing->delete();
+                    unset(static::$existing_records[$key]);
+                    break;
+                }
+            }
+            if (isset($result['FTLnotrunning'])) {
+                $result['success'] = false;
 
-            return $this->returnAsJSON($request, $response, $result);
+                return $this->returnAsJSON($request, $response, $result);
+            }
         }
 
         return $this->returnAsJSON($request, $response, ['success' => true]);
@@ -178,6 +189,7 @@ class DNSControl extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
+     * @throws \JsonException
      */
     public function getAsJSON(ServerRequestInterface $request, ResponseInterface $response)
     {

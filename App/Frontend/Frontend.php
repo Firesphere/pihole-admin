@@ -22,7 +22,7 @@ class Frontend
         13 => 'NS',
         14 => 'OTHER',
         15 => 'SVCB',
-        16 => 'HTTPS'
+        16 => 'HTTPS',
     ];
     /**
      * @var array|false
