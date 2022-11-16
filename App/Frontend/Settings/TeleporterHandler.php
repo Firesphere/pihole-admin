@@ -33,7 +33,7 @@ class TeleporterHandler extends Settings
 
     public function __construct(ContainerInterface $container)
     {
-        $this->gravity = new SQLiteDB('GRAVITY', SQLITE3_OPEN_READONLY);
+        $this->gravity = new SQLiteDB('GRAVITY', SQLITE3_OPEN_READWRITE);
         parent::__construct($container);
     }
 
@@ -63,22 +63,22 @@ class TeleporterHandler extends Settings
         }
 
         $dataSets = [
-            ['whitelist.exact.json', $this->exportTable('domainlist', SQLiteDB::LISTTYPE_WHITELIST)],
-            ['whitelist.regex.json', $this->exportTable('domainlist', SQLiteDB::LISTTYPE_REGEX_WHITELIST)],
-            ['blacklist.exact.json', $this->exportTable('domainlist', SQLiteDB::LISTTYPE_BLACKLIST)],
-            ['blacklist.regex.json', $this->exportTable('domainlist', SQLiteDB::LISTTYPE_REGEX_BLACKLIST)],
-            ['adlist.json', $this->exportTable('adlist')],
-            ['domain_audit.json', $this->exportTable('domain_audit')],
-            ['group.json', $this->exportTable('group')],
-            ['client.json', $this->exportTable('client')],
-            ['domainlist_by_group.json', $this->exportTable('domainlist_by_group')],
-            ['adlist_by_group.json', $this->exportTable('adlist_by_group')],
-            ['client_by_group.json', $this->exportTable('client_by_group')],
-            ['/etc/pihole/setupVars.conf', $this->exportFile('/etc/pihole/', 'setupVars.conf')],
-            ['/etc/pihole/dhcp.leases', $this->exportFile('/etc/pihole/', 'dhcp.leases')],
-            ['/etc/pihole/custom.list', $this->exportFile('/etc/pihole/', 'custom.list')],
-            ['/etc/pihole/pihole-FTL.conf', $this->exportFile('/etc/pihole', 'pihole-FTL.conf')],
-            ['etc/hosts', $this->exportFile('/etc/', 'hosts')],
+            'whitelist.exact.json'        => $this->exportTable('domainlist', SQLiteDB::LISTTYPE_WHITELIST),
+            'whitelist.regex.json'        => $this->exportTable('domainlist', SQLiteDB::LISTTYPE_REGEX_WHITELIST),
+            'blacklist.exact.json'        => $this->exportTable('domainlist', SQLiteDB::LISTTYPE_BLACKLIST),
+            'blacklist.regex.json'        => $this->exportTable('domainlist', SQLiteDB::LISTTYPE_REGEX_BLACKLIST),
+            'adlist.json'                 => $this->exportTable('adlist'),
+            'domain_audit.json'           => $this->exportTable('domain_audit'),
+            'group.json'                  => $this->exportTable('group'),
+            'client.json'                 => $this->exportTable('client'),
+            'domainlist_by_group.json'    => $this->exportTable('domainlist_by_group'),
+            'adlist_by_group.json'        => $this->exportTable('adlist_by_group'),
+            'client_by_group.json'        => $this->exportTable('client_by_group'),
+            '/etc/pihole/setupVars.conf'  => $this->exportFile('/etc/pihole/', 'setupVars.conf'),
+            '/etc/pihole/dhcp.leases'     => $this->exportFile('/etc/pihole/', 'dhcp.leases'),
+            '/etc/pihole/custom.list'     => $this->exportFile('/etc/pihole/', 'custom.list'),
+            '/etc/pihole/pihole-FTL.conf' => $this->exportFile('/etc/pihole', 'pihole-FTL.conf'),
+            '/etc/hosts'                  => $this->exportFile('/etc/', 'hosts'),
         ];
 
         // Get the files for DNSMasq config
@@ -93,8 +93,8 @@ class TeleporterHandler extends Settings
 
         // Add all files to the archive
         // @todo use the built in addFromFile and addFromString method
-        foreach ($dataSets as $set) {
-            $archive->addFromString($set[0], $set[1]);
+        foreach ($dataSets as $fileName => $data) {
+            $archive->addFromString($fileName, $data);
         }
 
         $archive->compress(Phar::GZ); // Creates a gzipped copy
@@ -121,6 +121,7 @@ class TeleporterHandler extends Settings
      * @param $postData
      * @param array|UploadedFile[] $files
      * @return string|void
+     * @throws \JsonException
      */
     public function import($postData, $files)
     {
@@ -160,23 +161,18 @@ class TeleporterHandler extends Settings
 
         foreach (new RecursiveIteratorIterator($archive) as $file) {
             $fileName = $file->getFilename();
-            $fileParts = explode('.', $filename);
+            $fileParts = explode('.', $fileName);
             $fileType = end($fileParts);
+            $fileDBName = str_replace('.' . $fileType, '', $fileName);
+
             if ($fileType === 'json') {
                 $fileContents = $this->getJSONContent($file);
                 // Do the JSON thing
-                switch ($filename) {
-                    case 'blacklist.exact.json':
-                }
-            }
-
-            switch ($fileName) {
-                case 'blacklist.txt':
-                    $lines = explode("\n", $file->getContent());
-                    $dataSet = array_filter($lines);
-                    $path = $file->getRealPath();
-                    $count = $this->importTable($dataSet, $path);
-                    break;
+                $this->restoreTable($fileContents, $fileDBName, true);
+            } elseif ($fileType === 'conf') {
+                // @todo import for config files
+            } elseif (count($fileType) === 1) {
+                // @todo import for other files, e.g. /etc/hosts
             }
         }
 
@@ -321,6 +317,7 @@ class TeleporterHandler extends Settings
         if (is_null($contents)) {
             return false;
         }
+
         return $contents;
     }
 }

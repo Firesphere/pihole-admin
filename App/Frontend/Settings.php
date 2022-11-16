@@ -103,6 +103,7 @@ class Settings extends Frontend
         /** @var \SlimSession\Helper $session */
         $this->session = $container->get('session');
         $this->api = new CallAPI();
+        $this->config = new Config();
 
         $piholeConfig = Config::get('pihole');
 
