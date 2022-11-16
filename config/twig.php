@@ -8,12 +8,7 @@ use App\SysInfo;
 use Odan\Twig\TwigAssetsExtension;
 use Slim\Views\Twig;
 
-$versions = (new PiHole())->getParsedVersions();
-foreach ($versions as $key => &$value) {
-    $val = explode('-', $value);
-    $value = $val[0];
-}
-unset($value);
+
 $twig = Twig::create(__DIR__ . '/../templates');
 $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
     'path'          => __DIR__ . '/../public/cache',
@@ -21,7 +16,12 @@ $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
     'url_base_path' => 'cache/',
     'minify'        => 0,
 ]));
-
+$versions = (new PiHole())->getParsedVersions();
+foreach ($versions as $key => &$value) {
+    $val = explode('-', $value);
+    $value = $val[0];
+}
+unset($value);
 [$mem, $load, $cpu, $temp] = SysInfo::getAll();
 $globals = [
     'baseHref'      => '/',
