@@ -22,7 +22,7 @@ $app = AppFactory::create();
 $twig = require __DIR__ . '/twig.php';
 
 // Register middleware
-(require __DIR__ . '/middleware.php')($app, $twig, $config);
+(require __DIR__ . '/middleware.php')($app, $twig);
 
 require __DIR__ . '/modules.php';
 // Register routes

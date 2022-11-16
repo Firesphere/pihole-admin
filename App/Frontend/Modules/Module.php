@@ -4,15 +4,27 @@ namespace App\Frontend\Modules;
 
 class Module
 {
+    /**
+     * @var array
+     */
     protected static $modules = [];
+    /**
+     * @var int
+     */
     public $sort = 0;
 
+    /**
+     * Register a Module
+     * @param string $className
+     * @return void
+     */
     public static function registerModule($className)
     {
         static::$modules[] = $className;
     }
 
     /**
+     * Used to sort the modules
      * @param $obj
      * @return int
      */
@@ -39,12 +51,12 @@ class Module
      */
     public function getModules()
     {
-        $class = [];
+        $modules = [];
         foreach (static::$modules as $module) {
-            $class[] = new $module();
+            $modules[] = new $module();
         }
-        usort($class, [self::class, 'getSortOrder']);
+        usort($modules, [self::class, 'getSortOrder']);
 
-        return $class;
+        return $modules;
     }
 }

@@ -25,7 +25,7 @@ class DNSControl extends APIBase
     public function __construct()
     {
         if (!count(static::$existing_records)) {
-            $files = (new Config())->get('dns');
+            $files = Config::get('dns');
             foreach ($files as $key => $file) {
                 [$type] = explode('_', $key);
                 $this->readEntries($file, $type);

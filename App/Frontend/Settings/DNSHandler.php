@@ -108,7 +108,7 @@ class DNSHandler extends Settings
 
             // Validate conditional forwarding domain name (empty is okay)
             $domain = trim($postData['rev_server_domain']);
-            if (strlen((string)$domain) > 0 && !Helper::validDomain($domain)) {
+            if ((string)$domain !== '' && !Helper::validDomain($domain)) {
                 $error .= 'Conditional forwarding domain name ("' . htmlspecialchars($domain) . '") is invalid!<br>';
             }
 

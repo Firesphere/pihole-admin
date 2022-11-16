@@ -26,9 +26,8 @@ class SQLiteDB
 
     private function getDBLocation(string $type)
     {
-        $conf = new Config();
-        $config = $conf->get('db');
-        $ftlConfig = $conf->get('ftl');
+        $config = Config::get('db');
+        $ftlConfig = Config::get('ftl');
 
         return $ftlConfig[$type . 'DB'] ?? $config[$type];
     }

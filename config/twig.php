@@ -3,6 +3,7 @@
 // Create Twig
 use App\API\FTL;
 use App\API\PiHole;
+use App\Helper\Config;
 use App\SysInfo;
 use Odan\Twig\TwigAssetsExtension;
 use Slim\Views\Twig;
@@ -36,11 +37,12 @@ $globals = [
     'MemUse'        => number_format($mem, 4),
     'CPUCount'      => $cpu,
     'Temperature'   => $temp,
-    'Menu'          => (require __DIR__ . '/menu.php')
+    'Menu'          => (require __DIR__ . '/menu.php'),
+    'Theme'         => Config::get('pihole.WEBTHEME', 'default-auto')
 ];
 $twigEnv = $twig->getEnvironment();
 foreach ($globals as $key => $value) {
     $twigEnv->addGlobal($key, $value);
 }
-$twigEnv->addGlobal('Theme', (new \App\Helper\Config())->get('pihole')['WEBTHEME'] ?? 'default-auto');
+
 return $twig;

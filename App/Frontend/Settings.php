@@ -10,6 +10,7 @@ use App\Frontend\Settings\DNSHandler;
 use App\Frontend\Settings\LoggingHandler;
 use App\Frontend\Settings\PrivacyHandler;
 use App\Frontend\Settings\WebUIHandler;
+use App\Helper\Config;
 use App\Helper\Helper;
 use App\Helper\QR\QRMath;
 use App\Helper\QRCode;
@@ -103,7 +104,7 @@ class Settings extends Frontend
         $this->session = $container->get('session');
         $this->api = new CallAPI();
 
-        $piholeConfig = $this->config->get('pihole');
+        $piholeConfig = Config::get('pihole');
 
         $IPv4txt = $this->getIPv4txt();
         $FTLPid = Helper::pidOf('pihole-FTL');
@@ -211,11 +212,11 @@ class Settings extends Frontend
                 break;
                 // Set DHCP
             case 'DHCP':
-                DHCPHandler::handleAction($postData, $this->config, $success, $error);
+                DHCPHandler::handleAction($postData, $success, $error);
                 break;
                 // set Privacy level
             case 'privacyLevel':
-                PrivacyHandler::handleAction($postData, $this->config, $success, $error);
+                PrivacyHandler::handleAction($postData, $success, $error);
                 break;
                 // Flush network table
             case 'flusharp':
@@ -260,7 +261,7 @@ class Settings extends Frontend
 
     protected function getDHCPSettings()
     {
-        $piholeConf = $this->config->get('pihole');
+        $piholeConf = Config::get('pihole');
 
         return [
             'Active'        => (isset($piholeConf['DHCP_ACTIVE']) && $piholeConf['DHCP_ACTIVE'] === 1),
@@ -278,11 +279,11 @@ class Settings extends Frontend
 
     protected function getDNSSettings()
     {
-        $piholeConf = $this->config->get('pihole');
+        $piholeConf = Config::get('pihole');
 
         $presetServers = $this->config->getDNSServerList();
         $activeServers = $this->getActiveDNSServers($presetServers);
-        $ftlConf = $this->config->get('ftl');
+        $ftlConf = Config::get('ftl');
         $ratelimit = 1000;
         $ratelimitinterval = 60;
         if (isset($ftlConf['RATE_LIMIT'])) {
@@ -309,7 +310,7 @@ class Settings extends Frontend
 
     protected function getAPISettings()
     {
-        $config = $this->config->get('pihole');
+        $config = Config::get('pihole');
         $activeTheme = $config['WEBTHEME'] ?? '';
         $activeTheme = isset(static::$themes[$activeTheme]) ? $activeTheme : 'default-auto';
 
@@ -326,7 +327,7 @@ class Settings extends Frontend
 
     protected function getPrivacySettings()
     {
-        $config = $this->config->get('pihole');
+        $config = Config::get('pihole');
         $privacyLevel = (int)($config['PRIVACYLEVEL'] ?? 0);
 
         return [
@@ -359,7 +360,7 @@ class Settings extends Frontend
 
     private function getActiveDNSServers($presetServers)
     {
-        $servers = $this->config->get('pihole');
+        $servers = Config::get('pihole');
         $preset = [];
         $custom = [];
 
