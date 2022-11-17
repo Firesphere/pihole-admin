@@ -203,15 +203,13 @@ class TeleporterHandler extends Settings
                     }
                     $fileParts = explode($fullFilePath, $path);
                     $dataSet = array_filter(explode("\n", $fileContents));
-                    if ($fileParts[1] === '/etc/hosts') {
-                        $newFile = @fopen($fileParts[1], 'ab');
-                    } else {
-                        $this->backupLocalFile($fileParts[1]);
+                    if ($fileParts[1] !== '/etc/hosts') { // NEVER empty/overwrite /etc/hosts
+                        $this->backupLocalFile($fileParts[1], $flush);
                         array_walk($dataSet, static function (&$item, $key) {
                             $item = substr($item, 0, 253) . "\n";
                         });
-                        $newFile = @fopen($fileParts[1], 'wb');
                     }
+                    $newFile = @fopen($fileParts[1], 'ab');
                     if ($newFile !== false) {
                         foreach ($dataSet as $line) {
                             fwrite($newFile, $line);
@@ -243,13 +241,15 @@ class TeleporterHandler extends Settings
      * @param $file
      * @return void
      */
-    private function backupLocalFile($file)
+    private function backupLocalFile($file, $flush)
     {
         $localFile = @fopen($file, 'rb+');
         if ($localFile !== false) {
             $backup = sprintf('%s-%s.backup', $localFile, date('YmdHis'));
             copy($localFile, $backup);
-            ftruncate($localFile, 0);
+            if ($flush) {
+                ftruncate($localFile, 0);
+            }
             fclose($localFile);
         }
     }
