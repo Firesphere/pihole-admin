@@ -67,8 +67,10 @@
                         <h4 class="modal-title" id="apiTokenModalHeaderLabel">API Token</h4>
                     </div>
                     <div class="modal-body">
-                        <pre><iframe id="apiTokenIframe" name="apiToken_iframe"
-                                     src="scripts/pi-hole/php/api_token.php"></iframe></pre>
+                        {# @todo implement the API token and QR properly #}
+                        <div class="onmyown">
+                        {{ QRFrame|raw }}
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" data-dismiss="modal" class="btn btn-default">Close</button>
@@ -176,7 +178,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <p>CPU Temperature Unit</p>
+                        <label for="tempunit-selector">CPU Temperature Unit</label>
                     </div>
                     <div class="col-md-6">
                         <select id="tempunit-selector">

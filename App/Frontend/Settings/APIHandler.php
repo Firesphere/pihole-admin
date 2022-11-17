@@ -45,7 +45,7 @@ class APIHandler extends Settings
         }
 
         // Set Top Lists options
-        if (!strlen($error)) {
+        if (!strlen((string)$error)) {
             // All entries are okay
             PiHole::execute('-a setexcludedomains ' . $domainlist);
             PiHole::execute('-a setexcludeclients ' . $clientlist);

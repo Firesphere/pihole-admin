@@ -6,6 +6,9 @@ use App\Helper\Config;
 
 class Frontend
 {
+    /**
+     * @var string[]
+     */
     protected static $querytypes = [
         1  => 'A',
         2  => 'AAAA',
@@ -22,7 +25,7 @@ class Frontend
         13 => 'NS',
         14 => 'OTHER',
         15 => 'SVCB',
-        16 => 'HTTPS'
+        16 => 'HTTPS',
     ];
     /**
      * @var array|false
@@ -33,8 +36,7 @@ class Frontend
 
     public function __construct()
     {
-        $this->config = new Config();
-        $this->setupVars = (new Config())->get('pihole');
+        $this->setupVars = Config::get('pihole');
     }
 
     /**

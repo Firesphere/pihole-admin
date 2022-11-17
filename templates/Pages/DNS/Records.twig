@@ -15,8 +15,9 @@
                 {{ include('Partials/DNS/Form.twig', {
                     'Title': 'Add a new domain/IP combination',
                     'Origin': 'Domain',
+                    'OriginPlaceholder': 'Domain or comma-separated list of domains',
                     'Target': 'IP Address',
-                    'Placeholder': 'Associated IP Address',
+                    'TargetPlaceholder': 'Associated IP Address',
                     'fieldtype': 'text',
                 }) }}
                 <div class="box-footer clearfix">

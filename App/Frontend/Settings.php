@@ -10,12 +10,16 @@ use App\Frontend\Settings\DNSHandler;
 use App\Frontend\Settings\LoggingHandler;
 use App\Frontend\Settings\PrivacyHandler;
 use App\Frontend\Settings\WebUIHandler;
+use App\Helper\Config;
 use App\Helper\Helper;
+use App\Helper\QR\QRCode;
+use App\Helper\QR\QRMath;
 use App\PiHole;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -99,8 +103,9 @@ class Settings extends Frontend
         /** @var \SlimSession\Helper $session */
         $this->session = $container->get('session');
         $this->api = new CallAPI();
+        $this->config = new Config();
 
-        $piholeConfig = $this->config->get('pihole');
+        $piholeConfig = Config::get('pihole');
 
         $IPv4txt = $this->getIPv4txt();
         $FTLPid = Helper::pidOf('pihole-FTL');
@@ -136,15 +141,9 @@ class Settings extends Frontend
 
         $this->session->delete('SETTINGS_SUCCESS');
         $this->session->delete('SETTINGS_ERROR');
-        foreach ($this->menuItems['Tabs'] as $key => &$value) {
-            if ($value['Slug'] === $activeTab) {
-                $value['Classes'] = 'active in ';
-                $value['Expanded'] = true;
-            }
-            $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
-            $value['Template'] = $view->getEnvironment()->render($template, $this->settings[$key]);
-        }
-        unset($value);
+        $environment = $view->getEnvironment();
+        $this->renderPartials($activeTab, $environment);
+
         $this->settings['MenuItems'] = $this->menuItems;
 
 
@@ -214,11 +213,11 @@ class Settings extends Frontend
                 break;
                 // Set DHCP
             case 'DHCP':
-                DHCPHandler::handleAction($postData, $this->config, $success, $error);
+                DHCPHandler::handleAction($postData, $success, $error);
                 break;
                 // set Privacy level
             case 'privacyLevel':
-                PrivacyHandler::handleAction($postData, $this->config, $success, $error);
+                PrivacyHandler::handleAction($postData, $success, $error);
                 break;
                 // Flush network table
             case 'flusharp':
@@ -263,7 +262,7 @@ class Settings extends Frontend
 
     protected function getDHCPSettings()
     {
-        $piholeConf = $this->config->get('pihole');
+        $piholeConf = Config::get('pihole');
 
         return [
             'Active'        => (isset($piholeConf['DHCP_ACTIVE']) && $piholeConf['DHCP_ACTIVE'] === 1),
@@ -281,11 +280,11 @@ class Settings extends Frontend
 
     protected function getDNSSettings()
     {
-        $piholeConf = $this->config->get('pihole');
+        $piholeConf = Config::get('pihole');
 
         $presetServers = $this->config->getDNSServerList();
         $activeServers = $this->getActiveDNSServers($presetServers);
-        $ftlConf = $this->config->get('ftl');
+        $ftlConf = Config::get('ftl');
         $ratelimit = 1000;
         $ratelimitinterval = 60;
         if (isset($ftlConf['RATE_LIMIT'])) {
@@ -312,7 +311,7 @@ class Settings extends Frontend
 
     protected function getAPISettings()
     {
-        $config = $this->config->get('pihole');
+        $config = Config::get('pihole');
         $activeTheme = $config['WEBTHEME'] ?? '';
         $activeTheme = isset(static::$themes[$activeTheme]) ? $activeTheme : 'default-auto';
 
@@ -329,39 +328,40 @@ class Settings extends Frontend
 
     protected function getPrivacySettings()
     {
-        $config = $this->config->get('pihole');
+        $config = Config::get('pihole');
         $privacyLevel = (int)($config['PRIVACYLEVEL'] ?? 0);
+
         return [
             'PrivacyLevels' => [
                 0 => [
-                    'Label' => 'Show everything and record everything',
+                    'Label'    => 'Show everything and record everything',
                     'Selected' => $privacyLevel === 0,
-                    'Note' => 'Gives maximum amount of statistics',
+                    'Note'     => 'Gives maximum amount of statistics',
                 ],
                 1 => [
                     'Selected' => $privacyLevel === 1,
-                    'Label' => 'Hide domains: Display and store all domains as "hidden"',
-                    'Note' => 'This disables the Top Permitted Domains and Top Blocked Domains tables on the dashboard'
+                    'Label'    => 'Hide domains: Display and store all domains as "hidden"',
+                    'Note'     => 'This disables the Top Permitted Domains and Top Blocked Domains tables on the dashboard'
                 ],
                 2 => [
                     'Selected' => $privacyLevel === 2,
-                    'Label' => 'Hide domains and clients: Display and store all domains as "hidden" and all clients as "0.0.0.0"',
-                    'Note' => 'This disables all tables on the dashboard'
+                    'Label'    => 'Hide domains and clients: Display and store all domains as "hidden" and all clients as "0.0.0.0"',
+                    'Note'     => 'This disables all tables on the dashboard'
                 ],
                 3 => [
                     'Selected' => $privacyLevel === 3,
-                    'Label' => 'Anonymous mode: This disables basically everything except the live anonymous statistics',
-                    'Note' => 'No history is saved at all to the database, and nothing is shown in the query log. Also, there are no top item lists.'
+                    'Label'    => 'Anonymous mode: This disables basically everything except the live anonymous statistics',
+                    'Note'     => 'No history is saved at all to the database, and nothing is shown in the query log. Also, there are no top item lists.'
                 ]
             ],
-            'PrivacyLevel' => $privacyLevel,
-            'QueryLogging' => $config['QUERY_LOGGING'] ?? true,
+            'PrivacyLevel'  => $privacyLevel,
+            'QueryLogging'  => $config['QUERY_LOGGING'] ?? true,
         ];
     }
 
     private function getActiveDNSServers($presetServers)
     {
-        $servers = $this->config->get('pihole');
+        $servers = Config::get('pihole');
         $preset = [];
         $custom = [];
 
@@ -408,5 +408,35 @@ class Settings extends Frontend
         }
 
         return $return;
+    }
+
+    /**
+     * @param mixed $activeTab
+     * @param Environment $environment
+     * @return array|mixed
+     * @throws LoaderError
+     * @throws RuntimeError
+     * @throws SyntaxError
+     */
+    protected function renderPartials(mixed $activeTab, Environment $environment)
+    {
+        foreach ($this->menuItems['Tabs'] as $key => &$value) {
+            if ($value['Slug'] === $activeTab) {
+                $value['Classes'] = 'active in ';
+                $value['Expanded'] = true;
+            }
+            if ($value['Slug'] === 'api') { // QR Token modal
+                QRMath::init();
+                $qrCode = QRCode::getMinimumQRCode($this->session->get('token'), QR_ERROR_CORRECT_LEVEL_Q);
+                $qr = [
+                    'APIQRCode' => $qrCode->printSVG(10),
+                    'APIToken'  => $this->session->get('token')
+                ];
+                $rendered = $environment->render('Partials/Settings/APIToken.twig', $qr);
+                $this->settings['API']['QRFrame'] = $rendered;
+            }
+            $template = sprintf('Partials/Settings/Tabs/%s.twig', $key);
+            $value['Template'] = $environment->render($template, $this->settings[$key]);
+        }
     }
 }

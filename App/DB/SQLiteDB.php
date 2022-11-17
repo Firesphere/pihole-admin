@@ -26,9 +26,8 @@ class SQLiteDB
 
     private function getDBLocation(string $type)
     {
-        $conf = new Config();
-        $config = $conf->get('db');
-        $ftlConfig = $conf->get('ftl');
+        $config = Config::get('db');
+        $ftlConfig = Config::get('ftl');
 
         return $ftlConfig[$type . 'DB'] ?? $config[$type];
     }
@@ -36,6 +35,29 @@ class SQLiteDB
     public function __destruct()
     {
         $this->db->close();
+    }
+
+    private function getDBType($value)
+    {
+        $type = gettype($value);
+        switch ($type) {
+            case 'integer':
+                $sqltype = SQLITE3_INTEGER;
+                break;
+            case 'string':
+                $sqltype = SQLITE3_TEXT;
+                break;
+            case 'NULL':
+                $sqltype = SQLITE3_NULL;
+                break;
+            case 'double':
+                $sqltype = SQLITE3_FLOAT;
+                break;
+            default:
+                $sqltype = 'UNK';
+        }
+
+        return $sqltype;
     }
 
     /**
@@ -51,7 +73,8 @@ class SQLiteDB
         if (count($params)) {
             $prepared = $this->db->prepare($query);
             foreach ($params as $key => $value) {
-                $prepared->bindValue($key, $value);
+                $type = $this->getDBType($value);
+                $prepared->bindValue($key, $value, $type);
             }
 
             return $prepared->execute();

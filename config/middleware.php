@@ -6,7 +6,7 @@ use Slim\Middleware\Session;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
-return static function (App $app, Twig $twig, Config $config) {
+return static function (App $app, Twig $twig) {
     // Parse json, form data and xml
     $app->addBodyParsingMiddleware();
 
@@ -31,7 +31,8 @@ return static function (App $app, Twig $twig, Config $config) {
      * @param bool $logErrorDetails -> Display error details in error log
      * Note: This middleware should be added last. It will not handle any exceptions/errors
      * for middleware added after it.
-     */    $production = $config->get('production');
+     */
+    $production = Config::get('production');
     // Add error handling middleware.
     $displayErrorDetails = !$production;
     $logErrors = $production;

@@ -7,31 +7,14 @@ class Config
     /**
      * @var []
      */
-    protected $data;
-    protected $default;
+    public static $data;
+    protected static $default;
 
     public function __construct()
     {
-        $this->data = require __DIR__ . '/../../config/settings.php';
-    }
-
-    public function get($key, $default = null)
-    {
-        $this->default = $default;
-
-        $segments = explode('.', $key);
-        $data = $this->data;
-
-        foreach ($segments as $segment) {
-            if (isset($data[$segment])) {
-                $data = $data[$segment];
-            } else {
-                $data = $this->default;
-                break;
-            }
+        if (!self::$data) {
+            self::$data = require __DIR__ . '/../../config/settings.php';
         }
-
-        return $data;
     }
 
     public function getDNSServerList()
@@ -43,7 +26,7 @@ class Config
             3 => 'v6_1',
             4 => 'v6_2'
         ];
-        $handle = @fopen($this->data['dns']['SERVERS_CONF'], 'rb');
+        $handle = @fopen(self::$data['dns']['SERVERS_CONF'], 'rb');
         if ($handle) {
             while ($line = fgets($handle)) {
                 $line = explode(';', rtrim($line));
@@ -65,13 +48,13 @@ class Config
     public function getDynamicLeases()
     {
         // Read leases file
-        $dhcp_leases = [];
-        $dhcpleases = @fopen($this->data['dns']['DYNAMIC_LEASES_CONF'], 'rb');
-        if (!is_resource($dhcpleases)) {
+        $dhcpLeases = [];
+        $dhcpFile = @fopen(self::$data['dns']['DYNAMIC_LEASES_CONF'], 'rb');
+        if (!is_resource($dhcpFile)) {
             return [];
         }
 
-        while ($dhcplease = fgets($dhcpleases)) {
+        while ($dhcplease = fgets($dhcpFile)) {
             [$time, $hwaddr, $ip, $host, $clid] = explode(' ', trim($dhcplease));
             if ($clid) {
                 $time = (int)$time;
@@ -94,7 +77,7 @@ class Config
 
                 $order = bin2hex(inet_pton($ip));
 
-                $dhcp_leases[] = [
+                $dhcpLeases[] = [
                     'time'   => $time,
                     'hwaddr' => strtoupper($hwaddr),
                     'IP'     => $ip,
@@ -106,46 +89,70 @@ class Config
             }
         }
 
-        return $dhcp_leases;
+        return $dhcpLeases;
     }
 
     public function getStaticLeases()
     {
-        $dhcp_static_leases = [];
-        $dnsConf = $this->get('dns');
+        $staticDHCPLeases = [];
+        $dnsConf = self::get('dns');
 
         if (!file_exists($dnsConf['STATIC_LEASES_CONF']) || !is_readable($dnsConf['STATIC_LEASES_CONF'])) {
             return false;
         }
 
-        $dhcpstatic = @fopen($dnsConf['STATIC_LEASES_CONF'], 'rb');
-        if (!is_resource($dhcpstatic)) {
+        $staticDHCPFile = @fopen($dnsConf['STATIC_LEASES_CONF'], 'rb');
+        if (!is_resource($staticDHCPFile)) {
             return false;
         }
 
-        while (!feof($dhcpstatic)) {
+        while (!feof($staticDHCPFile)) {
             // Remove any possibly existing variable with this name
             $mac = '';
             $one = '';
             $two = '';
-            sscanf(trim(fgets($dhcpstatic)), 'dhcp-host=%[^,],%[^,],%[^,]', $mac, $one, $two);
+            sscanf(trim(fgets($staticDHCPFile)), 'dhcp-host=%[^,],%[^,],%[^,]', $mac, $one, $two);
             if ($mac !== '' && filter_var($mac, FILTER_VALIDATE_MAC)) {
-                if (Helper::validIP($one) && $two === '') {
+                if ($two === '' && Helper::validIP($one)) {
                     // dhcp-host=mac,IP - no HOST
-                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => ''];
-                } elseif (strlen($two) == 0) {
+                    $staticDHCPLeases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => ''];
+                } elseif ((string)$two === "") {
                     // dhcp-host=mac,hostname - no IP
-                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => '', 'host' => $one];
+                    $staticDHCPLeases[] = ['hwaddr' => $mac, 'IP' => '', 'host' => $one];
                 } else {
                     // dhcp-host=mac,IP,hostname
-                    $dhcp_static_leases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => $two];
+                    $staticDHCPLeases[] = ['hwaddr' => $mac, 'IP' => $one, 'host' => $two];
                 }
             } elseif (Helper::validIP($one) && Helper::validDomain($mac)) {
                 // dhcp-host=hostname,IP - no MAC
-                $dhcp_static_leases[] = ['hwaddr' => '', 'IP' => $one, 'host' => $mac];
+                $staticDHCPLeases[] = ['hwaddr' => '', 'IP' => $one, 'host' => $mac];
             }
         }
 
-        return $dhcp_static_leases;
+        return $staticDHCPLeases;
+    }
+
+    /**
+     * Get a config setting
+     * @param string $key
+     * @param mixed $default
+     * @return mixed|null
+     */
+    public static function get($key, $default = null)
+    {
+        $data = self::$data;
+
+        $segments = explode('.', $key);
+
+        foreach ($segments as $segment) {
+            if (isset($data[$segment])) {
+                $data = $data[$segment];
+            } else {
+                $data = $default;
+                break;
+            }
+        }
+
+        return $data;
     }
 }

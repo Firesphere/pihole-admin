@@ -383,6 +383,10 @@ class FTL extends APIBase
         $offset = $params['offset'] ?? -1;
         $lines = [];
         if ($offset > 0) {
+            fseek($file, 0, SEEK_END);
+            if ($offset > ftell($file)) {
+                $offset = 0;
+            }
             // Seeks on the file pointer where we want to continue reading is known
             fseek($file, $offset);
             $ftell = ftell($file);

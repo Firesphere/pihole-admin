@@ -15,7 +15,7 @@ class PiHole
      */
     public static function getConfig()
     {
-        return (new Config())->get('pihole');
+        return Config::get('pihole');
     }
 
     public static function execute($command)

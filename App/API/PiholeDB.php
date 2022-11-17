@@ -427,7 +427,7 @@ SELECT domain, count(domain)
         $query = "
 SELECT domain, count(domain) 
     FROM queries 
-    WHERE status IN (2,3,12,13,14) AND $limit
+    WHERE status IN (2,3,12,13,14,17) AND $limit
     GROUP BY domain 
     ORDER BY count(domain) DESC LIMIT 20";
 
@@ -454,7 +454,10 @@ SELECT domain, count(domain)
             // Get IP addresses and host names for this device
             $res['ip'] = [];
             $res['name'] = [];
-            $network_addresses = $this->db->doQuery("SELECT ip,name FROM network_addresses WHERE network_id = :id ORDER BY lastSeen DESC", [':id' => $id]);
+            $network_addresses = $this->db->doQuery(
+                "SELECT ip,name FROM network_addresses WHERE network_id = :id ORDER BY lastSeen DESC",
+                [':id' => $id]
+            );
             while ($network_address = $network_addresses->fetchArray(SQLITE3_ASSOC)) {
                 $res['ip'][] = $network_address['ip'];
                 if ($network_address['name'] !== null) {

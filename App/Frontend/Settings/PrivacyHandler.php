@@ -3,17 +3,18 @@
 namespace App\Frontend\Settings;
 
 use App\Frontend\Settings;
+use App\Helper\Config;
 use App\PiHole;
 
 class PrivacyHandler extends Settings
 {
-    public static function handleAction($postData, $config, &$success, &$error)
+    public static function handleAction($postData, &$success, &$error)
     {
         $level = (int)$postData['privacylevel'];
         $change = -2;
         if ($level >= 0 && $level <= 4) {
             // Check if privacylevel is already set
-            $privacylevel = (int)($config['Config']['PRIVACYLEVEL'] ?? 0);
+            $privacylevel = (int)(Config::get('ftl')['PRIVACYLEVEL'] ?? 0);
 
             // Store privacy level
             PiHole::execute('-a privacylevel ' . $level);

@@ -111,7 +111,7 @@ class Domain extends GroupPostHandler
 
         foreach ($domains as $domain) {
             // Silently skip this entry when it is empty or not a string (e.g. NULL)
-            if (!is_string($domain) || strlen($domain) == 0) {
+            if (!is_string($domain) || strlen((string)$domain) == 0) {
                 continue;
             }
 
@@ -138,7 +138,7 @@ class Domain extends GroupPostHandler
             }
 
             if (isset($postData['type']) &&
-                strlen($postData['type']) === 2 &&
+                strlen((string)$postData['type']) === 2 &&
                 $postData['type'][1] === 'W'
             ) {
                 $escapedDomain = str_replace('.', '\\.', $domain);
