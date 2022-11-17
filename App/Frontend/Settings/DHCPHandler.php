@@ -88,7 +88,7 @@ class DHCPHandler extends Settings
         }
     }
 
-    private static function addStaticDHCPLease($mac, $ip, $hostname, &$success, &$error)
+    public static function addStaticDHCPLease($mac, $ip, $hostname, &$success, &$error)
     {
         global $dhcp_static_leases;
 

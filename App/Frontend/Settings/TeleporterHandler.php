@@ -4,12 +4,13 @@ namespace App\Frontend\Settings;
 
 use App\DB\SQLiteDB;
 use App\Frontend\Settings;
+use App\PiHole;
+use FilesystemIterator;
 use Phar;
 use PharData;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use RecursiveIteratorIterator;
 use Slim\Psr7\UploadedFile;
 
 class TeleporterHandler extends Settings
@@ -33,6 +34,10 @@ class TeleporterHandler extends Settings
 
     public function __construct(ContainerInterface $container)
     {
+        if (!extension_loaded('Phar')) {
+            exit('PHP Phar extension not loaded. Exiting ungracefully');
+        }
+
         $this->gravity = new SQLiteDB('GRAVITY', SQLITE3_OPEN_READWRITE);
         parent::__construct($container);
     }
@@ -130,6 +135,7 @@ class TeleporterHandler extends Settings
         $source = $file->getFilePath();
         $mimeType = $file->getClientMediaType();
 
+        $flush = $postData['flushtables'];
         // verify the file mime type
 
         $mime_valid = in_array($mimeType, self::$valid_mimetypes);
@@ -156,64 +162,105 @@ class TeleporterHandler extends Settings
         $archive = new PharData($fullFilePath);
 
         $importedsomething = false;
-        $fullpiholerestart = false;
         $reloadsettingspage = false;
 
-        foreach (new RecursiveIteratorIterator($archive) as $file) {
-            $fileName = $file->getFilename();
-            $fileParts = explode('.', $fileName);
-            $fileType = end($fileParts);
-            $fileDBName = str_replace('.' . $fileType, '', $fileName);
 
-            if ($fileType === 'json') {
-                $fileContents = $this->getJSONContent($file);
-                // Do the JSON thing
-                $this->restoreTable($fileContents, $fileDBName, true);
-            } elseif ($fileType === 'conf') {
-                // @todo import for config files
-            } elseif (count($fileType) === 1) {
-                // @todo import for other files, e.g. /etc/hosts
+        $iterator = new \RecursiveIteratorIterator($archive, FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO);
+
+        foreach ($iterator as $path => $file) {
+            [$fileType, $fileDBName] = $this->getFileInfo($file);
+            $count = 0;
+            if (!$reloadsettingspage) {
+                $reloadsettingspage = $fileDBName === '04-pihole-static-dhcp';
             }
+
+            $fileContents = file_get_contents($file);
+            switch ($fileType) {
+                case 'json':
+                    if ($fileDBName === 'auditlog') {
+                        $fileDBName = 'domain_audit';
+                    }
+                    $fileContents = $this->getJSONContent($fileContents);
+                    // Do the JSON thing
+                    $count = $this->restoreTable($fileContents, $fileDBName, $flush);
+                    $importedsomething = true;
+                    break;
+                case 'txt': // Note, txt files don't seem to exist anymore
+                    $dataSet = array_filter(explode("\n", $fileContents));
+                    // Return early if we cannot extract the lines in the file
+                    if (!count($dataSet)) {
+                        break;
+                    }
+                    if ($fileDBName === 'wildcardblocking') {
+                        $fileDBName = 'blacklist.regex';
+                    }
+                    $count = $this->importTable($dataSet, $fileDBName, $flush, $fileDBName === 'wildcardblocking');
+                    $importedsomething = true;
+                    break;
+                default:
+                    if (empty($fileContents)) {
+                        break;
+                    }
+                    $fileParts = explode($fullFilePath, $path);
+                    $dataSet = array_filter(explode("\n", $fileContents));
+                    if ($fileParts[1] === '/etc/hosts') {
+                        $newFile = @fopen($fileParts[1], 'ab');
+                    } else {
+                        $this->backupLocalFile($fileParts[1]);
+                        array_walk($dataSet, static function (&$item, $key) {
+                            $item = substr($item, 0, 253) . "\n";
+                        });
+                        $newFile = @fopen($fileParts[1], 'wb');
+                    }
+                    if ($newFile !== false) {
+                        foreach ($dataSet as $line) {
+                            fwrite($newFile, $line);
+                        }
+                    } else {
+                        echo sprintf('Could not restore file %s<br />', $fileParts[1]);
+                    }
+
+
+                    break;
+            }
+            echo sprintf("Processed %s, ran %d records<br />", $fileDBName, $count);
         }
 
-        return '';
+        unlink($fullFilePath);
+
+        if ($importedsomething) {
+            PiHole::execute('restartdns');
+        }
+        if ($reloadsettingspage) {
+            echo "<br>\n<span data-forcereload></span>";
+        }
+        echo "Import of data done";
+        exit;
     }
 
     /**
-     * Replacing archive_insert_into_table
-     * @param $dataSet
-     * @param $path
-     * @return int|void
+     * Backup a local file that is to be overwritten/replaced
+     * @param $file
+     * @return void
      */
-    protected function importTable($dataSet, $path)
+    private function backupLocalFile($file)
     {
-        // Return early if we cannot extract the lines in the file
-        if (is_null($dataSet) || empty($dataSet)) {
-            return 0;
+        $localFile = @fopen($file, 'rb+');
+        if ($localFile !== false) {
+            $backup = sprintf('%s-%s.backup', $localFile, date('YmdHis'));
+            copy($localFile, $backup);
+            ftruncate($localFile, 0);
+            fclose($localFile);
         }
-
-        $comment = 'Imported from ' . $path;
     }
 
     /**
-     * Replacing archive_restore_table
-     * @param array $dataSet
-     * @param string $table
      * @param bool $flush
-     * @return int
+     * @param mixed $table
+     * @return void
      */
-    protected function restoreTable($dataSet, $table, $flush = false)
+    public function flushTable(mixed $table, bool $flush): void
     {
-        $field = false;
-        $listTypes = ImportQueryHelper::$listTypes;
-        $queryList = ImportQueryHelper::$queryParts;
-        if (isset($listTypes[$table])) {
-            $table = $listTypes[$table]['table'];
-            // If the field "domain" is too long later on, we need to skip the dataset
-            $queryList[$table]['type'] = $listTypes[$table]['type'];
-            $field = 'domain';
-        }
-
         if ($flush && !in_array($table, $this->flushedTables)) {
             $masterSelect = 'SELECT name FROM sqlite_master WHERE type=:tabletype AND name=:tablename';
             $result = $this->gravity->doQuery($masterSelect, [':tabletype' => 'table', ':tablename' => $table]);
@@ -223,12 +270,23 @@ class TeleporterHandler extends Settings
                 $this->flushedTables[] = $table;
             }
         }
+    }
 
+    /**
+     * @param mixed $table
+     * @param $queryList
+     * @param array $dataSet
+     * @param mixed $field
+     * @param bool $wildcardstyle
+     * @return int
+     */
+    public function insertRows(mixed $table, $queryList, array $dataSet, mixed $field, $wildcardstyle = false): int
+    {
         $query = sprintf(
             'INSERT OR IGNORE INTO "%s" %s VALUES %s;',
             $table,
-            $queryList[$table]['fields'],
-            $queryList[$table]['values'],
+            $queryList['fields'],
+            $queryList['values'],
         );
 
         $rowCount = 0;
@@ -239,13 +297,16 @@ class TeleporterHandler extends Settings
             }
 
             $queryParams = [];
+            if ($wildcardstyle) {
+                $row[$field] = '(\\.|^)' . str_replace('.', '\\.', $row[$field]) . '$';
+            }
             foreach ($row as $key => $value) {
                 $queryParams[':' . $key] = $value;
             }
             // Make sure it's set properly _after_ the data is put in the array.
             // And of course, if it's needed.
-            if ($queryList[$table]['type'] >= 0) {
-                $queryParams[':type'] = $queryList[$table]['type'];
+            if ($queryList['type'] >= 0) {
+                $queryParams[':type'] = $queryList['type'];
             }
             $this->gravity->doQuery($query, $queryParams);
 
@@ -253,6 +314,57 @@ class TeleporterHandler extends Settings
         }
 
         return $rowCount;
+    }
+
+    /**
+     * Replacing archive_insert_into_table
+     * @param $dataSet
+     * @param $table
+     * @param bool $flush
+     * @param bool $wildcardstyle
+     * @return int|void
+     */
+    protected function importTable($dataSet, $table, $flush = false, $wildcardstyle = false)
+    {
+        $listTypes = ImportQueryHelper::$listTypes;
+        $queryList = ImportQueryHelper::$queryParts;
+        $field = false;
+        if (isset($listTypes[$table])) {
+            $table = $listTypes[$table]['table'];
+            // If the field "domain" is too long later on, we need to skip the dataset
+            $queryList[$table]['type'] = $listTypes[$table]['type'];
+            $field = 'domain';
+        }
+
+        $this->flushTable($table, $flush);
+
+        // Add domains to requested table
+        return $this->insertRows($table, $queryList[$table], $dataSet, $field, $wildcardstyle);
+    }
+
+    /**
+     * Replacing archive_restore_table
+     * @param array $dataSet
+     * @param string $table
+     * @param bool $flush
+     * @return int
+     */
+    protected function restoreTable($dataSet, $table, $flush = false, $wildcardstyle = false)
+    {
+        $field = false;
+        $listTypes = ImportQueryHelper::$listTypes;
+        $queryList = ImportQueryHelper::$queryParts;
+        if (isset($listTypes[$table])) {
+            $originalTable = $table;
+            $table = $listTypes[$table]['table'];
+            $queryList[$table]['type'] = $listTypes[$originalTable]['type'];
+            // If the field "domain" is too long later on, we need to skip the dataset
+            $field = 'domain';
+        }
+
+        $this->flushTable($table, $flush);
+
+        return $this->insertRows($table, $queryList[$table], $dataSet, $field, $wildcardstyle);
     }
 
     /**
@@ -304,20 +416,33 @@ class TeleporterHandler extends Settings
      * @return false|array
      * @throws \JsonException
      */
-    private function getJSONContent($file)
+    private function getJSONContent($contents)
     {
-        $json = file_get_contents($file);
         // Return early if we cannot extract the JSON string
-        if (is_null($json)) {
+        if (is_null($contents)) {
             return false;
         }
 
-        $contents = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        $contents = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         // Return early if we cannot decode the JSON string
         if (is_null($contents)) {
             return false;
         }
 
         return $contents;
+    }
+
+    /**
+     * @param mixed $file
+     * @return array
+     */
+    public function getFileInfo(mixed $file): array
+    {
+        $fileName = $file->getFilename();
+        $fileParts = explode('.', $fileName);
+        $fileType = end($fileParts);
+        $fileDBName = str_replace('.' . $fileType, '', $fileName);
+
+        return [$fileType, $fileDBName];
     }
 }

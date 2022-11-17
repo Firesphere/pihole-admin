@@ -16,13 +16,9 @@
 //
 //---------------------------------------------------------------------
 
-namespace App\Helper;
+namespace App\Helper\QR;
 
-use App\Helper\QR\QR8BitByte;
-use App\Helper\QR\QRAlphaNum;
-use App\Helper\QR\QRBitBuffer;
-use App\Helper\QR\QRKanji;
-use App\Helper\QR\QRRSBlock;
+use App\Helper\QR;
 
 class QRCode
 {
@@ -38,9 +34,9 @@ class QRCode
 
     public function __construct($typeNumber = 1, $errorCorrectLevel = QR_ERROR_CORRECT_LEVEL_H, $qrDataList = [])
     {
-        $this->typeNumber = 1;
-        $this->errorCorrectLevel = QR_ERROR_CORRECT_LEVEL_H;
-        $this->qrDataList = [];
+        $this->typeNumber = $typeNumber;
+        $this->errorCorrectLevel = $errorCorrectLevel;
+        $this->qrDataList = $qrDataList;
     }
 
     public static function getMinimumQRCode($data, $errorCorrectLevel)

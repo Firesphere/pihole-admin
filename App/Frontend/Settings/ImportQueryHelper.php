@@ -69,6 +69,14 @@ class ImportQueryHelper
             'table' => 'domainlist',
             'type'  => SQLiteDB::LISTTYPE_BLACKLIST
         ],
+        'whitelist.exact' => [
+            'table' => 'domainlist',
+            'type'  => SQLiteDB::LISTTYPE_WHITELIST
+        ],
+        'blacklist.exact' => [
+            'table' => 'domainlist',
+            'type'  => SQLiteDB::LISTTYPE_BLACKLIST
+        ],
         'whitelist.regex' => [
             'table' => 'domainlist',
             'type'  => SQLiteDB::LISTTYPE_REGEX_WHITELIST

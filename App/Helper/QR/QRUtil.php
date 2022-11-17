@@ -3,7 +3,6 @@
 namespace App\Helper\QR;
 
 use App\Helper\QR;
-use App\Helper\QRCode;
 
 class QRUtil
 {
