@@ -31,7 +31,7 @@ Todos matching Pi-hole:
   - [x] DHCP
   - [x] API/Web interface
   - [x] Privacy
-  - [ ] Teleporter
+  - [x] Teleporter
 - Login/security
 
 Todos - Additional
