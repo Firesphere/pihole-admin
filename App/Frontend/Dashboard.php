@@ -7,11 +7,13 @@ use App\Frontend\Modules\ModuleInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
+use SlimSession\Helper;
 
 class Dashboard extends Frontend
 {
     public function index(RequestInterface $request, ResponseInterface $response)
     {
+        $session = new Helper();
         $modules = (new Module())->getModules();
         $twig = Twig::fromRequest($request);
         $this->menuItems['Dashboard'] = 'active';

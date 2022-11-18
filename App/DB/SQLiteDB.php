@@ -14,6 +14,8 @@ class SQLiteDB
     public const LISTTYPE_REGEX_WHITELIST = 2;
     public const LISTTYPE_REGEX_BLACKLIST = 3;
 
+    private $mode;
+
     /**
      * @var SQLite3
      */
@@ -21,6 +23,7 @@ class SQLiteDB
 
     public function __construct($type, $mode = SQLITE3_OPEN_READONLY)
     {
+        $this->mode = $mode;
         $this->db = new SQLite3($this->getDBLocation($type), $mode);
     }
 

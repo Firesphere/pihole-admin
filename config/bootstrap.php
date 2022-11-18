@@ -3,6 +3,7 @@
 use App\Helper\Config;
 use DI\Container;
 use Slim\Factory\AppFactory;
+use Slim\Middleware\Session;
 use SlimSession\Helper;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -10,11 +11,14 @@ require __DIR__ . '/../vendor/autoload.php';
 $container = new Container();
 
 $config = new Config();
+
 // Register globally to app
 $container->set('session', function () {
-    return new Helper();
+    return new \SlimSession\Helper();
 });
+\Slim\Factory\AppFactory::setContainer($container);
 AppFactory::setContainer($container);
+
 $app = AppFactory::create();
 
 //$app->setBasePath('/pihole-admin');
@@ -30,4 +34,7 @@ require __DIR__ . '/modules.php';
 
 require __DIR__ . '/qr.php';
 // Get versions
+
+$auth = new \App\Auth\Auth($container);
+
 return $app;

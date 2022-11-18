@@ -15,7 +15,6 @@ use App\Helper\Helper;
 use App\Helper\QR\QRCode;
 use App\Helper\QR\QRMath;
 use App\PiHole;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Views\Twig;
@@ -26,11 +25,6 @@ use Twig\Error\SyntaxError;
 
 class Settings extends Frontend
 {
-    /**
-     * @var \SlimSession\Helper
-     */
-    private $session;
-
     protected $settings = [];
 
     protected $menuItems = [
@@ -97,11 +91,10 @@ class Settings extends Frontend
      */
     private $api;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct()
     {
         parent::__construct();
         /** @var \SlimSession\Helper $session */
-        $this->session = $container->get('session');
         $this->api = new CallAPI();
         $this->config = new Config();
 
