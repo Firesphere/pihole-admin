@@ -53,8 +53,12 @@ class Migrate
             $migrations = fopen(__DIR__ . '/Migrations/up/' . $file, 'rb');
             while ($migration = fgets($migrations)) {
                 [$table, $query] = explode(':', $migration);
-                (new SQLiteDB($table, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE))->doQuery($query);
-                echo sprintf("- Executed query\n%s\n on table %s\n", $query, $table);
+                try {
+                    (new SQLiteDB($table, SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE))->doQuery($query);
+                    echo sprintf("ii Executed query\n%s\n on table %s\n", $query, $table);
+                } catch (\Exception $e) {
+                    echo sprintf("!! Error executing query \n%s\nMessage: %s\n", $query, $e->getMessage());
+                }
             }
             fwrite($this->records, $file . "\n");
             fclose($migrations);
