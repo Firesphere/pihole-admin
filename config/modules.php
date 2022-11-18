@@ -1,7 +1,10 @@
 <?php
 
+use App\Frontend\Modules\ClientActivity;
 use App\Frontend\Modules\Module;
+use App\Frontend\Modules\Overview;
+use App\Frontend\Modules\TotalQueries;
 
-Module::registerModule(\App\Frontend\Modules\ClientActivity::class);
-Module::registerModule(\App\Frontend\Modules\Overview::class);
-Module::registerModule(\App\Frontend\Modules\TotalQueries::class);
+Module::registerModule(ClientActivity::class);
+Module::registerModule(Overview::class);
+Module::registerModule(TotalQueries::class);

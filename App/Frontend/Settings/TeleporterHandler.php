@@ -6,31 +6,31 @@ use App\DB\SQLiteDB;
 use App\Frontend\Settings;
 use App\PiHole;
 use FilesystemIterator;
+use JsonException;
 use Phar;
 use PharData;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use RecursiveIteratorIterator;
 use Slim\Psr7\UploadedFile;
 
 class TeleporterHandler extends Settings
 {
-    /**
-     * @var SQLiteDB
-     */
-    protected $gravity;
-
-    /**
-     * @var array
-     */
-    protected $flushedTables = [];
-
     protected static $valid_mimetypes = [
         'application/gzip',
         'application/tar',
         'application/x-compressed',
         'application/x-gzip'
     ];
+    /**
+     * @var SQLiteDB
+     */
+    protected $gravity;
+    /**
+     * @var array
+     */
+    protected $flushedTables = [];
 
     public function __construct(ContainerInterface $container)
     {
@@ -123,10 +123,54 @@ class TeleporterHandler extends Settings
     }
 
     /**
+     * @param string $table
+     * @param int $type
+     * @return false|string
+     * @throws JsonException
+     */
+    protected function exportTable($table, int $type = -1)
+    {
+        $queryStr = 'SELECT * FROM "%s"';
+        if ($type >= 0) {
+            $queryStr .= sprintf(" WHERE type = '%s'", $type);
+        }
+        $query = sprintf($queryStr, $table);
+
+        $results = $this->gravity->doQuery($query . ';');
+
+        // Return early without creating a file if the
+        // requested table cannot be accessed
+        if (is_null($results)) {
+            return json_encode([], JSON_THROW_ON_ERROR);
+        }
+
+        $content = [];
+        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
+            $content[] = $row;
+        }
+
+        return json_encode($content, JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @param $path
+     * @param $name
+     * @return false|string
+     */
+    protected function exportFile($path, $name)
+    {
+        if (file_exists($path . $name)) {
+            return file_get_contents($path . $name);
+        }
+
+        return '';
+    }
+
+    /**
      * @param $postData
      * @param array|UploadedFile[] $files
      * @return string|void
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function import($postData, $files)
     {
@@ -165,7 +209,7 @@ class TeleporterHandler extends Settings
         $reloadsettingspage = false;
 
 
-        $iterator = new \RecursiveIteratorIterator($archive, FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO);
+        $iterator = new RecursiveIteratorIterator($archive, FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO);
 
         foreach ($iterator as $path => $file) {
             [$fileType, $fileDBName] = $this->getFileInfo($file);
@@ -237,21 +281,63 @@ class TeleporterHandler extends Settings
     }
 
     /**
-     * Backup a local file that is to be overwritten/replaced
-     * @param $file
-     * @return void
+     * @param mixed $file
+     * @return array
      */
-    private function backupLocalFile($file, $flush)
+    public function getFileInfo(mixed $file): array
     {
-        $localFile = @fopen($file, 'rb+');
-        if ($localFile !== false) {
-            $backup = sprintf('%s-%s.backup', $localFile, date('YmdHis'));
-            copy($localFile, $backup);
-            if ($flush) {
-                ftruncate($localFile, 0);
-            }
-            fclose($localFile);
+        $fileName = $file->getFilename();
+        $fileParts = explode('.', $fileName);
+        $fileType = end($fileParts);
+        $fileDBName = str_replace('.' . $fileType, '', $fileName);
+
+        return [$fileType, $fileDBName];
+    }
+
+    /**
+     * @param $file
+     * @return false|array
+     * @throws JsonException
+     */
+    private function getJSONContent($contents)
+    {
+        // Return early if we cannot extract the JSON string
+        if (is_null($contents)) {
+            return false;
         }
+
+        $contents = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        // Return early if we cannot decode the JSON string
+        if (is_null($contents)) {
+            return false;
+        }
+
+        return $contents;
+    }
+
+    /**
+     * Replacing archive_restore_table
+     * @param array $dataSet
+     * @param string $table
+     * @param bool $flush
+     * @return int
+     */
+    protected function restoreTable($dataSet, $table, $flush = false, $wildcardstyle = false)
+    {
+        $field = false;
+        $listTypes = ImportQueryHelper::$listTypes;
+        $queryList = ImportQueryHelper::$queryParts;
+        if (isset($listTypes[$table])) {
+            $originalTable = $table;
+            $table = $listTypes[$table]['table'];
+            $queryList[$table]['type'] = $listTypes[$originalTable]['type'];
+            // If the field "domain" is too long later on, we need to skip the dataset
+            $field = 'domain';
+        }
+
+        $this->flushTable($table, $flush);
+
+        return $this->insertRows($table, $queryList[$table], $dataSet, $field, $wildcardstyle);
     }
 
     /**
@@ -343,106 +429,20 @@ class TeleporterHandler extends Settings
     }
 
     /**
-     * Replacing archive_restore_table
-     * @param array $dataSet
-     * @param string $table
-     * @param bool $flush
-     * @return int
-     */
-    protected function restoreTable($dataSet, $table, $flush = false, $wildcardstyle = false)
-    {
-        $field = false;
-        $listTypes = ImportQueryHelper::$listTypes;
-        $queryList = ImportQueryHelper::$queryParts;
-        if (isset($listTypes[$table])) {
-            $originalTable = $table;
-            $table = $listTypes[$table]['table'];
-            $queryList[$table]['type'] = $listTypes[$originalTable]['type'];
-            // If the field "domain" is too long later on, we need to skip the dataset
-            $field = 'domain';
-        }
-
-        $this->flushTable($table, $flush);
-
-        return $this->insertRows($table, $queryList[$table], $dataSet, $field, $wildcardstyle);
-    }
-
-    /**
-     * @param string $table
-     * @param int $type
-     * @return false|string
-     * @throws \JsonException
-     */
-    protected function exportTable($table, int $type = -1)
-    {
-        $queryStr = 'SELECT * FROM "%s"';
-        if ($type >= 0) {
-            $queryStr .= sprintf(" WHERE type = '%s'", $type);
-        }
-        $query = sprintf($queryStr, $table);
-
-        $results = $this->gravity->doQuery($query . ';');
-
-        // Return early without creating a file if the
-        // requested table cannot be accessed
-        if (is_null($results)) {
-            return json_encode([], JSON_THROW_ON_ERROR);
-        }
-
-        $content = [];
-        while ($row = $results->fetchArray(SQLITE3_ASSOC)) {
-            $content[] = $row;
-        }
-
-        return json_encode($content, JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * @param $path
-     * @param $name
-     * @return false|string
-     */
-    protected function exportFile($path, $name)
-    {
-        if (file_exists($path . $name)) {
-            return file_get_contents($path . $name);
-        }
-
-        return '';
-    }
-
-    /**
+     * Backup a local file that is to be overwritten/replaced
      * @param $file
-     * @return false|array
-     * @throws \JsonException
+     * @return void
      */
-    private function getJSONContent($contents)
+    private function backupLocalFile($file, $flush)
     {
-        // Return early if we cannot extract the JSON string
-        if (is_null($contents)) {
-            return false;
+        $localFile = @fopen($file, 'rb+');
+        if ($localFile !== false) {
+            $backup = sprintf('%s-%s.backup', $localFile, date('YmdHis'));
+            copy($localFile, $backup);
+            if ($flush) {
+                ftruncate($localFile, 0);
+            }
+            fclose($localFile);
         }
-
-        $contents = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        // Return early if we cannot decode the JSON string
-        if (is_null($contents)) {
-            return false;
-        }
-
-        return $contents;
-    }
-
-    /**
-     * @param mixed $file
-     * @return array
-     */
-    public function getFileInfo(mixed $file): array
-    {
-        $fileName = $file->getFilename();
-        $fileParts = explode('.', $fileName);
-        $fileType = end($fileParts);
-        $fileDBName = str_replace('.' . $fileType, '', $fileName);
-
-        return [$fileType, $fileDBName];
     }
 }

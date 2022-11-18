@@ -12,7 +12,7 @@ use App\DB\SQLiteDB;
 class ImportQueryHelper
 {
     /**
-     * @var \string[][]
+     * @var string[][]
      */
     public static $queryParts = [
         'adlist'              => [

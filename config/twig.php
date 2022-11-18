@@ -8,7 +8,6 @@ use App\SysInfo;
 use Odan\Twig\TwigAssetsExtension;
 use Slim\Views\Twig;
 
-
 $twig = Twig::create(__DIR__ . '/../templates');
 $twig->addExtension(new TwigAssetsExtension($twig->getEnvironment(), [
     'path'          => __DIR__ . '/../public/cache',

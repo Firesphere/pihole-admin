@@ -3,7 +3,6 @@
 namespace App\Auth;
 
 use App\Model\User;
-use Psr\Container\ContainerInterface;
 use Slim\Middleware\Session;
 use SlimSession\Helper;
 
@@ -16,7 +15,7 @@ class Auth
 
     public function __construct()
     {
-        /** @var \SlimSession\Helper $session */
+        /** @var Helper $session */
         $this->session = new Helper();
     }
 
@@ -36,15 +35,19 @@ class Auth
 
     public function login($username, $password)
     {
-        $user = (new User())->login($username, $password);
+        if ($user = (new User())->login($username, $password)) {
+            $this->session->set('user', $user->getId());
 
-        $this->session->set('user', $user->getId());
-        return true;
+            return $user;
+        }
+
+        return false;
     }
 
     public function logout()
     {
-        unset($_SESSION['user']);
-        session_destroy();
+        $this->session->delete('user');
+        $this->session->clear();
+        (new Session());
     }
 }

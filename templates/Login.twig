@@ -10,6 +10,7 @@
 <html lang="en">
 {% include('Partials/Head.twig') %}
 <body class="hold-transition layout-boxed login-page">
+
 <div class="box login-box">
     <section style="padding: 15px;">
         <div class="login-logo">
@@ -20,17 +21,40 @@
             </div>
         </div>
         <!-- /.login-logo -->
+        {% if error %}
+            <div class="box box-error">
+                <div class="box-header with-border">
+                    <h3 class="box-title">ERROR</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <p>Invalid credentials</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
         <div class="card">
             <div class="card-body login-card-body">
                 <div id="cookieInfo" class="panel-title text-center text-red" style="font-size: 150%" hidden>Verify that
                     cookies are allowed for <code>pi.hole</code></div>
 
-                <form action="" id="loginform" method="post">
+                <form action="login" id="loginform" method="post">
                     <div class="form-group login-options has-feedback">
+                        <div class="uname-field">
+                            <label for="loginuser">Username</label>
+                            <input type="text" id="loginuser" name="username" class="form-control"
+                                   placeholder="Username"
+                                   value="admin"
+                                   autofocus>
+                            <span class="fa fa-user form-control-feedback"></span>
+                        </div>
                         <div class="pwd-field">
+                            <label for="loginpw">Password</label>
                             <input type="password" id="loginpw" name="pw" class="form-control" placeholder="Password"
-                                   autocomplete="current-password" autofocus>
+                                   autocomplete="current-password">
                             <span class="fa fa-key form-control-feedback"></span>
                         </div>
                         <div>
@@ -39,8 +63,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn btn-primary form-control"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;&nbsp;Log
-                            in
+                        <button type="submit" class="btn btn-primary form-control">
+                            <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;&nbsp;Log in
                         </button>
                     </div>
                 </form>

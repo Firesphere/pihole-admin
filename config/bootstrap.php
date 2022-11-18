@@ -3,7 +3,6 @@
 use App\Helper\Config;
 use DI\Container;
 use Slim\Factory\AppFactory;
-use Slim\Middleware\Session;
 use SlimSession\Helper;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -14,9 +13,9 @@ $config = new Config();
 
 // Register globally to app
 $container->set('session', function () {
-    return new \SlimSession\Helper();
+    return new Helper();
 });
-\Slim\Factory\AppFactory::setContainer($container);
+
 AppFactory::setContainer($container);
 
 $app = AppFactory::create();
@@ -33,8 +32,7 @@ require __DIR__ . '/modules.php';
 (require __DIR__ . '/routes.php')($app);
 
 require __DIR__ . '/qr.php';
-// Get versions
 
-$auth = new \App\Auth\Auth($container);
+// Get versions
 
 return $app;

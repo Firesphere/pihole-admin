@@ -6,8 +6,8 @@ webserver_type: nginx-fpm
 router_http_port: "80"
 router_https_port: "443"
 xdebug_enabled: false
-additional_hostnames: []
-additional_fqdns: []
+additional_hostnames: [ ]
+additional_fqdns: [ ]
 database:
   type: mariadb
   version: "10.4"
@@ -15,7 +15,7 @@ nfs_mount_enabled: false
 mutagen_enabled: false
 use_dns_when_possible: true
 composer_version: "2"
-web_environment: []
+web_environment: [ ]
 nodejs_version: "16"
 
 # Key features of ddev's config.yaml:
@@ -107,7 +107,7 @@ composer_version: "2"
 # These values specify the destination directory for ddev ssh and the
 # directory in which commands passed into ddev exec are run.
 
-omit_containers: [db,dba]
+omit_containers: [ db,dba ]
 # Currently only these containers are supported. Some containers can also be
 # omitted globally in the ~/.ddev/global_config.yaml. Note that if you omit
 # the "db" container, several standard features of ddev that access the

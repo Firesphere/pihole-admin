@@ -6,6 +6,7 @@ use App\Helper\Config;
 use App\Helper\Helper;
 use App\Model\DNSRecord;
 use InvalidArgumentException;
+use JsonException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -78,7 +79,7 @@ class DNSControl extends APIBase
      * @param ResponseInterface $response
      * @param $args
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function addRecord(ServerRequestInterface $request, ResponseInterface $response, $args): ResponseInterface
     {
@@ -148,7 +149,7 @@ class DNSControl extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function deleteRecord(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -192,7 +193,7 @@ class DNSControl extends APIBase
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getAsJSON(ServerRequestInterface $request, ResponseInterface $response)
     {
@@ -231,7 +232,7 @@ class DNSControl extends APIBase
      * @param ResponseInterface $response
      * @param $args
      * @return ResponseInterface
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function deleteAll(ServerRequestInterface $request, ResponseInterface $response, $args)
     {

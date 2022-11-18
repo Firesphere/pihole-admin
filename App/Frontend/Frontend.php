@@ -2,8 +2,8 @@
 
 namespace App\Frontend;
 
-use App\Helper\Config;
-use App\Helper\Helper;
+use App\PiHole;
+use SlimSession\Helper as SessionHelper;
 
 class Frontend
 {
@@ -35,15 +35,15 @@ class Frontend
     protected $menuItems = [];
     protected $config;
     /**
-     * @var \SlimSession\Helper
+     * @var SessionHelper
      */
     protected $session;
 
 
     public function __construct()
     {
-        $this->setupVars = Config::get('pihole');
-        $this->session = new \SlimSession\Helper();
+        $this->setupVars = PiHole::getConfig();
+        $this->session = new SessionHelper();
     }
 
     /**

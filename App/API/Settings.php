@@ -2,7 +2,6 @@
 
 namespace App\API;
 
-use App\PiHole;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 

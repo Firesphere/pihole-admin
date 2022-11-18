@@ -5,6 +5,7 @@ namespace App\API;
 use App\DB\SQLiteDB;
 use App\Frontend\Frontend;
 use App\PiHole as GlobalPiHole;
+use InvalidArgumentException;
 use JsonException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -75,12 +76,12 @@ class PiholeDB extends APIBase
         $params = $request->getParsedBody();
         $ids = json_decode($params['id'], true, 512, JSON_THROW_ON_ERROR);
         if (!is_array($ids)) {
-            throw new \InvalidArgumentException('Invalid payload: id is not an array');
+            throw new InvalidArgumentException('Invalid payload: id is not an array');
         }
         // Exploit prevention: Ensure all entries in the ID array are integers
         foreach ($ids as $value) {
             if (!is_numeric($value)) {
-                throw new \InvalidArgumentException('Invalid payload: id contains non-numeric entries');
+                throw new InvalidArgumentException('Invalid payload: id contains non-numeric entries');
             }
         }
         $this->db->doQuery('DELETE FROM message WHERE id IN (:ids);', [':ids' => implode(',', $ids)]);

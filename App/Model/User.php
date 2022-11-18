@@ -7,11 +7,6 @@ use App\DB\SQLiteDB;
 class User
 {
     /**
-     * @var SQLiteDB
-     */
-    private $db;
-
-    /**
      * @var int
      */
     protected $id = 0;
@@ -20,6 +15,10 @@ class User
      */
     protected $username;
     /**
+     * @var SQLiteDB
+     */
+    private $db;
+    /**
      * @var string
      */
     private $password;
@@ -27,17 +26,6 @@ class User
     public function __construct()
     {
         $this->db = new SQLiteDB('USER', SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-    }
-
-    public function setPassword($password)
-    {
-        $this->db->doQuery(
-            "UPDATE user SET password = :password WHERE id = :id",
-            [
-                ':password' => $this->hashPassword($password),
-                ':id' => $this->id
-            ]
-        );
     }
 
     /**
@@ -50,15 +38,13 @@ class User
         $params = [':username' => $username];
         $result = $this->db->doQuery($query, $params)->fetchArray();
 
-        $this->id = $result['id'];
-        $this->username = $result['username'];
-        $this->password = $result['password'];
+        if ($result !== false) {
+            $this->id = $result['id'];
+            $this->username = $result['username'];
+            $this->password = $result['password'];
+        }
 
         return $this->validatePassword($password, $username === 'admin');
-    }
-
-    public function createUser()
-    {
     }
 
     /**
@@ -67,11 +53,12 @@ class User
      */
     public function validatePassword($enteredPassword, $isAdmin = false)
     {
-        $valid = password_verify($enteredPassword, $this->password);
+        $valid = password_verify((string)$enteredPassword, (string)$this->password);
         if ($isAdmin && !$valid) {
-            $oldHash =  hash('sha256', hash('sha256', $enteredPassword));
+            $oldHash = hash('sha256', hash('sha256', $enteredPassword));
             if (hash_equals($this->password, $oldHash)) {
                 $this->setPassword($enteredPassword);
+
                 return $this;
             }
         }
@@ -82,6 +69,26 @@ class User
 
 
         return false;
+    }
+
+    public function setPassword($password)
+    {
+        $this->db->doQuery(
+            "UPDATE user SET password = :password WHERE id = :id",
+            [
+                ':password' => $this->hashPassword($password),
+                ':id'       => $this->id
+            ]
+        );
+    }
+
+    private function hashPassword($password)
+    {
+        return password_hash($password, PASSWORD_BCRYPT);
+    }
+
+    public function createUser()
+    {
     }
 
     public function byId($id)
@@ -101,10 +108,5 @@ class User
     public function getId()
     {
         return $this->id;
-    }
-
-    private function hashPassword($password)
-    {
-        return password_hash($password, PASSWORD_BCRYPT);
     }
 }

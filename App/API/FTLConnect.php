@@ -22,6 +22,12 @@ class FTLConnect
      */
     protected $message = '';
 
+    public static function getFTLData($pid, $cmd)
+    {
+        $command = sprintf('ps -p %d -o %s', $pid, $cmd);
+
+        return trim(exec($command));
+    }
 
     public function connectFTL()
     {
@@ -71,12 +77,5 @@ class FTLConnect
     public function getMessage(): string
     {
         return $this->message;
-    }
-
-    public static function getFTLData($pid, $cmd)
-    {
-        $command = sprintf('ps -p %d -o %s', $pid, $cmd);
-
-        return trim(exec($command));
     }
 }
