@@ -3,6 +3,7 @@
 namespace App\Middleware;
 
 use App\Auth\Auth;
+use http\Exception\RuntimeException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -25,8 +26,9 @@ class AuthMiddleware
 
                 return $response->withHeader('Location', '/login')->withStatus(302);
             }
+            return $handler->handle($request, $handler);
         }
 
-        return $handler->handle($request, $handler);
+        throw new RuntimeException('No session available.');
     }
 }
