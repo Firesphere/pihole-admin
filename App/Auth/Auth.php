@@ -21,16 +21,16 @@ class Auth
 
     public function user()
     {
-        if ($id = $this->check()) {
+        if ($id = $this->session->get('user')) {
             return (new User())->byId($id);
         }
 
         return null;
     }
 
-    public function check()
+    public function check($id)
     {
-        return $this->session->get('user') !== null;
+        return $this->session->get('user') === $id;
     }
 
     public function login($username, $password)

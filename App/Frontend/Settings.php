@@ -25,6 +25,8 @@ use Twig\Error\SyntaxError;
 
 class Settings extends Frontend
 {
+    protected $name = 'settings';
+
     public static $themes = [
         'default-light'  => [
             'label' => 'Pi-hole default theme (light, default)',

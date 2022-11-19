@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 class Queries extends Frontend
 {
+    protected $name = 'queries';
+
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $view = Twig::fromRequest($request);

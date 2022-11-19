@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 class Tools extends Frontend
 {
+    protected $name = 'tools';
+
     public function __construct()
     {
         parent::__construct();

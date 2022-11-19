@@ -10,6 +10,8 @@ use Slim\Views\Twig;
 
 class Dashboard extends Frontend
 {
+    protected $name = 'dashboard';
+
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $modules = (new Module())->getModules();

@@ -3,7 +3,11 @@
 namespace App\Model;
 
 use App\DB\SQLiteDB;
+use App\Helper\Config;
 
+/**
+ *
+ */
 class User
 {
     /**
@@ -23,6 +27,9 @@ class User
      */
     private $password;
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->db = new SQLiteDB('USER', SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
@@ -30,6 +37,7 @@ class User
 
     /**
      * @param string $username
+     * @param string $password
      * @return self
      */
     public function login(string $username, string $password)
@@ -49,6 +57,7 @@ class User
 
     /**
      * @param $enteredPassword
+     * @param bool $isAdmin
      * @return bool|self
      */
     public function validatePassword($enteredPassword, $isAdmin = false)
@@ -56,7 +65,8 @@ class User
         $valid = password_verify((string)$enteredPassword, (string)$this->password);
         if ($isAdmin && !$valid) {
             $oldHash = hash('sha256', hash('sha256', $enteredPassword));
-            if (hash_equals($this->password, $oldHash)) {
+            $oldPassword = Config::get('pihole.WEBPASSWORD');
+            if (hash_equals($oldPassword, $oldHash)) {
                 $this->setPassword($enteredPassword);
 
                 return $this;
@@ -67,10 +77,13 @@ class User
             return $this;
         }
 
-
         return false;
     }
 
+    /**
+     * @param $password
+     * @return void
+     */
     public function setPassword($password)
     {
         $this->db->doQuery(
@@ -82,15 +95,26 @@ class User
         );
     }
 
+    /**
+     * @param $password
+     * @return string
+     */
     private function hashPassword($password)
     {
         return password_hash($password, PASSWORD_BCRYPT);
     }
 
+    /**
+     * @return void
+     */
     public function createUser()
     {
     }
 
+    /**
+     * @param $id
+     * @return $this
+     */
     public function byId($id)
     {
         $dbUser = $this->db->doQuery('SELECT id, username FROM user WHERE id = :id', [':id' => $id])->fetchArray();

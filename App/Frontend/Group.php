@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 class Group extends Frontend
 {
+    protected $name = 'group';
+
     public function index(RequestInterface $request, ResponseInterface $response)
     {
         $this->menuItems['Groups'] = 'active';

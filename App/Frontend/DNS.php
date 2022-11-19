@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 class DNS extends Frontend
 {
+    protected $name = 'dns';
+
     public function __construct()
     {
         parent::__construct();

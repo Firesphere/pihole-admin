@@ -2,11 +2,14 @@
 
 namespace App\Frontend;
 
+use App\Auth\Permission;
 use App\PiHole;
+use Slim\Psr7\Factory\ResponseFactory;
 use SlimSession\Helper as SessionHelper;
 
 class Frontend
 {
+    protected $name;
     /**
      * @var string[]
      */

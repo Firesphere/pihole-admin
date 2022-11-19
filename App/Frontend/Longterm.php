@@ -8,6 +8,8 @@ use Slim\Views\Twig;
 
 class Longterm extends Frontend
 {
+    protected $name = 'longterm';
+
     public function __construct()
     {
         parent::__construct();

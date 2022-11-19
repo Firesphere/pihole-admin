@@ -13,7 +13,7 @@ class SQLiteDB
     public const LISTTYPE_REGEX_WHITELIST = 2;
     public const LISTTYPE_REGEX_BLACKLIST = 3;
 
-    private $mode;
+    private $mode = SQLITE3_OPEN_READONLY;
 
     /**
      * @var SQLite3
