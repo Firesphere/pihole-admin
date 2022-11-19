@@ -8,32 +8,19 @@ use App\Helper\Config;
 /**
  *
  */
-class User
+class User extends BaseModel
 {
-    /**
-     * @var int
-     */
-    protected $id = 0;
+    protected $table = 'user';
     /**
      * @var string
      */
     protected $username;
     /**
-     * @var SQLiteDB
-     */
-    private $db;
-    /**
      * @var string
      */
     private $password;
 
-    /**
-     *
-     */
-    public function __construct()
-    {
-        $this->db = new SQLiteDB('USER', SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE);
-    }
+    protected $permissions = [];
 
     /**
      * @param string $username
@@ -44,7 +31,7 @@ class User
     {
         $query = 'SELECT id, username, password FROM user WHERE username=:username';
         $params = [':username' => $username];
-        $result = $this->db->doQuery($query, $params)->fetchArray();
+        $result = self::$db->doQuery($query, $params)->fetchArray();
 
         if ($result !== false) {
             $this->id = $result['id'];
@@ -86,7 +73,7 @@ class User
      */
     public function setPassword($password)
     {
-        $this->db->doQuery(
+        self::$db->doQuery(
             "UPDATE user SET password = :password WHERE id = :id",
             [
                 ':password' => $this->hashPassword($password),
@@ -112,25 +99,26 @@ class User
     }
 
     /**
-     * @param $id
-     * @return $this
-     */
-    public function byId($id)
-    {
-        $dbUser = $this->db->doQuery('SELECT id, username FROM user WHERE id = :id', [':id' => $id])->fetchArray();
-        if (count($dbUser)) {
-            $this->username = $dbUser['username'];
-            $this->id = $dbUser['id'];
-        }
-
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getId()
     {
         return $this->id;
+    }
+
+    public function getPermissions($refresh = false)
+    {
+        if (!$refresh && count($this->permissions)) {
+            return $this->permissions;
+        }
+        $relationQuery = "SELECT permission_id FROM user_permissions
+                WHERE user_permissions.user_id = :id;";
+        $result = self::$db->doQuery($relationQuery, [':id' => $this->id]);
+
+        while ($permissionId = $result->fetchArray()) {
+            $this->permissions[] = $this->byId(Permission::class, $permissionId['id']);
+        }
+
+        return $this->permissions;
     }
 }

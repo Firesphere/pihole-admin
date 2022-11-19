@@ -3,7 +3,7 @@
 namespace App\Middleware;
 
 use App\Auth\Auth;
-use App\Auth\Permission;
+use App\Model\Permission;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -29,12 +29,12 @@ class AuthMiddleware
             if (!$user) {
                 return $response->withHeader('Location', '/login')->withStatus(302);
             }
+            // @todo do something with securing the API more?
             if ($route !== 'api' && Permission::check($route, $user) === false) {
                 return $response->withHeader('Location', '/')->withStatus(302);
             }
             return $handler->handle($request, $handler);
         }
-
 
         throw new HttpUnauthorizedException($request, 'No session available.');
     }
