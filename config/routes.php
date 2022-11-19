@@ -24,7 +24,7 @@ return static function (App $slimApp) {
             $group->get('summary', [FTL::class, 'summary'])->setName('api');
             $group->get('summaryRaw', [FTL::class, 'summary'])->setName('api');
             $group->get('enable', [FTL::class, 'startstop'])->setName('api');
-            $group->get('disable[/{time}]', [FTL::class, 'startstop']);
+            $group->get('disable[/{time}]', [FTL::class, 'startstop'])->setName('api');
             $group->get('maxlogage', [FTL::class, 'getMaxlogage'])->setName('api');
             $group->get('overTimeData', [FTL::class, 'overTimeData'])->setName('api');
             $group->get('getQueryTypes', [FTL::class, 'getQueryTypes'])->setName('api');

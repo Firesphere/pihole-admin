@@ -19,10 +19,14 @@ class BaseModel
         }
     }
 
-    public function byId($class, $id)
+    public function byId($id = 0, $class = null)
     {
-        /** @var User|Permission $class */
-        $class = new $class();
+        /** @var User|Permission|Section $class */
+        if (!$class) {
+            $class = clone $this;
+        } else {
+            $class = new $class();
+        }
         $query = sprintf("SELECT * FROM %s WHERE id = :id", $class->table);
         $result = self::$db->doQuery($query, [':id' => $id])->fetchArray();
         foreach ($result as $key => $value) {
@@ -32,5 +36,12 @@ class BaseModel
         }
 
         return $class;
+    }
+
+    public function set($key, $value)
+    {
+        $this->$key = $value;
+
+        return $this;
     }
 }

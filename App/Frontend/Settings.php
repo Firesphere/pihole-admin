@@ -79,6 +79,10 @@ class Settings extends Frontend
                 'Title' => 'Privacy',
                 'Slug'  => 'privacy',
             ],
+            'Users'      => [
+                'Title' => 'Users &amp; permissions',
+                'Slug'  => 'users-and-permissions'
+            ],
             'Teleporter' => [
                 'Title' => 'Teleporter',
                 'Slug'  => 'teleporter',
@@ -112,6 +116,7 @@ class Settings extends Frontend
             'IPv4'            => $IPv4txt,
             'API'             => $this->getAPISettings(),
             'Privacy'         => $this->getPrivacySettings(),
+            'Users'           => $this->getUserSettings(),
             'Teleporter'      => ['HasPHAR' => extension_loaded('Phar')],
         ];
     }
@@ -429,5 +434,9 @@ class Settings extends Frontend
 
         return $response->withHeader('Location', '/settings')
             ->withStatus(302);
+    }
+
+    public function getUserSettings()
+    {
     }
 }

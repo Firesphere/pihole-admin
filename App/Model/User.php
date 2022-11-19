@@ -2,11 +2,12 @@
 
 namespace App\Model;
 
-use App\DB\SQLiteDB;
 use App\Helper\Config;
 
 /**
- *
+ * A basic user class. A user can have a name, and a password.
+ * Permissions are what a user can access, which is checked in Permission::check()
+ * A user can have a password set
  */
 class User extends BaseModel
 {
@@ -18,29 +19,9 @@ class User extends BaseModel
     /**
      * @var string
      */
-    private $password;
+    protected $password;
 
     protected $permissions = [];
-
-    /**
-     * @param string $username
-     * @param string $password
-     * @return self
-     */
-    public function login(string $username, string $password)
-    {
-        $query = 'SELECT id, username, password FROM user WHERE username=:username';
-        $params = [':username' => $username];
-        $result = self::$db->doQuery($query, $params)->fetchArray();
-
-        if ($result !== false) {
-            $this->id = $result['id'];
-            $this->username = $result['username'];
-            $this->password = $result['password'];
-        }
-
-        return $this->validatePassword($password, $username === 'admin');
-    }
 
     /**
      * @param $enteredPassword
@@ -71,7 +52,7 @@ class User extends BaseModel
      * @param $password
      * @return void
      */
-    public function setPassword($password)
+    private function setPassword($password)
     {
         self::$db->doQuery(
             "UPDATE user SET password = :password WHERE id = :id",
@@ -116,7 +97,7 @@ class User extends BaseModel
         $result = self::$db->doQuery($relationQuery, [':id' => $this->id]);
 
         while ($permissionId = $result->fetchArray()) {
-            $this->permissions[] = $this->byId(Permission::class, $permissionId['id']);
+            $this->permissions[] = $this->byId($permissionId['id'], Permission::class);
         }
 
         return $this->permissions;

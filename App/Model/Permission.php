@@ -22,7 +22,7 @@ class Permission extends BaseModel
         $result = self::$db->doQuery($relationQuery, [':id' => $this->id]);
 
         while ($userId = $result->fetchArray()) {
-            $this->users[] = $this->byId(User::class, $userId['user_id']);
+            $this->users[] = $this->byId($userId['user_id'], User::class);
         }
 
         return $this->users;
@@ -39,7 +39,7 @@ class Permission extends BaseModel
         $result = self::$db->doQuery($relationQuery, [':id' => $this->id]);
 
         while ($sectionId = $result->fetchArray()) {
-            $this->sections[] = $this->byId(Section::class, $sectionId['id']);
+            $this->sections[] = $this->byId($sectionId['id'], Section::class);
         }
 
         return $this->sections;

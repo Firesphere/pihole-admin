@@ -18,7 +18,7 @@ class Login extends Frontend
     {
         $postData = $request->getParsedBody();
         $auth = new Auth();
-        if ($auth->login($postData['username'], $postData['pw'])) {
+        if ($auth->login($postData['username'], $postData['pw']) !== false) {
             return $response->withStatus(302, 'Success')->withHeader('Location', '/');
         }
 

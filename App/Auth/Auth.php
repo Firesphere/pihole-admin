@@ -2,6 +2,7 @@
 
 namespace App\Auth;
 
+use App\DB\SQLiteDB;
 use App\Model\User;
 use Slim\Middleware\Session;
 use SlimSession\Helper;
@@ -35,11 +36,24 @@ class Auth
 
     public function login($username, $password)
     {
-        if ($user = (new User())->login($username, $password)) {
-            $this->session->set('user', $user->getId());
+        $db = new SQLiteDB('USERS', SQLITE3_OPEN_READONLY);
+        $query = 'SELECT id, username, password FROM user WHERE username=:username';
+        $params = [':username' => $username];
+        $result = $db->doQuery($query, $params)->fetchArray();
 
-            return $user;
+        if ($result !== false) {
+            $user = new User();
+            $user->set('id', $result['id']);
+            $user->set('username', $result['username']);
+            $user->set('password', $result['password']);
+            if ($user->validatePassword($password, $username === 'admin')) {
+                $this->session->set('user', $user->getId());
+
+                return $user;
+            }
         }
+
+        $this->logout();
 
         return false;
     }
@@ -48,6 +62,5 @@ class Auth
     {
         $this->session->delete('user');
         $this->session->clear();
-        (new Session());
     }
 }

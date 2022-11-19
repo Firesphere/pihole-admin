@@ -2,9 +2,16 @@
 
 namespace App\Model;
 
+/**
+ * A section is a static part of the Pi-hole admin interface
+ * and can not be created or removed, unless there is an active
+ * change in the sections of the interface.
+ *
+ * Adding or removing, should be done via a migration.
+ */
 class Section extends BaseModel
 {
-    protected $table = 'permission';
+    protected $table = 'section';
 
     protected $title;
 
@@ -20,7 +27,7 @@ class Section extends BaseModel
         $result = self::$db->doQuery($relationQuery, [':id' => $this->id]);
 
         while ($userId = $result->fetchArray()) {
-            $this->permissions[] = $this->byId(Permission::class, $userId['user_id']);
+            $this->permissions[] = $this->byId($userId['user_id'], Permission::class);
         }
 
         return $this->permissions;
